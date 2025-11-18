@@ -318,8 +318,8 @@ function HomeContent() {
                 }}
                 onClick={handleTitleClick}
               >
-                <motion.h1
-                  className={`text-4xl sm:text-5xl font-light text-gray-900 dark:text-gray-100 tracking-tight relative z-10 ${
+                <motion.div
+                  className={`relative z-10 ${
                     isMobile ? 'cursor-pointer' : 'cursor-default'
                   }`}
                   style={{ transformOrigin: '15% 100%' }}
@@ -328,8 +328,15 @@ function HomeContent() {
                   }}
                   transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
                 >
-                  Bio
-                </motion.h1>
+                  <Image
+                    src="/eco/eco-logo-trans.png"
+                    alt="Ecoheart"
+                    width={200}
+                    height={80}
+                    className="h-12 sm:h-16 w-auto"
+                    priority
+                  />
+                </motion.div>
                 
                 {/* "By Valyu" that slides out from under */}
                 <motion.div 
@@ -378,7 +385,7 @@ function HomeContent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
               >
-                Powered by Valyu&apos;s specialized biomedical data infrastructure for comprehensive research
+                AI Research Assistant
               </motion.p>
             </motion.div>
           )}
