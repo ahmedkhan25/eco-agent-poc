@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { EnterpriseInquiryEmail } from '@/lib/email-templates/enterprise-inquiry';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available (lazy initialization)
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+  return new Resend(apiKey);
+}
 
 const ENTERPRISE_RECIPIENTS = [
   'harvey@valyu.ai',
@@ -56,13 +63,19 @@ export async function POST(req: NextRequest) {
     });
 
     // Send email to Valyu team
-    await resend.emails.send({
-      from: 'Bio Enterprise <support@valyu.ai>',
-      to: ENTERPRISE_RECIPIENTS,
-      replyTo: contactEmail,
-      subject: `🏢 Enterprise Inquiry from Bio - ${companyName}`,
-      html: emailHtml
-    });
+    const resend = getResend();
+    if (!resend) {
+      console.warn('[Enterprise Inquiry API] RESEND_API_KEY not configured, skipping email send');
+      // Still return success since the inquiry data could be logged elsewhere
+    } else {
+      await resend.emails.send({
+        from: 'Bio Enterprise <support@valyu.ai>',
+        to: ENTERPRISE_RECIPIENTS,
+        replyTo: contactEmail,
+        subject: `🏢 Enterprise Inquiry from Bio - ${companyName}`,
+        html: emailHtml
+      });
+    }
 
     // Track event in PostHog if available
     if (typeof window !== 'undefined' && (window as any).posthog) {
