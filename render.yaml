@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: eco-agent-poc
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install --legacy-peer-deps && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      # App Configuration
+      - key: NEXT_PUBLIC_APP_MODE
+        value: production
+      - key: NODE_ENV
+        value: production
+      
+      # Supabase Configuration (secrets - will prompt in Render Dashboard)
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      
+      # API Keys (secrets - will prompt in Render Dashboard)
+      - key: VALYU_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      
+      # Daytona Configuration (optional - can add later)
+      - key: DAYTONA_API_KEY
+        sync: false
+      - key: DAYTONA_API_URL
+        value: https://api.daytona.io
+      - key: DAYTONA_TARGET
+        value: latest
+      
+      # App URL (will be set after deployment)
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+
