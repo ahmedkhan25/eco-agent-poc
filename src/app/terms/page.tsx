@@ -23,7 +23,7 @@ export default function TermsOfService() {
             </p>
             <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
               <li>OpenAI GPT-5 for natural language processing</li>
-              <li>Valyu API for data search and retrieval</li>
+              <li>Search API for data search and retrieval</li>
               <li>Daytona for code execution</li>
               <li>Supabase for authentication and data storage</li>
             </ul>
@@ -59,7 +59,7 @@ export default function TermsOfService() {
           <section className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">5. Intellectual Property</h2>
             <p className="text-gray-700 dark:text-gray-300">
-              All content, features, and functionality of our service are owned by Valyu.Network LTD and are protected by international copyright, trademark, and other intellectual property laws.
+              All content, features, and functionality of our service are owned by Ecoheart and are protected by international copyright, trademark, and other intellectual property laws.
             </p>
           </section>
 
@@ -73,7 +73,7 @@ export default function TermsOfService() {
           <section className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">7. Limitation of Liability</h2>
             <p className="text-gray-700 dark:text-gray-300">
-              In no event shall Valyu.Network LTD be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your use of the service.
+              In no event shall Ecoheart be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your use of the service.
             </p>
           </section>
 
@@ -94,10 +94,9 @@ export default function TermsOfService() {
           <section className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">10. Contact Information</h2>
             <p className="text-gray-700 dark:text-gray-300">
-              Valyu.Network LTD<br />
-              17 Hanover Square<br />
-              London W1S 1BN<br />
-              United Kingdom
+              Ecoheart<br />
+              City of Olympia, Washington<br />
+              United States
             </p>
           </section>
 

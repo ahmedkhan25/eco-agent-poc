@@ -338,7 +338,7 @@ function HomeContent() {
                   />
                 </motion.div>
                 
-                {/* "By Valyu" that slides out from under */}
+                {/* "By Ecoheart" */}
                 <motion.div 
                   className="absolute -bottom-6 left-0 right-0 flex items-center justify-center gap-1"
                   initial={{ opacity: 0 }}
@@ -351,13 +351,13 @@ function HomeContent() {
                     y: { delay: isHoveringTitle ? 0.1 : 0, duration: 0.3, ease: [0.23, 1, 0.32, 1] }
                   }}
                 >
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-light">By</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-light">Powered by</span>
                   <Image 
-                    src="/valyu.svg" 
-                    alt="Valyu" 
+                    src="/eco/eco-logo-trans.png" 
+                    alt="Ecoheart" 
                     width={60}
                     height={60}
-                    className="h-5 opacity-80 dark:invert"
+                    className="h-5 opacity-80"
                   />
                 </motion.div>
                 
@@ -385,7 +385,7 @@ function HomeContent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
               >
-                AI Research Assistant
+                City of Olympia Climate AI
               </motion.p>
             </motion.div>
           )}

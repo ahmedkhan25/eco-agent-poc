@@ -25,24 +25,24 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   ),
   title: {
-    default: "Bio | By Valyu",
-    template: "%s | Bio | By Valyu",
+    default: "Ecoheart | City of Olympia Climate AI",
+    template: "%s | Ecoheart",
   },
   description:
-    "Enterprise-grade biomedical research AI with access to PubMed, clinical trials, FDA drug labels, secure Python execution, and interactive visualizations for comprehensive research.",
-  applicationName: "Bio | By Valyu",
+    "AI-powered research assistant for City of Olympia climate action, environmental planning, and municipal operations. Access official city documents, climate data, and smart city analytics.",
+  applicationName: "Ecoheart",
   openGraph: {
-    title: "Bio | By Valyu",
+    title: "Ecoheart | City of Olympia Climate AI",
     description:
-      "Access PubMed articles, clinical trials, FDA drug labels, and more. AI-powered biomedical research with secure Python execution and interactive visualizations.",
+      "Smart data for sustainable cities. AI-powered assistant for Olympia city planning, climate action, and environmental initiatives.",
     url: "/",
-    siteName: "Bio | By Valyu",
+    siteName: "Ecoheart",
     images: [
       {
-        url: "/valyu.png",
+        url: "/eco/eco-logo-trans.png",
         width: 1200,
         height: 630,
-        alt: "Bio | By Valyu",
+        alt: "Ecoheart - Smart data for cities",
       },
     ],
     locale: "en_US",
@@ -50,10 +50,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bio | By Valyu",
+    title: "Ecoheart | City of Olympia Climate AI",
     description:
-      "AI-powered biomedical research. Access PubMed, clinical trials, FDA drug labels. Secure Python execution in Daytona sandboxes for statistical analysis and visualizations.",
-    images: ["/valyu.png"],
+      "Smart data for sustainable cities. AI-powered city planning, climate action, and environmental research for the City of Olympia.",
+    images: ["/eco/eco-logo-trans.png"],
   },
   icons: {
     icon: "/favicon.ico",

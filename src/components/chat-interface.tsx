@@ -2743,7 +2743,7 @@ export function ChatInterface({
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Calculate the half-life of warfarin based on plasma concentrations: 8mg/L at 0 hours, 4mg/L at 36 hours. Use Python to determine the elimination rate constant, volume of distribution, and clearance. Visualize the concentration-time curve with confidence intervals."
+                        "Analyze Olympia's greenhouse gas emissions trends from the GHG Inventory. Calculate the reduction rate needed to meet the 2030 target of 50% reduction. Use Python to model emission scenarios and visualize the trajectory with confidence intervals."
                       )
                     }
                     className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
@@ -2753,17 +2753,17 @@ export function ChatInterface({
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      🐍 Pharmacokinetics
+                      📊 Climate Modeling
                     </div>
                     <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      Advanced Python modeling & calculations
+                      Advanced Python analysis & projections
                     </div>
                   </motion.button>
 
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Search for recent Phase 3 clinical trials investigating CAR-T therapy for melanoma. Extract key endpoints, patient populations, and efficacy results. Compare different CAR-T constructs and their response rates."
+                        "What are Olympia's climate action goals? Search the Climate Risk and Vulnerability Assessment and Sea Level Rise Response Plan. Extract key milestones, adaptation strategies, and implementation timelines."
                       )
                     }
                     className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
@@ -2773,17 +2773,17 @@ export function ChatInterface({
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      🧬 Clinical Trials
+                      🌍 Climate Goals
                     </div>
                     <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      Phase data & efficacy analysis
+                      Adaptation plans & resilience strategies
                     </div>
                   </motion.button>
 
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Find recent PubMed papers on CRISPR gene editing safety in human trials. Create a CSV with study details, adverse events, off-target effects, and success rates. Generate charts showing safety trends over time and correlation with delivery methods."
+                        "Search Olympia's Transportation Master Plan and Street Safety Plan. Create a CSV with project details, implementation phases, budget allocations, and safety metrics. Generate charts showing infrastructure investment trends over time."
                       )
                     }
                     className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
@@ -2793,17 +2793,17 @@ export function ChatInterface({
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      📚 Literature Analysis
+                      🚌 Transportation Plans
                     </div>
                     <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      PubMed research & meta-analysis
+                      Infrastructure & safety planning
                     </div>
                   </motion.button>
 
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Search FDA drug labels for interactions between metformin, lisinopril, and atorvastatin. Identify contraindications, dosing adjustments, and mechanism of interactions. Create a comprehensive CSV with interaction severity, clinical significance, and monitoring recommendations."
+                        "Analyze Olympia's 2025 Operating Budget. Compare budget allocations across climate action, transportation, and environmental departments. Create a comprehensive CSV with spending categories, year-over-year changes, and per capita costs."
                       )
                     }
                     className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
@@ -2813,17 +2813,17 @@ export function ChatInterface({
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      💊 Drug Interactions
+                      💰 Budget Analysis
                     </div>
                     <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      FDA labels & safety data
+                      Municipal spending & allocations
                     </div>
                   </motion.button>
 
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Compare efficacy rates of the 5 major COVID-19 vaccines (Pfizer, Moderna, AstraZeneca, J&J, Novavax). Create a CSV with trial data: efficacy percentages, sample sizes, variant coverage, and adverse event rates. Generate visualizations showing: 1) Efficacy comparison by variant, 2) Safety profiles, 3) Durability of protection over time."
+                        "Compare Olympia's Capital Facilities Plans for 2025-2030 and 2026-2031. Create a CSV with project priorities, infrastructure investments, and funding sources. Generate visualizations showing: 1) Spending by department, 2) Project timelines, 3) Climate impact investments over time."
                       )
                     }
                     className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
@@ -2833,30 +2833,30 @@ export function ChatInterface({
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      📊 Comparative Study
+                      🏗️ Infrastructure Plans
                     </div>
                     <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      Multi-drug comparison with charts
+                      Multi-year capital investment comparison
                     </div>
                   </motion.button>
 
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Do an in-depth analysis of pembrolizumab (Keytruda) for non-small cell lung cancer. Search clinical trials for efficacy data, find PubMed papers on mechanism of action and biomarkers, review FDA drug label for dosing and contraindications. Use Python to analyze trial data and create comprehensive CSV with: Trial phase, patient population, PD-L1 expression levels, response rates, progression-free survival, overall survival, and adverse events. Generate charts comparing outcomes across different patient subgroups."
+                        "Do a comprehensive analysis of Olympia's climate resilience strategy. Search the Comprehensive Plan 2045 EIS, Climate Risk Assessment, and Neighborhood Centers Strategy. Analyze urban planning priorities, environmental impact mitigation, and community development goals. Use Python to create a comprehensive CSV with: Planning areas, climate adaptation measures, timeline projections, and implementation budgets. Generate charts comparing sustainability metrics across different neighborhoods and policy areas."
                       )
                     }
-                    className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-2.5 sm:p-4 rounded-xl border border-blue-200 dark:border-blue-700 hover:border-blue-300 dark:hover:border-blue-600 transition-colors hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 text-left group col-span-1 sm:col-span-2 lg:col-span-1"
+                    className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-2.5 sm:p-4 rounded-xl border border-green-200 dark:border-green-700 hover:border-green-300 dark:hover:border-green-600 transition-colors hover:from-green-100 hover:to-blue-100 dark:hover:from-green-900/30 dark:hover:to-blue-900/30 text-left group col-span-1 sm:col-span-2 lg:col-span-1"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.5 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="text-blue-700 dark:text-blue-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-blue-900 dark:group-hover:text-blue-100">
+                    <div className="text-green-700 dark:text-green-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-green-900 dark:group-hover:text-green-100">
                       🚀 Deep Investigation
                     </div>
-                    <div className="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400">
-                      Multi-source research + Trial data + Efficacy analysis
+                    <div className="text-[10px] sm:text-xs text-green-600 dark:text-green-400">
+                      Multi-source planning analysis + Climate data + Policy review
                     </div>
                   </motion.button>
                 </div>
@@ -2934,7 +2934,7 @@ export function ChatInterface({
                 </div>
               </form>
 
-              {/* Powered by Valyu */}
+              {/* Powered by Ecoheart */}
               <motion.div
                 className="flex items-center justify-center mt-4"
                 initial={{ opacity: 0 }}
@@ -2945,17 +2945,17 @@ export function ChatInterface({
                   Powered by
                 </span>
                 <a
-                  href="https://platform.valyu.ai"
+                  href="https://eco-arch.vercel.app/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center hover:scale-105 transition-transform"
                 >
                   <Image
-                    src="/valyu.svg"
-                    alt="Valyu"
+                    src="/eco/eco-logo-trans.png"
+                    alt="Ecoheart"
                     width={60}
                     height={60}
-                    className="h-4 opacity-60 hover:opacity-100 transition-opacity cursor-pointer dark:invert"
+                    className="h-4 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
                   />
                 </a>
               </motion.div>

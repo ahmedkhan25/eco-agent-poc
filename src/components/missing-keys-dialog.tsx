@@ -71,8 +71,7 @@ export function MissingKeysDialog() {
             <div className="rounded-md border p-3">
               <div className="font-medium">Missing VALYU_API_KEY</div>
               <div className="text-muted-foreground">
-                Add VALYU_API_KEY to your environment to enable biomedical data and
-                web search.
+                Add VALYU_API_KEY to your environment to enable web search functionality.
               </div>
             </div>
           )}
@@ -101,11 +100,11 @@ export function MissingKeysDialog() {
             Dismiss
           </Button>
           <a
-            href="https://platform.valyu.ai"
+            href="https://eco-arch.vercel.app/"
             target="_blank"
             rel="noreferrer"
           >
-            <Button>Get Valyu Key</Button>
+            <Button>Get API Key</Button>
           </a>
         </div>
       </DialogContent>

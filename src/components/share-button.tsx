@@ -24,7 +24,7 @@ export function ShareButton({ query, className }: ShareButtonProps) {
   const shareOnX = (e: React.MouseEvent) => {
     e.preventDefault();
     const url = getCurrentUrl();
-    const text = 'Yo @ValyuNetwork just put bloomberg-grade data behind a chatbot and open sourced it 👉';
+    const text = 'Check out Ecoheart - AI-powered climate and planning assistant for the City of Olympia 👉';
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(twitterUrl, '_blank', 'width=550,height=420');
   };

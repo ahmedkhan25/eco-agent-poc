@@ -172,10 +172,10 @@ export function RateLimitDialog({ open, onOpenChange, resetTime, onShowAuth }: R
     track('Platform Clickthrough', {
       source: 'rate_limit_dialog',
       action: 'build_your_own',
-      url: 'https://platform.valyu.ai/?utm_source=biomed.valyu.ai&utm_medium=rate_limit_dialog'
+      url: 'https://eco-arch.vercel.app/'
     });
     
-    window.open('https://platform.valyu.ai/?utm_source=biomed.valyu.ai&utm_medium=rate_limit_dialog', '_blank');
+    window.open('https://eco-arch.vercel.app/', '_blank');
   };
 
   const handleCreateAccount = () => {
@@ -253,7 +253,7 @@ export function RateLimitDialog({ open, onOpenChange, resetTime, onShowAuth }: R
                           Need enterprise deployment?
                         </h4>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
-                          Deploy Valyu&apos;s infrastructure in your organization with custom data integrations and AI agents
+                          Deploy Ecoheart for your organization with custom data integrations and climate AI
                         </p>
                       </div>
                     </div>
@@ -292,7 +292,7 @@ export function RateLimitDialog({ open, onOpenChange, resetTime, onShowAuth }: R
                     className="flex-1 text-sm"
                   >
                     <Code className="mr-2 h-4 w-4" />
-                    Build with Valyu
+                    Build with Ecoheart
                   </Button>
                 </div>
               </div>

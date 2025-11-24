@@ -398,6 +398,83 @@ export const healthcareTools = {
     },
   }),
 
+  olympiaRAGSearch: tool({
+    description: `Search City of Olympia official planning documents. This tool provides semantic search 
+  across 26 indexed city documents covering climate action, comprehensive planning, budgets, 
+  transportation, infrastructure, public safety, and municipal operations.
+  
+  Available Documents (26 total):
+  - Climate & Environment: Climate Risk Assessment, Sea Level Rise Plan, GHG Inventory, Water Quality/System Plans, Stormwater, Urban Forestry
+  - Planning: Neighborhood Centers, Comprehensive Plan 2045 EIS, Housing Action Plan
+  - Budget: 2025 Operating Budget, Long-Range Projections, Capital Facilities Plans
+  - Transportation: Master Plan, Street Safety Plan
+  - Public Safety: Hazard Mitigation, Emergency Management, Police Strategic Plan
+  - Other: Parks Plan, Waste Management, Annual Work Plan
+  
+  CRITICAL: Use this tool FIRST before webSearch when answering Olympia-related questions.
+  Only use webSearch if this tool returns insufficient information.
+  
+  Use this tool when users ask about:
+  - Olympia city planning, zoning, and land use
+  - Climate action and environmental policies
+  - Municipal budgets and financial planning
+  - Transportation and infrastructure projects
+  - Sustainability and green initiatives
+  - Urban development and neighborhood planning
+  - Environmental impact and regulations
+  - Public safety and emergency planning
+  - Parks, recreation, and urban forestry
+  - Water quality, stormwater, and sea level rise`,
+    
+    inputSchema: z.object({
+      query: z.string().describe('Natural language question about Olympia city planning, climate, or municipal operations'),
+      topK: z.number().min(1).max(10).optional().default(5).describe('Number of relevant document chunks to retrieve (default: 5)'),
+    }),
+    
+    execute: async ({ query, topK }, options) => {
+      const userId = (options as any)?.experimental_context?.userId;
+      const sessionId = (options as any)?.experimental_context?.sessionId;
+      
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+        const response = await fetch(`${baseUrl}/api/eco-rag`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, topK }),
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          return `❌ Error searching Olympia documents: ${error.details || error.error}`;
+        }
+        
+        const data = await response.json();
+        
+        await track('Olympia RAG Search', {
+          query,
+          resultCount: data.sources?.length || 0,
+          processingTime: data.processingTimeMs,
+        });
+        
+        // Format response to emphasize document sources
+        const sourceList = data.sources?.map((s: any) => `${s.title} (page ${s.page})`).join(', ') || 'None';
+        
+        return JSON.stringify({
+          type: "olympia_planning",
+          query: query,
+          answer: data.answer,
+          sources: data.sources,
+          sourceDocuments: sourceList,
+          documentCount: data.sources?.length || 0,
+          processingTimeMs: data.processingTimeMs,
+          displaySource: 'City of Olympia Official Documents'
+        }, null, 2);
+      } catch (error) {
+        return `❌ Error searching Olympia documents: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+    },
+  }),
+
   codeExecution: tool({
     description: `Execute Python code securely in a Daytona Sandbox for biomedical data analysis, statistical calculations, and pharmacokinetic modeling.
 
@@ -498,6 +575,12 @@ ${execution.result || '(No output produced)'}
     },
   }),
 
+  // ===================================================================================
+  // BIOMEDICAL TOOLS (COMMENTED OUT - Preserved for potential future use)
+  // Uncomment if biomedical research features are needed
+  // ===================================================================================
+
+  /*
   clinicalTrialsSearch: tool({
     description: "Search for clinical trials based on conditions, drugs, or research criteria using ClinicalTrials.gov data",
     inputSchema: z.object({
@@ -676,6 +759,7 @@ ${execution.result || '(No output produced)'}
       }
     },
   }),
+  */
 
   webSearch: tool({
     description: "Search the web for general information on any topic",

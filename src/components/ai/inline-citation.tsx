@@ -67,8 +67,8 @@ export const InlineCitationCardTrigger = React.forwardRef<
   const count = sources.length > 1 ? ` +${sources.length - 1}` : "";
   
   // Check if it's a special source that needs a logo
-  const isValyu = React.useMemo(() =>
-    hostname.includes('valyu') || hostname.includes('biomed'),
+  const isEcoheart = React.useMemo(() =>
+    hostname.includes('ecoheart') || hostname.includes('olympia'),
     [hostname]
   );
   const isWiley = React.useMemo(() => 
@@ -79,12 +79,12 @@ export const InlineCitationCardTrigger = React.forwardRef<
   );
 
   const badgeContent = React.useMemo(() => {
-    if (isValyu) {
+    if (isEcoheart) {
       return (
         <>
           <img
-            src="/valyu.svg"
-            alt="Valyu"
+            src="/eco/eco-logo-trans.png"
+            alt="Ecoheart"
             className="h-6 w-6 inline-block"
             loading="eager"
             decoding="async"
@@ -119,7 +119,7 @@ export const InlineCitationCardTrigger = React.forwardRef<
         <span className="ml-0.5">{hostname}{count}</span>
       </>
     );
-  }, [isValyu, isWiley, hostname, count, firstSource]);
+  }, [isEcoheart, isWiley, hostname, count, firstSource]);
 
   return (
     <HoverCardPrimitive.Trigger asChild>

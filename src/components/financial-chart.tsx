@@ -471,8 +471,8 @@ function BiomedicalChartComponent({
             {/* Right: Logo */}
             <div className="flex items-center justify-center flex-shrink-0">
               <Image
-                src="/valyu.svg"
-                alt="Valyu"
+                src="/eco/eco-logo-trans.png"
+                alt="Ecoheart"
                 width={70}
                 height={70}
                 className="opacity-80"

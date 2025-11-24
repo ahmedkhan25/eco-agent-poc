@@ -347,12 +347,10 @@ const DataSourceLogos = () => {
 
   // All logos from assets/banner
   const allLogos = [
-    { name: "PubMed", src: "/assets/banner/pubmed.png" },
+    { name: "Ecoheart", src: "/eco/eco-logo-trans.png" },
+    { name: "City of Olympia", src: "/city_of_olympia_logo.jpeg" },
     { name: "ClinicalTrials", src: "/assets/banner/clinicaltrials.png" },
-    { name: "bioRxiv", src: "/assets/banner/biorxiv.png" },
-    { name: "medRxiv", src: "/assets/banner/medrxiv.png" },
     { name: "arXiv", src: "/assets/banner/arxiv.png" },
-    { name: "DailyMed", src: "/assets/banner/dailymed.png" },
     { name: "WHO", src: "/assets/banner/who.png" },
     { name: "Wikipedia", src: "/assets/banner/wikipedia.png" },
     { name: "USPTO", src: "/assets/banner/uspto.png" },

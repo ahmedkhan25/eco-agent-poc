@@ -90,7 +90,7 @@ export default function CodeSnippetDialog({
       'FDA Drug Labels': '/fda.svg',
       'Wiley': '/wy.svg'
     };
-    return logoMap[title] || '/valyu.svg';
+    return logoMap[title] || '/eco/eco-logo-trans.png';
   };
 
   return (
@@ -123,7 +123,7 @@ export default function CodeSnippetDialog({
                       {title}
                     </h2>
                     <p className='text-xs text-gray-500 dark:text-gray-400 mt-0.5'>
-                      Integration snippet for Valyu API
+                      Integration snippet for Olympia RAG API
                     </p>
                   </div>
                 </div>

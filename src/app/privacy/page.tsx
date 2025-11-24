@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">2. How We Use Your Information</h2>
             <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
               <li>To provide and improve our services</li>
-              <li>To process queries through OpenAI GPT-5 and Valyu API</li>
+              <li>To process queries through OpenAI GPT-5 and search APIs</li>
               <li>To execute code through Daytona services</li>
               <li>To authenticate users via Supabase Auth</li>
               <li>To process payments and billing</li>
@@ -40,7 +40,7 @@ export default function PrivacyPolicy() {
             </p>
             <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
               <li>OpenAI (for AI processing)</li>
-              <li>Valyu API (for search functionality)</li>
+              <li>Search API (for search functionality)</li>
               <li>Daytona (for code execution)</li>
               <li>Supabase (for authentication and database)</li>
               <li>Payment processors (for billing)</li>
@@ -70,10 +70,9 @@ export default function PrivacyPolicy() {
           <section className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">6. Contact Information</h2>
             <p className="text-gray-700 dark:text-gray-300">
-              Valyu.Network LTD<br />
-              17 Hanover Square<br />
-              London W1S 1BN<br />
-              United Kingdom
+              Ecoheart<br />
+              City of Olympia, Washington<br />
+              United States
             </p>
           </section>
 
