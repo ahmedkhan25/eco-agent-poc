@@ -55,3 +55,4 @@ __pycache__/
 .DS_Store
 *.log
 ingestion_progress.json
+.local-data/dev.db
