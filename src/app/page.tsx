@@ -12,7 +12,9 @@ import { Button } from '@/components/ui/button';
 import {
   CheckCircle,
   AlertCircle,
+  Info,
 } from 'lucide-react';
+import { OlympiaInfoModal } from '@/components/olympia-info-modal';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRateLimit } from '@/lib/hooks/use-rate-limit';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -44,6 +46,7 @@ function HomeContent() {
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [messageCount, setMessageCount] = useState(0);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
   // Handle rate limit errors from chat interface
   const handleRateLimitError = useCallback((resetTime: string) => {
@@ -249,7 +252,7 @@ function HomeContent() {
   }
 
   return (
-    <div className='min-h-screen bg-[#F5F5F5] dark:bg-gray-950 flex'>
+    <div className='min-h-screen bg-gradient-to-br from-slate-100 via-gray-200 to-slate-300 dark:from-slate-900 dark:via-gray-900 dark:to-slate-800 flex animate-gradient-shift'>
       {/* Enterprise Banner */}
       <EnterpriseBanner />
 
@@ -292,101 +295,84 @@ function HomeContent() {
         <AnimatePresence mode="wait">
             {!hasMessages && (
               <motion.div 
-                className="text-center pt-12 sm:pt-16 pb-6 sm:pb-4 px-4 sm:px-0"
+                className="pt-6 sm:pt-8 pb-4 px-4 sm:px-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
               >
-              <motion.div 
-                className="relative mb-10 inline-block"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.6, ease: "easeOut" }}
-                onHoverStart={() => {
-                  if (!isMobile) {
-                    track('Title Hover', {
-                      trigger: 'user_hover'
-                    });
-                    setIsHoveringTitle(true);
-                  }
-                }}
-                onHoverEnd={() => {
-                  if (!isMobile) {
-                    setIsHoveringTitle(false);
-                  }
-                }}
-                onClick={handleTitleClick}
-              >
-                <motion.div
-                  className={`relative z-10 ${
-                    isMobile ? 'cursor-pointer' : 'cursor-default'
-                  }`}
-                  style={{ transformOrigin: '15% 100%' }}
-                  animate={{
-                    rotateZ: isHoveringTitle ? -8 : 0,
-                  }}
-                  transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                >
-                  <Image
-                    src="/eco/eco-logo-trans.png"
-                    alt="Ecoheart"
-                    width={200}
-                    height={80}
-                    className="h-12 sm:h-16 w-auto"
-                    priority
-                  />
-                </motion.div>
-                
-                {/* "By Ecoheart" */}
+              {/* 2-Column Hero Layout */}
+              <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                {/* Left Column - Logo */}
                 <motion.div 
-                  className="absolute -bottom-6 left-0 right-0 flex items-center justify-center gap-1"
-                  initial={{ opacity: 0 }}
-                  animate={{ 
-                    opacity: isHoveringTitle ? 1 : 0,
-                    y: isHoveringTitle ? 0 : -10,
+                  className="relative flex justify-center md:justify-end"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1, duration: 0.6, ease: "easeOut" }}
+                  onHoverStart={() => {
+                    if (!isMobile) {
+                      track('Title Hover', {
+                        trigger: 'user_hover'
+                      });
+                      setIsHoveringTitle(true);
+                    }
                   }}
-                  transition={{ 
-                    opacity: { delay: isHoveringTitle ? 0.15 : 0, duration: 0.2 },
-                    y: { delay: isHoveringTitle ? 0.1 : 0, duration: 0.3, ease: [0.23, 1, 0.32, 1] }
+                  onHoverEnd={() => {
+                    if (!isMobile) {
+                      setIsHoveringTitle(false);
+                    }
                   }}
+                  onClick={handleTitleClick}
                 >
-                  <span className="text-sm text-gray-500 dark:text-gray-400 font-light">Powered by</span>
-                  <Image 
-                    src="/eco/eco-logo-trans.png" 
-                    alt="Ecoheart" 
-                    width={60}
-                    height={60}
-                    className="h-5 opacity-80"
-                  />
-                </motion.div>
-                
-                {/* Mobile tap hint */}
-                {isMobile && !isHoveringTitle && !hasMessages && (
                   <motion.div
-                    className="absolute -bottom-8 left-0 right-0 flex items-center justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ delay: 3, duration: 0.5 }}
+                    className={`relative z-10 ${
+                      isMobile ? 'cursor-pointer' : 'cursor-default'
+                    }`}
+                    style={{ transformOrigin: '15% 100%' }}
+                    animate={{
+                      rotateZ: isHoveringTitle ? -8 : 0,
+                    }}
+                    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
                   >
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                      Tap to reveal
-                    </span>
+                    <Image
+                      src="/eco/eco-logo-trans.png"
+                      alt="Ecoheart"
+                      width={300}
+                      height={120}
+                      className="h-16 sm:h-20 w-auto"
+                      priority
+                    />
                   </motion.div>
-                )}
+                </motion.div>
 
-                {/* Hover area extender */}
-                <div className="absolute inset-0 -bottom-10" />
-              </motion.div>
-              <motion.p
-                className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm max-w-md mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
-              >
-                City of Olympia Climate AI
-              </motion.p>
+                {/* Right Column - Text & Button */}
+                <motion.div
+                  className="flex flex-col items-center md:items-start text-center md:text-left gap-3"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+                >
+                  <h1 className="text-gray-800 dark:text-gray-200 text-lg sm:text-xl font-semibold">
+                    City of Olympia AI Researcher
+                  </h1>
+                  
+                  <motion.button
+                    onClick={() => setIsInfoModalOpen(true)}
+                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white transition-colors flex items-center gap-2 text-sm font-medium shadow-md"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    aria-label="Learn more about this AI"
+                  >
+                    <Info className="w-4 h-4" />
+                    About & Indexed Documents
+                  </motion.button>
+
+                  <p className="text-amber-600 dark:text-amber-500 text-[10px] sm:text-xs font-medium flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+                    Proof of Concept - Not for Production Use
+                  </p>
+                </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -446,6 +432,12 @@ function HomeContent() {
           messageCount={messageCount}
         />
       )}
+
+      {/* Info Modal */}
+      <OlympiaInfoModal 
+        isOpen={isInfoModalOpen} 
+        onClose={() => setIsInfoModalOpen(false)} 
+      />
     </div>
   );
 }

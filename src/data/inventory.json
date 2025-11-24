@@ -1,0 +1,270 @@
+{
+  "metadata": {
+    "created_at": "2025-11-23T22:16:25.692782Z",
+    "updated_at": "2025-11-23T22:17:18.414147Z",
+    "source_file": "olympia-weblinks.xlsx",
+    "bucket": "olympia-plans-raw"
+  },
+  "files": [
+    {
+      "excel_title": "Olympia Neighborhood Centers Strategy",
+      "source_url": "https://www.olympiawa.gov/Document_center/Government/Codes,%20Plans%20&%20Standards/Neighborhood-Centers-Report.pdf",
+      "local_filename": "Neighborhood-Centers-Report.pdf",
+      "s3_key": "pdfs/Neighborhood-Centers-Report.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 23676198,
+      "downloaded_at": "2025-11-23T22:16:27.282304Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Olympia 2045: Comprehensive Plan Periodic Update  Final Environmental Impact Statement",
+      "source_url": "https://www.olympiawa.gov/Document_center/Government/Codes,%20Plans%20&%20Standards/Comprehensive_Plan/Olympia_CompPlan_FEIS_06302025.pdf",
+      "local_filename": "Olympia_CompPlan_FEIS_06302025.pdf",
+      "s3_key": "pdfs/Olympia_CompPlan_FEIS_06302025.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 8225214,
+      "downloaded_at": "2025-11-23T22:16:28.306241Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "2025 Adopted Operating Budget",
+      "source_url": "https://www.olympiawa.gov/Document_center/Government/Budget%20Financial%20Reports/Financial%20reports/2024%20Annual%20Report.pdf",
+      "local_filename": "2024 Annual Report.pdf",
+      "s3_key": "pdfs/2024 Annual Report.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 14173129,
+      "downloaded_at": "2025-11-23T22:16:28.306824Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "2025 Long-Range Financial Projections",
+      "source_url": "https://www.olympiawa.gov/Document_center/Government/Budget%20Financial%20Reports/Financial%20reports/2025%20Long%20Range%20Financial%20Projection.pdf",
+      "local_filename": "2025 Long Range Financial Projection.pdf",
+      "s3_key": "pdfs/2025 Long Range Financial Projection.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 295533,
+      "downloaded_at": "2025-11-23T22:16:28.306879Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Capital Facilities Plan: 2025-2030 Financial Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Government/Budget%20Financial%20Reports/Budget%20documents/Capital%20Facilities%20Plan%202025-2030.pdf",
+      "local_filename": "Capital Facilities Plan 2025-2030.pdf",
+      "s3_key": "pdfs/Capital Facilities Plan 2025-2030.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 20487187,
+      "downloaded_at": "2025-11-23T22:16:28.306906Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Capital Facilities Plan: 2026-2031 Financial Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Government/Budget%20Financial%20Reports/Budget%20documents/2026-2031%20Prelim%20CFP%20Budget.pdf",
+      "local_filename": "2026-2031 Prelim CFP Budget.pdf",
+      "s3_key": "pdfs/2026-2031 Prelim CFP Budget.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 26721405,
+      "downloaded_at": "2025-11-23T22:16:28.306922Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Water Quality Report",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Water%20Resources/Drinking%20Water/Water%20Quality/WQR-030625.pdf",
+      "local_filename": "WQR-030625.pdf",
+      "s3_key": "pdfs/WQR-030625.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 1328503,
+      "downloaded_at": "2025-11-23T22:16:29.058191Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Climate Risk and Vulnerability Assessment",
+      "source_url": "https://www.olympiawa.gov/Document_center/Community/Climate%20Change%20Response/CRVA-Report-050125.pdf",
+      "local_filename": "CRVA-Report-050125.pdf",
+      "s3_key": "pdfs/CRVA-Report-050125.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 14568233,
+      "downloaded_at": "2025-11-23T22:16:30.295409Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Olympia Sea Level Rise Response Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Water%20Resources/Storm%20&%20Surface%20Water/Sea%20Level%20Rise/View%20the%20Sea%20Level%20Rise%20Plan/SLR-Plan-Final.pdf",
+      "local_filename": "SLR-Plan-Final.pdf",
+      "s3_key": "pdfs/SLR-Plan-Final.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 124055397,
+      "downloaded_at": "2025-11-23T22:16:36.332394Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Olympia Greenhouse Gas Inventory",
+      "source_url": "https://www.olympiawa.gov/Document_center/Community/Climate%20Change%20Response/2021-greenhouse-gas-inventory.pdf",
+      "local_filename": "2021-greenhouse-gas-inventory.pdf",
+      "s3_key": "pdfs/2021-greenhouse-gas-inventory.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 40394394,
+      "downloaded_at": "2025-11-23T22:16:38.182174Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Olympia Urban Forestry Manual",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Urban%20Forestry/Urban-Forestry-Manual.pdf",
+      "local_filename": "Urban-Forestry-Manual.pdf",
+      "s3_key": "pdfs/Urban-Forestry-Manual.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 2662435,
+      "downloaded_at": "2025-11-23T22:16:38.878603Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "How to Calculate Tree Density",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Urban%20Forestry/HowtoCalculateTreeDensity03242017.pdf",
+      "local_filename": "HowtoCalculateTreeDensity03242017.pdf",
+      "s3_key": "pdfs/HowtoCalculateTreeDensity03242017.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 116383,
+      "downloaded_at": "2025-11-23T22:16:39.183496Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Green Belt Stewardship for HOAs",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Urban%20Forestry/greenbelt-stewardship-booklet.pdf",
+      "local_filename": "greenbelt-stewardship-booklet.pdf",
+      "s3_key": "pdfs/greenbelt-stewardship-booklet.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 22992826,
+      "downloaded_at": "2025-11-23T22:16:40.687680Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Street Safety Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Transportation/Plans,%20Studies%20and%20Data/Street-Safety-Plan-020524.pdf",
+      "local_filename": "Street-Safety-Plan-020524.pdf",
+      "s3_key": "pdfs/Street-Safety-Plan-020524.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 10871933,
+      "downloaded_at": "2025-11-23T22:16:41.957765Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Parks Arts and Recreation Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Parks%20&%20Recreation/Parks-Plan/2022-2028-OPARD-Plan.pdf",
+      "local_filename": "2022-2028-OPARD-Plan.pdf",
+      "s3_key": "pdfs/2022-2028-OPARD-Plan.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 32775567,
+      "downloaded_at": "2025-11-23T22:16:44.422897Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Stormwater Management Action Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Water%20Resources/Storm%20&%20Surface%20Water/Stormwater-Management-Action-Plan-112624.pdf",
+      "local_filename": "Stormwater-Management-Action-Plan-112624.pdf",
+      "s3_key": "pdfs/Stormwater-Management-Action-Plan-112624.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 7841373,
+      "downloaded_at": "2025-11-23T22:16:45.337679Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Transportation Master Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Transportation/Plans,%20Studies%20and%20Data/Transportation%20Master%20Plan/TMP_Book_FINAL.pdf",
+      "local_filename": "TMP_Book_FINAL.pdf",
+      "s3_key": "pdfs/TMP_Book_FINAL.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 22752439,
+      "downloaded_at": "2025-11-23T22:16:46.819389Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Stormwater Site Plans",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Water%20Resources/Water%20Plans,%20Regulations%20&%20Reports/Drainage%20Design%20And%20Erosion%20Control%20Manual/2022-DDECM/Guide-sheets/Guidesheet-1C-061323.pdf",
+      "local_filename": "Guidesheet-1C-061323.pdf",
+      "s3_key": "pdfs/Guidesheet-1C-061323.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 645368,
+      "downloaded_at": "2025-11-23T22:16:47.272424Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Waste Resources Management Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Garbage%20&%20Recycling/Waste-Resources-Management-Plan-042023.pdf",
+      "local_filename": "Waste-Resources-Management-Plan-042023.pdf",
+      "s3_key": "pdfs/Waste-Resources-Management-Plan-042023.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 4527899,
+      "downloaded_at": "2025-11-23T22:16:48.050062Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "City of Olympias Natural Hazard Mitigation Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Fire%20department/Disaster%20and%20Emergency%20Preparedness/Hazard-Mitigation-Plan-Oly-Annex-030524.pdf",
+      "local_filename": "Hazard-Mitigation-Plan-Oly-Annex-030524.pdf",
+      "s3_key": "pdfs/Hazard-Mitigation-Plan-Oly-Annex-030524.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 23626240,
+      "downloaded_at": "2025-11-23T22:16:49.502502Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Water System Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Water%20Resources/Water%20Plans,%20Regulations%20&%20Reports/WSP/Water-System-Plan-2021-2026-040224.pdf",
+      "local_filename": "Water-System-Plan-2021-2026-040224.pdf",
+      "s3_key": "pdfs/Water-System-Plan-2021-2026-040224.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 22236358,
+      "downloaded_at": "2025-11-23T22:16:50.835738Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Annual City Work Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Government/City%20manager/Work-Plan/Complete-Work-Plan-061824.pdf",
+      "local_filename": "Complete-Work-Plan-061824.pdf",
+      "s3_key": "pdfs/Complete-Work-Plan-061824.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 184258,
+      "downloaded_at": "2025-11-23T22:16:51.187546Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Public Participation Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Community/Housing%20&%20Homelessness/CDBG%20Program/CDBG-Public-Participation-Plan-060324.pdf",
+      "local_filename": "CDBG-Public-Participation-Plan-060324.pdf",
+      "s3_key": "pdfs/CDBG-Public-Participation-Plan-060324.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 242600,
+      "downloaded_at": "2025-11-23T22:16:51.553128Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Emergency Management Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Fire%20department/Disaster%20and%20Emergency%20Preparedness/2022-CEMP-041823.pdf",
+      "local_filename": "2022-CEMP-041823.pdf",
+      "s3_key": "pdfs/2022-CEMP-041823.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 6988910,
+      "downloaded_at": "2025-11-23T22:16:52.413990Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Police Department Strategic Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Services/Police/OPD-Strategic-Plan-111224.pdf",
+      "local_filename": "OPD-Strategic-Plan-111224.pdf",
+      "s3_key": "pdfs/OPD-Strategic-Plan-111224.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 1902265,
+      "downloaded_at": "2025-11-23T22:16:53.039911Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    },
+    {
+      "excel_title": "Housing Action Plan",
+      "source_url": "https://www.olympiawa.gov/Document_center/Government/Codes,%20Plans%20&%20Standards/Housing-Action-Plan/Housing-Action-Plan.pdf",
+      "local_filename": "Housing-Action-Plan.pdf",
+      "s3_key": "pdfs/Housing-Action-Plan.pdf",
+      "s3_bucket": "olympia-plans-raw",
+      "file_size": 3589587,
+      "downloaded_at": "2025-11-23T22:16:53.733164Z",
+      "uploaded_at": "2025-11-23T22:17:04.038893Z"
+    }
+  ]
+}

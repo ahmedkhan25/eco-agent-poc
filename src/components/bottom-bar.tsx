@@ -16,10 +16,11 @@ const BottomBar = () => {
         {/* Social Links */}
         <SocialLinks />
 
-        {/* Medical Disclaimer */}
+        {/*  Disclaimer */}
         <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">
-          Not medical advice.
+          POC only, please do not cite.
         </p>
+ 
       </motion.div>
     </>
   );

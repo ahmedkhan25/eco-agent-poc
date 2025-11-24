@@ -9,7 +9,6 @@ import { QueryProvider } from "@/components/query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { logEnvironmentStatus } from "@/lib/env-validation";
-import { ProviderSelector } from "@/components/providers/provider-selector";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -86,7 +85,7 @@ export default function RootLayout({
               <PostHogProvider>
                 <OllamaProvider>
                   <MissingKeysDialog />
-                  <ProviderSelector />
+                  {/* <ProviderSelector /> */} {/* Disabled - using OpenAI only */}
                   {children}
                   <Analytics />
                 </OllamaProvider>

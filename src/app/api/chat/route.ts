@@ -257,10 +257,10 @@ export async function POST(req: Request) {
           'x-local-provider': req.headers.get('x-local-provider'),
           'x-ollama-model': req.headers.get('x-ollama-model')
         });
-        selectedModel = hasOpenAIKey ? openai("gpt-5") : "openai/gpt-5";
+        selectedModel = hasOpenAIKey ? openai("gpt-5.1") : "openai/gpt-5.1";
         modelInfo = hasOpenAIKey
-          ? "OpenAI (gpt-5) - Development Mode Fallback"
-          : 'Vercel AI Gateway ("gpt-5") - Development Mode Fallback';
+          ? "OpenAI (gpt-5.1) - Development Mode Fallback"
+          : 'Vercel AI Gateway ("gpt-5.1") - Development Mode Fallback';
       }
     } else {
       // Production mode: Use Polar-wrapped OpenAI ONLY for pay-per-use users
@@ -273,20 +273,20 @@ export async function POST(req: Request) {
         
         // Only use Polar LLM Strategy for pay-per-use users
         if (isActive && userTier === 'pay_per_use') {
-          selectedModel = getPolarTrackedModel(user.id, "gpt-5");
-          modelInfo = "OpenAI (gpt-5) - Production Mode (Polar Tracked - Pay-per-use)";
+          selectedModel = getPolarTrackedModel(user.id, "gpt-5.1");
+          modelInfo = "OpenAI (gpt-5.1) - Production Mode (Polar Tracked - Pay-per-use)";
         } else {
           // Unlimited users and free users use regular model (no per-token billing)
-          selectedModel = hasOpenAIKey ? openai("gpt-5") : "openai/gpt-5";
+          selectedModel = hasOpenAIKey ? openai("gpt-5.1") : "openai/gpt-5.1";
           modelInfo = hasOpenAIKey
-            ? `OpenAI (gpt-5) - Production Mode (${userTier} tier - Flat Rate)`
-            : `Vercel AI Gateway ("gpt-5") - Production Mode (${userTier} tier - Flat Rate)`;
+            ? `OpenAI (gpt-5.1) - Production Mode (${userTier} tier - Flat Rate)`
+            : `Vercel AI Gateway ("gpt-5.1") - Production Mode (${userTier} tier - Flat Rate)`;
         }
       } else {
-        selectedModel = hasOpenAIKey ? openai("gpt-5") : "openai/gpt-5";
+        selectedModel = hasOpenAIKey ? openai("gpt-5.1") : "openai/gpt-5.1";
         modelInfo = hasOpenAIKey
-          ? "OpenAI (gpt-5) - Production Mode (Anonymous)"
-          : 'Vercel AI Gateway ("gpt-5") - Production Mode (Anonymous)';
+          ? "OpenAI (gpt-5.1) - Production Mode (Anonymous)"
+          : 'Vercel AI Gateway ("gpt-5.1") - Production Mode (Anonymous)';
       }
     }
 

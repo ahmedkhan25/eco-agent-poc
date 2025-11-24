@@ -227,13 +227,23 @@ export async function POST(req: Request) {
     // Step 4: Generate answer with GPT-4o
     const answer = await generateAnswer(openai, query, context);
 
-    // Step 5: Format sources
-    const sources = results.map(result => ({
+    // Step 5: Format sources for citation system
+    const sources = results.map((result, index) => ({
       doc_id: result.metadata?.doc_id || 'unknown',
       title: result.metadata?.title || 'Unknown Document',
       page: result.metadata?.page || 0,
       s3_pdf_key: result.metadata?.s3_pdf_key,
       distance: result.distance,
+      // Add URL for citations - using S3 bucket URL with PDF key
+      url: result.metadata?.s3_pdf_key 
+        ? `https://olympia-plans-raw.s3.us-west-2.amazonaws.com/${result.metadata.s3_pdf_key}#page=${result.metadata.page || 1}`
+        : `#source-${index + 1}`,
+      // Add content/description for citation preview
+      content: result.metadata?.snippet || '',
+      description: `${result.metadata?.title} - Page ${result.metadata?.page}`,
+      source: 'City of Olympia Official Documents',
+      relevanceScore: 1 - result.distance, // Convert distance to relevance (0-1)
+      toolType: 'olympia' as const, // Tool type for citation rendering
     }));
 
     const processingTimeMs = Date.now() - startTime;

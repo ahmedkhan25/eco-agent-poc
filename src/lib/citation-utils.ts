@@ -11,7 +11,7 @@ export interface Citation {
   authors?: string[];
   doi?: string;
   relevanceScore?: number;
-  toolType?: 'clinical' | 'drug' | 'literature' | 'web';
+  toolType?: 'clinical' | 'drug' | 'literature' | 'web' | 'olympia';
 }
 
 export interface CitationMap {
@@ -69,9 +69,10 @@ export function extractCitationsFromToolResults(toolResults: any[]): CitationMap
 }
 
 // Get tool type from tool name
-function getToolType(toolName?: string): 'clinical' | 'drug' | 'literature' | 'web' | undefined {
+function getToolType(toolName?: string): 'clinical' | 'drug' | 'literature' | 'web' | 'olympia' | undefined {
   if (!toolName) return undefined;
 
+  if (toolName.toLowerCase().includes('olympia')) return 'olympia';
   if (toolName.toLowerCase().includes('clinical')) return 'clinical';
   if (toolName.toLowerCase().includes('drug')) return 'drug';
   if (toolName.toLowerCase().includes('literature') || toolName.toLowerCase().includes('biomedical')) return 'literature';

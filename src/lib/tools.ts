@@ -459,12 +459,15 @@ export const healthcareTools = {
         // Format response to emphasize document sources
         const sourceList = data.sources?.map((s: any) => `${s.title} (page ${s.page})`).join(', ') || 'None';
         
+        // Return in format expected by citation system (results array with URLs)
         return JSON.stringify({
           type: "olympia_planning",
           query: query,
           answer: data.answer,
-          sources: data.sources,
+          results: data.sources, // Use 'results' for citation system compatibility
+          sources: data.sources, // Keep 'sources' for backward compatibility
           sourceDocuments: sourceList,
+          resultCount: data.sources?.length || 0,
           documentCount: data.sources?.length || 0,
           processingTimeMs: data.processingTimeMs,
           displaySource: 'City of Olympia Official Documents'

@@ -805,11 +805,13 @@ const MemoizedTextPartWithCitations = memo(
           p.type === "tool-drugInformationSearch" ||
           p.type === "tool-biomedicalLiteratureSearch" ||
           p.type === "tool-webSearch" ||
+          p.type === "tool-olympiaRAGSearch" ||
           (p.type === "tool-result" && (
             p.toolName === "clinicalTrialsSearch" ||
             p.toolName === "drugInformationSearch" ||
             p.toolName === "biomedicalLiteratureSearch" ||
-            p.toolName === "webSearch"
+            p.toolName === "webSearch" ||
+            p.toolName === "olympiaRAGSearch"
           ));
 
         if (isSearchTool && (p.output || p.result)) {
@@ -866,11 +868,13 @@ const MemoizedTextPartWithCitations = memo(
             p.type === "tool-drugInformationSearch" ||
             p.type === "tool-biomedicalLiteratureSearch" ||
             p.type === "tool-webSearch" ||
+            p.type === "tool-olympiaRAGSearch" ||
             (p.type === "tool-result" && (
               p.toolName === "clinicalTrialsSearch" ||
               p.toolName === "drugInformationSearch" ||
               p.toolName === "biomedicalLiteratureSearch" ||
-              p.toolName === "webSearch"
+              p.toolName === "webSearch" ||
+              p.toolName === "olympiaRAGSearch"
             ));
 
           if (isSearchTool && (p.output || p.result)) {
@@ -998,7 +1002,7 @@ const SearchResultCard = ({
   type,
 }: {
   result: any;
-  type: "clinical" | "drug" | "literature" | "web";
+  type: "clinical" | "drug" | "literature" | "web" | "olympia";
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -1358,7 +1362,7 @@ const SearchResultsCarousel = ({
   type,
 }: {
   results: any[];
-  type: "clinical" | "drug" | "literature" | "web";
+  type: "clinical" | "drug" | "literature" | "web" | "olympia";
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const imagesScrollRef = useRef<HTMLDivElement>(null);
@@ -2715,21 +2719,21 @@ export function ChatInterface({
       <div
         ref={messagesContainerRef}
         className={`space-y-4 sm:space-y-8 min-h-[300px] overflow-y-auto overflow-x-hidden ${
-          messages.length > 0 ? "pt-20 sm:pt-24" : "pt-2 sm:pt-4"
+          messages.length > 0 ? "pt-20 sm:pt-24" : "pt-0"
         } ${isFormAtBottom ? "pb-44 sm:pb-36" : "pb-4 sm:pb-8"}`}
       >
         {messages.length === 0 && (
           <motion.div
-            className="pt-8 1"
+            className="pt-2 sm:pt-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="text-center mb-6 sm:mb-8">
+            <div className="text-center mb-3 sm:mb-4">
               {/* Capabilities */}
-              <div className="max-w-4xl mx-auto">
+              <div className="max-w-6xl mx-auto">
                 <motion.div
-                  className="text-center mb-4 sm:mb-6"
+                  className="text-center mb-3"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1, duration: 0.5 }}
@@ -2739,24 +2743,30 @@ export function ChatInterface({
                   </h3>
                 </motion.div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 px-2 sm:px-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 px-2 sm:px-4">
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
                         "Analyze Olympia's greenhouse gas emissions trends from the GHG Inventory. Calculate the reduction rate needed to meet the 2030 target of 50% reduction. Use Python to model emission scenarios and visualize the trajectory with confidence intervals."
                       )
                     }
-                    className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all hover:shadow-lg dark:hover:shadow-blue-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      📊 Climate Modeling
+                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg flex items-center justify-center">
+                      <Image src="/eco/home-cards/climate.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
-                    <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      Advanced Python analysis & projections
+                    <div className="flex-1 min-w-0">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        Climate Modeling
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                        Python analysis & projections
+                      </div>
                     </div>
                   </motion.button>
 
@@ -2766,17 +2776,23 @@ export function ChatInterface({
                         "What are Olympia's climate action goals? Search the Climate Risk and Vulnerability Assessment and Sea Level Rise Response Plan. Extract key milestones, adaptation strategies, and implementation timelines."
                       )
                     }
-                    className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all hover:shadow-lg dark:hover:shadow-emerald-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4, duration: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      🌍 Climate Goals
+                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 rounded-lg flex items-center justify-center">
+                      <Image src="/eco/home-cards/climate-goals.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
-                    <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      Adaptation plans & resilience strategies
+                    <div className="flex-1 min-w-0">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        Climate Goals
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                        Adaptation & resilience strategies
+                      </div>
                     </div>
                   </motion.button>
 
@@ -2786,17 +2802,23 @@ export function ChatInterface({
                         "Search Olympia's Transportation Master Plan and Street Safety Plan. Create a CSV with project details, implementation phases, budget allocations, and safety metrics. Generate charts showing infrastructure investment trends over time."
                       )
                     }
-                    className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600 transition-all hover:shadow-lg dark:hover:shadow-purple-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      🚌 Transportation Plans
+                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center">
+                      <Image src="/eco/home-cards/trans.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
-                    <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      Infrastructure & safety planning
+                    <div className="flex-1 min-w-0">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                        Transportation Plans
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                        Infrastructure & safety planning
+                      </div>
                     </div>
                   </motion.button>
 
@@ -2806,17 +2828,23 @@ export function ChatInterface({
                         "Analyze Olympia's 2025 Operating Budget. Compare budget allocations across climate action, transportation, and environmental departments. Create a comprehensive CSV with spending categories, year-over-year changes, and per capita costs."
                       )
                     }
-                    className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-600 transition-all hover:shadow-lg dark:hover:shadow-amber-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6, duration: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      💰 Budget Analysis
+                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-800/30 rounded-lg flex items-center justify-center">
+                      <Image src="/eco/home-cards/budget.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
-                    <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      Municipal spending & allocations
+                    <div className="flex-1 min-w-0">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                        Budget Analysis
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                        Municipal spending & allocations
+                      </div>
                     </div>
                   </motion.button>
 
@@ -2826,17 +2854,23 @@ export function ChatInterface({
                         "Compare Olympia's Capital Facilities Plans for 2025-2030 and 2026-2031. Create a CSV with project priorities, infrastructure investments, and funding sources. Generate visualizations showing: 1) Spending by department, 2) Project timelines, 3) Climate impact investments over time."
                       )
                     }
-                    className="bg-gray-50 dark:bg-gray-800/50 p-2.5 sm:p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-left group"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all hover:shadow-lg dark:hover:shadow-indigo-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7, duration: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      🏗️ Infrastructure Plans
+                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-lg flex items-center justify-center">
+                      <Image src="/eco/home-cards/infra-plan.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
-                    <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      Multi-year capital investment comparison
+                    <div className="flex-1 min-w-0">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        Infrastructure Plans
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                        Multi-year capital investments
+                      </div>
                     </div>
                   </motion.button>
 
@@ -2846,22 +2880,28 @@ export function ChatInterface({
                         "Do a comprehensive analysis of Olympia's climate resilience strategy. Search the Comprehensive Plan 2045 EIS, Climate Risk Assessment, and Neighborhood Centers Strategy. Analyze urban planning priorities, environmental impact mitigation, and community development goals. Use Python to create a comprehensive CSV with: Planning areas, climate adaptation measures, timeline projections, and implementation budgets. Generate charts comparing sustainability metrics across different neighborhoods and policy areas."
                       )
                     }
-                    className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-2.5 sm:p-4 rounded-xl border border-green-200 dark:border-green-700 hover:border-green-300 dark:hover:border-green-600 transition-colors hover:from-green-100 hover:to-blue-100 dark:hover:from-green-900/30 dark:hover:to-blue-900/30 text-left group col-span-1 sm:col-span-2 lg:col-span-1"
+                    className="bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 dark:from-green-900/30 dark:via-emerald-900/30 dark:to-blue-900/30 rounded-xl border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 transition-all hover:shadow-xl dark:hover:shadow-green-900/30 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="text-green-700 dark:text-green-300 mb-1.5 sm:mb-2 text-xs sm:text-sm font-medium group-hover:text-green-900 dark:group-hover:text-green-100">
-                      🚀 Deep Investigation
+                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-800/40 dark:to-emerald-700/40 rounded-lg flex items-center justify-center">
+                      <Image src="/eco/home-cards/deep.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
-                    <div className="text-[10px] sm:text-xs text-green-600 dark:text-green-400">
-                      Multi-source planning analysis + Climate data + Policy review
+                    <div className="flex-1 min-w-0">
+                      <div className="text-green-700 dark:text-green-300 text-xs font-semibold group-hover:text-green-800 dark:group-hover:text-green-200 transition-colors">
+                        Deep Investigation
+                      </div>
+                      <div className="text-xs text-green-600 dark:text-green-400 line-clamp-1">
+                        Multi-source analysis + Climate data
+                      </div>
                     </div>
                   </motion.button>
                 </div>
 
-                <div className="mt-4 sm:mt-8">
+                <div className="mt-3 sm:mt-4 scale-75 sm:scale-90">
                   <DataSourceLogos />
                 </div>
               </div>
@@ -3861,6 +3901,78 @@ export function ChatInterface({
                                     </div>
                                   </div>
                                 );
+
+                              // Olympia RAG Search Tool
+                              case "tool-olympiaRAGSearch": {
+                                const callId = part.toolCallId;
+                                const isStreaming = part.state === "input-streaming" || part.state === "input-available";
+                                const hasResults = part.state === "output-available";
+                                const hasError = part.state === "output-error";
+
+                                if (hasError) {
+                                  return (
+                                    <div key={callId} className="my-1">
+                                      <TimelineStep
+                                        part={part}
+                                        messageId={message.id}
+                                        index={index}
+                                        status="error"
+                                        type="search"
+                                        title="Olympia Documents Search Error"
+                                        subtitle={part.errorText}
+                                        icon={<AlertCircle />}
+                                        expandedTools={expandedTools}
+                                        toggleToolExpansion={toggleToolExpansion}
+                                      />
+                                    </div>
+                                  );
+                                }
+
+                                const olympiaResults = hasResults ? extractSearchResults(part.output) : [];
+                                const query = part.input?.query || "";
+
+                                // Create subtitle with City of Olympia logo
+                                let subtitleContent: React.ReactNode = query;
+                                if (!isStreaming && olympiaResults.length > 0) {
+                                  subtitleContent = (
+                                    <div className="flex flex-col gap-1">
+                                      <div className="text-xs text-gray-600 dark:text-gray-400">{query}</div>
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 flex items-center justify-center overflow-hidden">
+                                          <img src="/city_of_olympia_logo.jpeg" alt="City of Olympia" className="w-3 h-3 object-cover" />
+                                        </div>
+                                        <span className="text-xs text-gray-600 dark:text-gray-400">
+                                          {olympiaResults.length} official documents
+                                        </span>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                return (
+                                  <div key={callId}>
+                                    <TimelineStep
+                                      part={part}
+                                      messageId={message.id}
+                                      index={index}
+                                      status={isStreaming ? "streaming" : "complete"}
+                                      type="search"
+                                      title="Olympia Documents Search"
+                                      subtitle={subtitleContent}
+                                      icon={<FileText />}
+                                      expandedTools={expandedTools}
+                                      toggleToolExpansion={toggleToolExpansion}
+                                    >
+                                      {hasResults && olympiaResults.length > 0 && (
+                                        <SearchResultsCarousel
+                                          results={olympiaResults}
+                                          type="olympia"
+                                        />
+                                      )}
+                                    </TimelineStep>
+                                  </div>
+                                );
+                              }
 
                               default:
                                 return null;
