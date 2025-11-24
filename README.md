@@ -682,7 +682,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🙏 Acknowledgments
 
-- Built with [Valyu](https://platform.valyu.ai) - The unified biomedical data API
+- Built with [Valyu](https://platform.valyu.ai) -  
 - Powered by [Daytona](https://daytona.io) - Secure code execution
 - UI components from [shadcn/ui](https://ui.shadcn.com)
 

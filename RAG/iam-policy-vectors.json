@@ -1,0 +1,40 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3ObjectAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::olympia-plans-raw",
+        "arn:aws:s3:::olympia-plans-raw/*",
+        "arn:aws:s3:::olympia-rag-vectors",
+        "arn:aws:s3:::olympia-rag-vectors/*"
+      ]
+    },
+    {
+      "Sid": "S3VectorOperations",
+      "Effect": "Allow",
+      "Action": [
+        "s3vectors:PutVector",
+        "s3vectors:BatchPutVector",
+        "s3vectors:QueryVector",
+        "s3vectors:GetVector",
+        "s3vectors:DeleteVector",
+        "s3vectors:ListVectors",
+        "s3vectors:DescribeIndex",
+        "s3vectors:ListIndexes"
+      ],
+      "Resource": [
+        "arn:aws:s3:::olympia-rag-vectors/*",
+        "arn:aws:s3vectors:us-west-2:*:index/olympia-pages-idx"
+      ]
+    }
+  ]
+}
+
