@@ -438,3 +438,119 @@ export async function createCSV(csv: {
   const { error } = await supabase.from("csvs").insert(csv);
   return { error };
 }
+
+// ============================================================================
+// IMAGE FUNCTIONS
+// ============================================================================
+
+export async function getImage(imageId: string) {
+  if (isDevelopmentMode()) {
+    const db = getLocalDb();
+    const image = await db.query.images.findFirst({
+      where: eq(schema.images.id, imageId),
+    });
+    return { data: image || null, error: null };
+  }
+
+  const supabase = await createSupabaseClient();
+  const { data, error } = await supabase
+    .from("images")
+    .select("*")
+    .eq("id", imageId)
+    .single();
+  return { data, error };
+}
+
+export async function createImage(image: {
+  id: string;
+  user_id?: string;
+  anonymous_id?: string;
+  session_id: string;
+  prompt: string;
+  revised_prompt?: string;
+  size: string;
+  quality: string;
+  background: string;
+  title?: string;
+  image_data: string;
+}) {
+  if (isDevelopmentMode()) {
+    const db = getLocalDb();
+    await db.insert(schema.images).values({
+      id: image.id,
+      userId: image.user_id || null,
+      anonymousId: image.anonymous_id || null,
+      sessionId: image.session_id,
+      prompt: image.prompt,
+      revisedPrompt: image.revised_prompt || null,
+      size: image.size,
+      quality: image.quality,
+      background: image.background,
+      title: image.title || null,
+      imageData: image.image_data,
+    });
+    return { error: null };
+  }
+
+  const supabase = await createSupabaseClient();
+  const { error } = await supabase.from("images").insert(image);
+  return { error };
+}
+
+// ============================================================================
+// RAG CONTEXT FUNCTIONS
+// ============================================================================
+
+export async function createRagContext(context: {
+  id: string;
+  sessionId: string;
+  query: string;
+  fullContext: any;
+  compressedSummary: string;
+  sources: any[];
+  tokenCount?: number;
+}) {
+  if (isDevelopmentMode()) {
+    const db = getLocalDb();
+    await db.insert(schema.ragContexts).values({
+      id: context.id,
+      sessionId: context.sessionId,
+      query: context.query,
+      fullContext: JSON.stringify(context.fullContext),
+      compressedSummary: context.compressedSummary,
+      sources: JSON.stringify(context.sources),
+      tokenCount: context.tokenCount || null,
+    });
+    return { error: null };
+  }
+
+  const supabase = await createSupabaseClient();
+  const { error } = await supabase.from("rag_contexts").insert({
+    id: context.id,
+    session_id: context.sessionId,
+    query: context.query,
+    full_context: context.fullContext,
+    compressed_summary: context.compressedSummary,
+    sources: context.sources,
+    token_count: context.tokenCount,
+  });
+  return { error };
+}
+
+export async function getRagContext(contextId: string) {
+  if (isDevelopmentMode()) {
+    const db = getLocalDb();
+    const context = await db.query.ragContexts.findFirst({
+      where: eq(schema.ragContexts.id, contextId),
+    });
+    return { data: context || null, error: null };
+  }
+
+  const supabase = await createSupabaseClient();
+  const { data, error } = await supabase
+    .from("rag_contexts")
+    .select("*")
+    .eq("id", contextId)
+    .single();
+  return { data, error };
+}

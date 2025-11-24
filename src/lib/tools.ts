@@ -7,6 +7,7 @@ import { Daytona } from '@daytonaio/sdk';
 import { createClient } from '@/utils/supabase/server';
 import * as db from '@/lib/db';
 import { randomUUID } from 'crypto';
+import OpenAI from 'openai';
 
 export const healthcareTools = {
   // Chart Creation Tool - Create interactive charts for biomedical data visualization
@@ -398,6 +399,185 @@ export const healthcareTools = {
     },
   }),
 
+  generateImage: tool({
+    description: `Generate images, infographics, flyers, and visual content using GPT Image AI.
+
+    USE CASES:
+    - Create infographics for city planning, climate action, and sustainability initiatives
+    - Design flyers and promotional materials for community events
+    - Generate visual diagrams for public policy explanations
+    - Create educational graphics about environmental topics
+    - Design posters for public awareness campaigns
+    - Generate concept art for urban planning projects
+    - Create visual representations of data and statistics
+
+    IMAGE SPECIFICATIONS:
+    - Size options: "1024x1024" (square), "1024x1536" (portrait), "1536x1024" (landscape)
+    - Quality options: "low" (fast), "medium" (balanced), "high" (best quality)
+    - Background: "opaque" (default) or "transparent" (for logos/graphics)
+    - Format: Images are returned as PNG by default
+
+    PROMPT GUIDELINES:
+    - Be specific and detailed in your description
+    - Include style preferences (e.g., "modern minimalist", "infographic style", "professional")
+    - Specify colors, layout, and key elements to include
+    - For text-heavy images like flyers, describe the text content and layout
+    - For infographics, describe the data visualization approach
+
+    EXAMPLE PROMPTS:
+    - "Create a modern infographic about Olympia's climate action plan with green and blue colors, showing renewable energy statistics and carbon reduction goals in a clean, professional layout"
+    - "Design a community event flyer for an urban forestry workshop, with nature-inspired colors, tree illustrations, and space for event details in a readable font"
+    - "Generate a minimalist poster showing the water cycle in an urban environment, with labels and arrows, suitable for educational purposes"
+
+    The generated image will be automatically displayed in the chat and available for download.`,
+    inputSchema: z.object({
+      prompt: z
+        .string()
+        .describe(
+          'Detailed description of the image to generate. Be specific about content, style, colors, layout, and any text elements.'
+        ),
+      size: z
+        .enum(['1024x1024', '1024x1536', '1536x1024'])
+        .optional()
+        .default('1024x1024')
+        .describe(
+          'Image dimensions: "1024x1024" (square), "1024x1536" (portrait), "1536x1024" (landscape)'
+        ),
+      quality: z
+        .enum(['low', 'medium', 'high'])
+        .optional()
+        .default('medium')
+        .describe('Image quality: "low" (fastest), "medium" (balanced), "high" (best quality)'),
+      background: z
+        .enum(['opaque', 'transparent'])
+        .optional()
+        .default('opaque')
+        .describe('Background type: "opaque" (solid) or "transparent" (for logos/graphics)'),
+      title: z
+        .string()
+        .optional()
+        .describe('Optional title/description for the image (used for filename and metadata)'),
+    }),
+    execute: async ({ prompt, size, quality, background, title }, options) => {
+      const userId = (options as any)?.experimental_context?.userId;
+      const sessionId = (options as any)?.experimental_context?.sessionId;
+      const userTier = (options as any)?.experimental_context?.userTier;
+      const isDevelopment = process.env.NEXT_PUBLIC_APP_MODE === 'development';
+
+      const startTime = Date.now();
+
+      try {
+        const openaiApiKey = process.env.OPENAI_API_KEY;
+        if (!openaiApiKey) {
+          return '❌ **Configuration Error**: OpenAI API key is not configured.';
+        }
+
+        const openai = new OpenAI({ apiKey: openaiApiKey });
+
+        // Generate the image using OpenAI Image API
+        const result = await openai.images.generate({
+          model: 'gpt-image-1',
+          prompt: prompt,
+          size: size || '1024x1024',
+          quality: quality || 'medium',
+          background: background || 'opaque',
+        });
+
+        const executionTime = Date.now() - startTime;
+
+        if (!result.data || result.data.length === 0) {
+          return '❌ **Error**: No image was generated. Please try again with a different prompt.';
+        }
+
+        const imageBase64 = result.data[0].b64_json;
+        const revisedPrompt = result.data[0].revised_prompt || prompt;
+
+        if (!imageBase64) {
+          return '❌ **Error**: Failed to retrieve image data.';
+        }
+
+        // Save image to database
+        let imageId: string | null = null;
+        try {
+          imageId = randomUUID();
+
+          const insertData: any = {
+            id: imageId,
+            session_id: sessionId || null,
+            prompt: prompt,
+            revised_prompt: revisedPrompt,
+            size: size || '1024x1024',
+            quality: quality || 'medium',
+            background: background || 'opaque',
+            title: title || undefined,
+            image_data: imageBase64,
+          };
+
+          if (userId) {
+            insertData.user_id = userId;
+          } else {
+            insertData.anonymous_id = 'anonymous';
+          }
+
+          await db.createImage(insertData);
+        } catch (error) {
+          console.error('[generateImage] Error saving image:', error);
+          imageId = null;
+        }
+
+        // Track image generation
+        await track('Image Generated', {
+          size: size || '1024x1024',
+          quality: quality || 'medium',
+          background: background || 'opaque',
+          hasTitle: !!title,
+          promptLength: prompt.length,
+          executionTime: executionTime,
+          savedToDb: !!imageId,
+        });
+
+        // Track usage for pay-per-use tier
+        if (userId && sessionId && userTier === 'pay_per_use' && !isDevelopment) {
+          try {
+            const polarTracker = new PolarEventTracker();
+            // Estimate cost based on quality and size
+            const estimatedTokens = quality === 'high' ? 4160 : quality === 'medium' ? 1056 : 272;
+            await polarTracker.trackImageGeneration(userId, sessionId, {
+              prompt,
+              size: size || '1024x1024',
+              quality: quality || 'medium',
+              executionTime,
+              estimatedTokens,
+            });
+          } catch (error) {
+            console.error('[generateImage] Failed to track usage:', error);
+          }
+        }
+
+        return {
+          success: true,
+          imageId: imageId || undefined,
+          imageUrl: imageId ? `/api/images/${imageId}` : undefined,
+          // NOTE: We do NOT return imageData (base64) here - it's already saved to DB!
+          // Returning it would cause 876K+ token context overflow
+          prompt: prompt,
+          revisedPrompt: revisedPrompt,
+          size: size || '1024x1024',
+          quality: quality || 'medium',
+          background: background || 'opaque',
+          title: title || 'Generated Image',
+          executionTime: executionTime,
+          _instructions: imageId
+            ? `IMPORTANT: Display this image in your response using this EXACT markdown syntax:\n\n![image](image:${imageId})\n\nDo not use any other format. The image is saved in the database and will be loaded automatically.`
+            : 'Image generated successfully but could not be saved to database.',
+        };
+      } catch (error: any) {
+        console.error('[generateImage] Error:', error);
+        return `❌ **Image Generation Error**: ${error.message || 'Unknown error occurred'}. Please try again with a different prompt or lower quality settings.`;
+      }
+    },
+  }),
+
   olympiaRAGSearch: tool({
     description: `Search City of Olympia official planning documents. This tool provides semantic search 
   across 26 indexed city documents covering climate action, comprehensive planning, budgets, 
@@ -440,7 +620,7 @@ export const healthcareTools = {
         const response = await fetch(`${baseUrl}/api/eco-rag`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, topK }),
+          body: JSON.stringify({ query, topK, sessionId }), // Pass sessionId for context storage
         });
         
         if (!response.ok) {
@@ -454,21 +634,24 @@ export const healthcareTools = {
           query,
           resultCount: data.sources?.length || 0,
           processingTime: data.processingTimeMs,
+          tokenCount: data.tokenCount,
         });
         
         // Format response to emphasize document sources
         const sourceList = data.sources?.map((s: any) => `${s.title} (page ${s.page})`).join(', ') || 'None';
         
-        // Return in format expected by citation system (results array with URLs)
+        // Return compressed format with context_id (~800 tokens vs 5-10KB)
         return JSON.stringify({
           type: "olympia_planning",
+          context_id: data.context_id,         // NEW: Reference to stored context
+          compressed_summary: data.compressed_summary, // NEW: Compressed context (~800 tokens)
           query: query,
-          answer: data.answer,
-          results: data.sources, // Use 'results' for citation system compatibility
-          sources: data.sources, // Keep 'sources' for backward compatibility
+          sources: data.sources,                // Keep citations
+          results: data.sources,                // Use 'results' for citation system compatibility
           sourceDocuments: sourceList,
           resultCount: data.sources?.length || 0,
           documentCount: data.sources?.length || 0,
+          tokenCount: data.tokenCount,          // NEW: Track compression size
           processingTimeMs: data.processingTimeMs,
           displaySource: 'City of Olympia Official Documents'
         }, null, 2);

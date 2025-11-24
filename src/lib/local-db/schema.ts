@@ -89,6 +89,43 @@ export const csvs = sqliteTable("csvs", {
     .default(sql`(unixepoch())`),
 });
 
+// Images table - mirrors Supabase images table
+export const images = sqliteTable("images", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+  anonymousId: text("anonymous_id"),
+  sessionId: text("session_id").notNull(),
+  prompt: text("prompt").notNull(),
+  revisedPrompt: text("revised_prompt"),
+  size: text("size").notNull(),
+  quality: text("quality").notNull(),
+  background: text("background").notNull(),
+  title: text("title"),
+  imageData: text("image_data").notNull(), // Base64 encoded image
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+// RAG contexts table - stores compressed and full context from RAG queries
+export const ragContexts = sqliteTable("rag_contexts", {
+  id: text("id").primaryKey(),
+  sessionId: text("session_id")
+    .notNull()
+    .references(() => chatSessions.id, { onDelete: "cascade" }),
+  query: text("query").notNull(),
+  fullContext: text("full_context").notNull(), // JSON string of full results
+  compressedSummary: text("compressed_summary").notNull(),
+  sources: text("sources").notNull(), // JSON array of citations
+  tokenCount: integer("token_count"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type ChatSession = typeof chatSessions.$inferSelect;
@@ -99,3 +136,7 @@ export type Chart = typeof charts.$inferSelect;
 export type InsertChart = typeof charts.$inferInsert;
 export type CSV = typeof csvs.$inferSelect;
 export type InsertCSV = typeof csvs.$inferInsert;
+export type Image = typeof images.$inferSelect;
+export type InsertImage = typeof images.$inferInsert;
+export type RagContext = typeof ragContexts.$inferSelect;
+export type InsertRagContext = typeof ragContexts.$inferInsert;

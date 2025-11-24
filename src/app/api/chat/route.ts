@@ -15,16 +15,291 @@ import { saveChatMessages } from '@/lib/db';
 // 13mins max streaming (vercel limit)
 export const maxDuration = 800;
 
+/**
+ * Rough token estimation (1 token ≈ 4 characters for English text)
+ * This is a conservative estimate to prevent overflow
+ */
+function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
+/**
+ * Estimate tokens in a message including all parts (text, tool calls, tool results)
+ */
+function estimateMessageTokens(message: BiomedUIMessage): number {
+  let tokens = 0;
+  
+  // Add role overhead (small cost)
+  tokens += 4;
+  
+  // BiomedUIMessage only has 'parts', not 'content'
+  if (Array.isArray(message.parts)) {
+    for (const part of message.parts) {
+      try {
+        if (typeof part === 'string') {
+          tokens += estimateTokens(part);
+        } else if (part && typeof part === 'object') {
+          // Safely check part type
+          const partType = (part as any).type;
+          const partText = (part as any).text;
+          
+          if (partType === 'text' && partText) {
+            tokens += estimateTokens(partText);
+          } else {
+            // For all other part types (tool-call, tool-result, step-start, etc.)
+            // Use JSON stringification for accurate size estimation
+            const partJson = JSON.stringify(part);
+            tokens += estimateTokens(partJson);
+          }
+        }
+      } catch (e) {
+        // Fallback: estimate entire part as JSON
+        try {
+          tokens += estimateTokens(JSON.stringify(part));
+        } catch {
+          tokens += 100; // Minimal fallback estimate
+        }
+      }
+    }
+  }
+  
+  // If we still have minimal tokens, use entire message as fallback
+  if (tokens <= 10) {
+    try {
+      tokens = estimateTokens(JSON.stringify(message));
+    } catch {
+      tokens = 100; // Absolute fallback
+    }
+  }
+  
+  return tokens;
+}
+
+/**
+ * Trim messages to prevent context window overflow using token-aware strategy
+ * Keeps as many recent messages as possible within the token budget
+ * 
+ * @param messages - All messages in the conversation
+ * @param maxTokens - Maximum tokens to keep (default: 8000 tokens, ~32KB text)
+ * @returns Trimmed messages that fit within token budget
+ */
+function trimMessages(messages: BiomedUIMessage[], maxTokens: number = 8000): BiomedUIMessage[] {
+  if (messages.length === 0) {
+    return messages;
+  }
+
+  // Estimate tokens for all messages
+  const messageTokens = messages.map((msg, idx) => {
+    const tokens = estimateMessageTokens(msg);
+    console.log(`[Chat API] Message ${idx + 1}/${messages.length} (${msg.role}): ~${tokens} tokens`);
+    return {
+      message: msg,
+      tokens
+    };
+  });
+
+  // Work backwards from most recent messages
+  const trimmedMessages: BiomedUIMessage[] = [];
+  let currentTokens = 0;
+
+  for (let i = messageTokens.length - 1; i >= 0; i--) {
+    const { message, tokens } = messageTokens[i];
+    
+    // If adding this message would exceed budget, stop
+    if (currentTokens + tokens > maxTokens) {
+      console.log(`[Chat API] Stopping at message ${i + 1}/${messages.length} (would add ${tokens} tokens, exceeding ${maxTokens} token budget)`);
+      break;
+    }
+    
+    trimmedMessages.unshift(message); // Add to front (we're going backwards)
+    currentTokens += tokens;
+  }
+
+  // Always keep at least the last USER message (not assistant with huge tool results)
+  if (trimmedMessages.length === 0 && messages.length > 0) {
+    // Find the last user message (not assistant)
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') {
+        console.log(`[Chat API] Emergency fallback: keeping only last user message (all others too large)`);
+        trimmedMessages.push(messages[i]);
+        const userTokens = estimateMessageTokens(messages[i]);
+        currentTokens = userTokens;
+        break;
+      }
+    }
+    
+    // Absolute fallback: just keep last message
+    if (trimmedMessages.length === 0) {
+      console.log(`[Chat API] Warning: Last message alone exceeds token budget, keeping it anyway`);
+      trimmedMessages.push(messages[messages.length - 1]);
+      currentTokens = estimateMessageTokens(messages[messages.length - 1]);
+    }
+  }
+
+  if (trimmedMessages.length < messages.length) {
+    console.log(`[Chat API] Trimmed messages: ${messages.length} → ${trimmedMessages.length} (estimated ${currentTokens} tokens)`);
+  }
+
+  return trimmedMessages;
+}
+
+/**
+ * Strip OpenAI response IDs and other API-specific metadata from message parts.
+ * This prevents "Duplicate item found" errors when reloading messages from the database.
+ */
+function stripResponseMetadata(parts: any[]): any[] {
+  if (!Array.isArray(parts)) return parts;
+  
+  return parts.map((part: any) => {
+    if (!part || typeof part !== 'object') return part;
+    
+    // Deep clean: remove all fields that might contain response IDs
+    const cleaned = JSON.parse(JSON.stringify(part, (key, value) => {
+      // Skip any fields that look like they contain response IDs
+      if (key === 'response' || 
+          key === 'responseId' || 
+          key === 'rs_id' ||
+          key === 'response_id' ||
+          key === 'requestId' ||
+          key === 'request_id' ||
+          (typeof value === 'string' && value.startsWith('rs_'))) {
+        return undefined; // Don't include this field
+      }
+      return value;
+    }));
+    
+    return cleaned;
+  });
+}
+
 export async function POST(req: Request) {
   try {
-    const { messages, sessionId }: { messages: BiomedUIMessage[], sessionId?: string } = await req.json();
+    const { messages: frontendMessages, sessionId }: { messages: BiomedUIMessage[], sessionId?: string } = await req.json();
     console.log("[Chat API] ========== NEW REQUEST ==========");
     console.log("[Chat API] Received sessionId:", sessionId);
-    console.log("[Chat API] Number of messages:", messages.length);
-    // console.log(
-    //   "[Chat API] Incoming messages:",
-    //   JSON.stringify(messages, null, 2)
-    // );
+    console.log("[Chat API] Frontend messages count:", frontendMessages.length);
+    
+    // CRITICAL: Reload messages from database instead of trusting frontend
+    // Frontend keeps full image/tool result data in memory, causing context overflow
+    let messages: BiomedUIMessage[];
+    if (sessionId && frontendMessages.length > 1) {
+      // Reload all previous messages from database (they're already filtered)
+      const { data: dbMessages } = await db.getChatMessages(sessionId);
+      
+      // Convert DB messages to BiomedUIMessage format and strip response metadata
+      const loadedMessages: BiomedUIMessage[] = (dbMessages || []).map((msg: any) => ({
+        id: msg.id,
+        role: msg.role,
+        parts: stripResponseMetadata(JSON.parse(msg.content)),
+      }));
+      
+      // Add the new message from frontend (it's not in DB yet)
+      // CRITICAL: Filter it first! Frontend caches full image/tool data in memory
+      const newMessage = frontendMessages[frontendMessages.length - 1];
+      const filteredNewMessage = {
+        ...newMessage,
+        parts: Array.isArray(newMessage.parts) 
+          ? newMessage.parts.filter((part: any) => {
+              if (!part || typeof part !== 'object') return true;
+              const partType = part.type;
+              
+              // Keep: text and ALL tool-related parts
+              // REMOVE: reasoning (huge!), step-start/finish (UI markers)
+              // NOTE: stripResponseMetadata removes rs_* IDs to prevent "missing reasoning" errors
+              if (partType === 'text' || 
+                  (typeof partType === 'string' && partType.startsWith('tool-'))) {
+                return true;
+              }
+              
+              // Remove: images (base64 data)
+              if (partType === 'image') {
+                return false;
+              }
+              
+              // Remove unknown types by default
+              return false;
+            }).map((part: any) => {
+              // CRITICAL: Strip base64 image data from tool-generateImage results
+              if (part.type === 'tool-generateImage') {
+                console.log(`[Chat API] DEBUG - tool-generateImage from NEW frontend message:`, {
+                  type: part.type,
+                  hasResult: !!part.result,
+                  resultType: typeof part.result,
+                  resultKeys: part.result ? Object.keys(part.result) : [],
+                  hasImageData: part.result?.imageData ? 'YES' : 'NO',
+                  imageDataLength: part.result?.imageData?.length || 0,
+                });
+                
+                if (part.result && typeof part.result === 'object') {
+                  const filteredPart = { ...part };
+                  if (part.result.imageData) {
+                    const imageId = part.result.imageId || 'unknown';
+                    filteredPart.result = {
+                      ...part.result,
+                      imageData: undefined,
+                      _saved: `✓ Image saved to database (ID: ${imageId}). Display using: ![image](image:${imageId})`
+                    };
+                    console.log(`[Chat API] ✓ Stripped base64 imageData from frontend tool-generateImage (imageId: ${imageId})`);
+                  }
+                  return filteredPart;
+                }
+              }
+              return part;
+            })
+          : newMessage.parts
+      };
+      
+      messages = [...loadedMessages, filteredNewMessage];
+      
+      console.log(`[Chat API] Reloaded ${loadedMessages.length} messages from DB + 1 new (filtered) from frontend`);
+    } else {
+      // First message in conversation - filter frontend messages too!
+      // Frontend might have cached data from previous sessions
+      messages = frontendMessages.map((msg: BiomedUIMessage) => ({
+        ...msg,
+        parts: Array.isArray(msg.parts)
+          ? msg.parts.filter((part: any) => {
+              if (!part || typeof part !== 'object') return true;
+              const partType = part.type;
+              
+              // Keep: text and ALL tool-related parts
+              // REMOVE: reasoning (huge!), step-start/finish (UI markers)
+              // NOTE: stripResponseMetadata removes rs_* IDs to prevent "missing reasoning" errors
+              if (partType === 'text' || 
+                  (typeof partType === 'string' && partType.startsWith('tool-'))) {
+                return true;
+              }
+              
+              // Remove: images (base64 data)
+              if (partType === 'image') {
+                return false;
+              }
+              
+              // Remove unknown types
+              return false;
+            }).map((part: any) => {
+              // CRITICAL: Strip base64 image data from tool-generateImage results
+              if (part.type === 'tool-generateImage' && part.result && typeof part.result === 'object') {
+                const filteredPart = { ...part };
+                if (part.result.imageData) {
+                  const imageId = part.result.imageId || 'unknown';
+                  filteredPart.result = {
+                    ...part.result,
+                    imageData: undefined,
+                    _saved: `✓ Image saved to database (ID: ${imageId}). Display using: ![image](image:${imageId})`
+                  };
+                  console.log(`[Chat API] Stripped base64 imageData from frontend tool-generateImage (first message, imageId: ${imageId})`);
+                }
+                return filteredPart;
+              }
+              return part;
+            })
+          : msg.parts
+      }));
+      console.log("[Chat API] Using filtered frontend messages (first in conversation)");
+    }
+    
+    console.log("[Chat API] Total messages:", messages.length);
 
     // Determine if this is a user-initiated message (should count towards rate limit)
     // ONLY increment for the very first user message in a conversation
@@ -372,9 +647,28 @@ export async function POST(req: Request) {
       }
     }
 
+    // Trim messages to prevent context window overflow
+    // Using token-aware trimming: keep as many recent messages as fit in token budget
+    // Set to 6000 tokens - RAG tool now returns compressed ~800 token summaries
+    // instead of 5-10KB raw chunks, so we can fit more turns
+    const trimmedMessages = trimMessages(messages, 6000);
+    
+    // Debug: Log message structure to understand format
+    if (messages.length > 0) {
+      const sampleMessage = messages[messages.length - 1];
+      console.log('[Chat API] Sample message structure:', {
+        role: sampleMessage.role,
+        hasParts: !!sampleMessage.parts,
+        partsLength: Array.isArray(sampleMessage.parts) ? sampleMessage.parts.length : 0,
+        firstPartType: Array.isArray(sampleMessage.parts) && sampleMessage.parts.length > 0 
+          ? sampleMessage.parts[0].type 
+          : 'none',
+      });
+    }
+
     const result = streamText({
       model: selectedModel as any,
-      messages: convertToModelMessages(messages),
+      messages: convertToModelMessages(trimmedMessages),
       tools: healthcareTools,
       toolChoice: "auto",
       experimental_context: {
@@ -732,12 +1026,97 @@ Do NOT search the web first - always check official documents via olympiaRAGSear
           // The correct pattern: Save ALL messages from the conversation
           // This replaces all messages in the session with the complete, up-to-date conversation
           const { randomUUID } = await import('crypto');
+          
+          // DEBUG: Log what we're receiving
+          console.log('[Chat API] DEBUG - allMessages structure:');
+          allMessages.forEach((msg: any, idx: number) => {
+            console.log(`  Message ${idx}: role=${msg.role}, parts count=${msg.parts?.length || 0}`);
+            if (msg.parts) {
+              msg.parts.forEach((part: any, partIdx: number) => {
+                console.log(`    Part ${partIdx}: type=${part.type || 'unknown'}`);
+              });
+            }
+          });
+          
           const messagesToSave = allMessages.map((message: any, index: number) => {
             // AI SDK v5 uses 'parts' array for UIMessage
             let contentToSave = [];
 
             if (message.parts && Array.isArray(message.parts)) {
-              contentToSave = message.parts;
+              // CRITICAL: Filter out large data to prevent context explosion
+              // KEEP: text, tool calls, step markers, reasoning (small metadata)
+              // REMOVE: tool results (RAG chunks), images (base64 data), unknown types
+              const originalPartsCount = message.parts.length;
+              contentToSave = message.parts.filter((part: any) => {
+                // Keep user messages completely
+                if (message.role === 'user') {
+                  return true;
+                }
+                
+                // For assistant messages, filter based on part type
+                if (part && typeof part === 'object') {
+                  const partType = part.type;
+                  
+                  // Keep: text and ALL tool-related parts
+                  // REMOVE: reasoning (huge!), step-start/finish (UI markers)
+                  // NOTE: stripResponseMetadata removes rs_* IDs to prevent "missing reasoning" errors
+                  if (partType === 'text' || 
+                      (typeof partType === 'string' && partType.startsWith('tool-'))) {
+                    return true;
+                  }
+                  
+                  // Remove: images (base64 data)
+                  if (partType === 'image') {
+                    console.log(`[Chat API] Filtering out ${partType} part from message ${message.id}`);
+                    return false;
+                  }
+                  
+                  // Log unknown part types
+                  console.log(`[Chat API] Filtering out UNKNOWN part type '${partType}' from message ${message.id}`);
+                } else {
+                  console.log(`[Chat API] Filtering out invalid part (not an object) from message ${message.id}`, part);
+                }
+                
+                // Remove unknown part types by default to prevent data leaks
+                return false;
+              }).map((part: any) => {
+                // CRITICAL: Strip base64 image data from tool-generateImage results
+                // The result field can contain imageData which is base64 encoded (100K+ tokens)
+                if (part.type === 'tool-generateImage') {
+                  console.log(`[Chat API] DEBUG - tool-generateImage part structure:`, {
+                    type: part.type,
+                    hasResult: !!part.result,
+                    resultType: typeof part.result,
+                    resultKeys: part.result ? Object.keys(part.result) : [],
+                    hasImageData: part.result?.imageData ? 'YES' : 'NO',
+                    imageDataLength: part.result?.imageData?.length || 0,
+                    has_instructions: !!part.result?._instructions,
+                    partKeys: Object.keys(part),
+                  });
+                  console.log(`[Chat API] DEBUG - Full part (first 500 chars):`, JSON.stringify(part).substring(0, 500));
+                  
+                  if (part.result && typeof part.result === 'object') {
+                    const filteredPart = { ...part };
+                    if (part.result.imageData) {
+                      const imageId = part.result.imageId || 'unknown';
+                      const imageUrl = part.result.imageUrl || `/api/images/${imageId}`;
+                      filteredPart.result = {
+                        ...part.result,
+                        imageData: undefined, // Remove base64 data
+                        _saved: `✓ Image successfully saved to database (ID: ${imageId}). Display it using: ![image](image:${imageId})`
+                      };
+                      console.log(`[Chat API] ✓ Stripped base64 imageData from tool-generateImage result (imageId: ${imageId})`);
+                    }
+                    return filteredPart;
+                  }
+                }
+                return part;
+              });
+              
+              // Log if we filtered anything
+              if (message.role === 'assistant' && contentToSave.length < originalPartsCount) {
+                console.log(`[Chat API] Filtered message parts: ${originalPartsCount} → ${contentToSave.length} (removed ${originalPartsCount - contentToSave.length} parts)`);
+              }
             } else if (message.content) {
               // Fallback for older format
               if (typeof message.content === 'string') {

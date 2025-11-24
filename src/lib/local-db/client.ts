@@ -95,10 +95,39 @@ function initializeDatabase(sqlite: Database.Database) {
       updated_at INTEGER NOT NULL DEFAULT (unixepoch())
     );
 
+    CREATE TABLE IF NOT EXISTS images (
+      id TEXT PRIMARY KEY,
+      user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+      anonymous_id TEXT,
+      session_id TEXT NOT NULL,
+      prompt TEXT NOT NULL,
+      revised_prompt TEXT,
+      size TEXT NOT NULL,
+      quality TEXT NOT NULL,
+      background TEXT NOT NULL,
+      title TEXT,
+      image_data TEXT NOT NULL,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+      updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+    );
+
+    CREATE TABLE IF NOT EXISTS rag_contexts (
+      id TEXT PRIMARY KEY,
+      session_id TEXT NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
+      query TEXT NOT NULL,
+      full_context TEXT NOT NULL,
+      compressed_summary TEXT NOT NULL,
+      sources TEXT NOT NULL,
+      token_count INTEGER,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch())
+    );
+
     CREATE INDEX IF NOT EXISTS idx_chat_sessions_user_id ON chat_sessions(user_id);
     CREATE INDEX IF NOT EXISTS idx_chat_messages_session_id ON chat_messages(session_id);
     CREATE INDEX IF NOT EXISTS idx_charts_session_id ON charts(session_id);
     CREATE INDEX IF NOT EXISTS idx_csvs_session_id ON csvs(session_id);
+    CREATE INDEX IF NOT EXISTS idx_images_session_id ON images(session_id);
+    CREATE INDEX IF NOT EXISTS idx_rag_contexts_session_id ON rag_contexts(session_id);
   `);
 
   // Insert dev user if it doesn't exist

@@ -105,6 +105,65 @@ const InlineChartRenderer = React.memo(({ chartId, alt }: { chartId: string; alt
 
 InlineChartRenderer.displayName = 'InlineChartRenderer';
 
+// Inline Image Renderer for CitationTextRenderer
+const InlineImageRenderer = React.memo(({ imageId, alt }: { imageId: string; alt?: string }) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>('');
+
+  useEffect(() => {
+    // Construct the image URL
+    const url = `/api/images/${imageId}`;
+    setImageUrl(url);
+    
+    // Validate that the image exists
+    const checkImage = async () => {
+      try {
+        const response = await fetch(url, { method: 'HEAD' });
+        if (!response.ok) {
+          setError(true);
+        }
+        setLoading(false);
+      } catch (err) {
+        setError(true);
+        setLoading(false);
+      }
+    };
+    
+    checkImage();
+  }, [imageId]);
+
+  if (loading) {
+    return (
+      <div className="my-4 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center">
+        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
+        <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading image...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="my-4 border border-red-200 dark:border-red-700 rounded-lg p-4 text-center">
+        <div className="text-sm text-red-600 dark:text-red-400">Failed to load image</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="my-4 flex justify-center">
+      <img 
+        src={imageUrl} 
+        alt={alt || 'Generated image'} 
+        className="max-w-full h-auto rounded-lg shadow-lg"
+        loading="lazy"
+      />
+    </div>
+  );
+}, (prevProps, nextProps) => prevProps.imageId === nextProps.imageId);
+
+InlineImageRenderer.displayName = 'InlineImageRenderer';
+
 // CSV rendering now handled by shared CsvRenderer component
 
 // Component to render grouped citations with hover card
@@ -332,12 +391,12 @@ const createMarkdownComponents = (citations: CitationMap) => ({
   },
 });
 
-// Helper to parse and extract CSV/chart references from markdown
-const parseSpecialReferences = (text: string): Array<{ type: 'text' | 'csv' | 'chart', content: string, id?: string }> => {
-  const segments: Array<{ type: 'text' | 'csv' | 'chart', content: string, id?: string }> = [];
+// Helper to parse and extract CSV/chart/image references from markdown
+const parseSpecialReferences = (text: string): Array<{ type: 'text' | 'csv' | 'chart' | 'image', content: string, id?: string }> => {
+  const segments: Array<{ type: 'text' | 'csv' | 'chart' | 'image', content: string, id?: string }> = [];
 
-  // Pattern to match ![alt](csv:uuid) or ![alt](/api/csvs/uuid) or chart references
-  const pattern = /!\[([^\]]*)\]\((csv:[a-f0-9-]+|\/api\/csvs\/[a-f0-9-]+|\/api\/charts\/[^\/]+\/image)\)/gi;
+  // Pattern to match ![alt](csv:uuid) or ![alt](/api/csvs/uuid) or chart/image references
+  const pattern = /!\[([^\]]*)\]\((csv:[a-f0-9-]+|\/api\/csvs\/[a-f0-9-]+|\/api\/charts\/[^\/]+\/image|image:[a-f0-9-]+|\/api\/images\/[a-f0-9-]+)\)/gi;
 
   let lastIndex = 0;
   let match;
@@ -365,14 +424,27 @@ const parseSpecialReferences = (text: string): Array<{ type: 'text' | 'csv' | 'c
         id: csvId
       });
     } else {
-      // Chart reference
-      const chartMatch = url.match(/^\/api\/charts\/([^\/]+)\/image$/);
-      if (chartMatch) {
+      // Check if it's an image reference
+      const imageProtocolMatch = url.match(/^image:([a-f0-9-]+)$/i);
+      const imageApiMatch = url.match(/^\/api\/images\/([a-f0-9-]+)$/i);
+
+      if (imageProtocolMatch || imageApiMatch) {
+        const imageId = (imageProtocolMatch || imageApiMatch)![1];
         segments.push({
-          type: 'chart',
+          type: 'image',
           content: match[0],
-          id: chartMatch[1]
+          id: imageId
         });
+      } else {
+        // Chart reference
+        const chartMatch = url.match(/^\/api\/charts\/([^\/]+)\/image$/);
+        if (chartMatch) {
+          segments.push({
+            type: 'chart',
+            content: match[0],
+            id: chartMatch[1]
+          });
+        }
       }
     }
 
@@ -410,9 +482,9 @@ export const CitationTextRenderer = React.memo(({
     [citations]
   );
 
-  // Parse special references (CSV/charts)
+  // Parse special references (CSV/charts/images)
   const specialSegments = React.useMemo(() => parseSpecialReferences(text), [text]);
-  const hasSpecialRefs = specialSegments.some(s => s.type === 'csv' || s.type === 'chart');
+  const hasSpecialRefs = specialSegments.some(s => s.type === 'csv' || s.type === 'chart' || s.type === 'image');
 
   // Memoize parsed segments to avoid re-parsing on every render during streaming
   const parsedSegments = React.useMemo(() => {
@@ -424,7 +496,7 @@ export const CitationTextRenderer = React.memo(({
 
   const hasCitationGroups = parsedSegments && parsedSegments.segments.some(s => s.type === 'citation-group');
 
-  // If we have CSV or chart references, render them separately to avoid nesting issues
+  // If we have CSV, chart, or image references, render them separately to avoid nesting issues
   if (hasSpecialRefs) {
     return (
       <div className={className}>
@@ -434,6 +506,9 @@ export const CitationTextRenderer = React.memo(({
           }
           if (segment.type === 'chart' && segment.id) {
             return <InlineChartRenderer key={`${segment.id}-${idx}`} chartId={segment.id} />;
+          }
+          if (segment.type === 'image' && segment.id) {
+            return <InlineImageRenderer key={`${segment.id}-${idx}`} imageId={segment.id} />;
           }
           // Render text segment as markdown
           return (

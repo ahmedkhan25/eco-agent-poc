@@ -1,5 +1,6 @@
 import { OpenAI } from 'openai';
 import { S3VectorsClient, QueryVectorsCommand } from "@aws-sdk/client-s3vectors";
+import * as db from '@/lib/db';
 
 // Configuration
 const VECTOR_BUCKET = "olympia-rag-vectors";
@@ -14,6 +15,7 @@ export const maxDuration = 30;
 interface QueryRequest {
   query: string;
   topK?: number;
+  sessionId?: string; // NEW: For context storage
 }
 
 interface VectorResult {
@@ -31,7 +33,8 @@ interface VectorResult {
 }
 
 interface RAGResponse {
-  answer: string;
+  context_id: string;         // NEW: Reference to stored context
+  compressed_summary: string; // NEW: Compressed context
   sources: Array<{
     doc_id: string;
     title: string;
@@ -41,6 +44,7 @@ interface RAGResponse {
   }>;
   query: string;
   processingTimeMs: number;
+  tokenCount?: number;        // NEW: Track compression size
 }
 
 /**
@@ -113,7 +117,56 @@ function buildContext(results: VectorResult[]): string {
 }
 
 /**
+ * Compress retrieved context using GPT-4o-mini
+ * Budget: max 800 tokens output
+ */
+async function compressContext(
+  openai: OpenAI,
+  query: string,
+  results: VectorResult[]
+): Promise<{ summary: string; tokenCount: number }> {
+  console.log('[Eco-RAG] Compressing context with GPT-4o-mini...');
+  
+  const rawContext = buildContext(results);
+  
+  const systemPrompt = `You are a context compression assistant. Your job is to take long document excerpts and compress them into concise, fact-dense summaries (max 800 tokens).
+
+Rules:
+1. Preserve all key facts, numbers, dates, and policy decisions
+2. Keep document citations (titles and page numbers)
+3. Remove redundancy and verbose explanations
+4. Output ONLY the compressed facts, no meta-commentary
+5. Stay under 800 tokens`;
+
+  const userPrompt = `Compress this context for the query: "${query}"
+
+RAW CONTEXT:
+${rawContext}
+
+COMPRESSED SUMMARY (max 800 tokens):`;
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    temperature: 0.2,
+    max_tokens: 900, // Slightly higher to allow completion
+  });
+
+  const summary = completion.choices[0].message.content || "";
+  const tokenCount = completion.usage?.completion_tokens || 0;
+  
+  console.log(`[Eco-RAG] ✓ Compressed to ${tokenCount} tokens`);
+  
+  return { summary, tokenCount };
+}
+
+/**
  * Generate answer using GPT-4o with RAG context
+ * NOTE: This function is now replaced by compressContext for the main flow
+ * Kept for potential future use or optional detailed generation
  */
 async function generateAnswer(
   openai: OpenAI,
@@ -173,7 +226,7 @@ export async function POST(req: Request) {
     
     // Parse request
     const body: QueryRequest = await req.json();
-    const { query, topK = 5 } = body;
+    const { query, topK = 5, sessionId } = body;
 
     if (!query || query.trim().length === 0) {
       return Response.json(
@@ -213,21 +266,21 @@ export async function POST(req: Request) {
 
     if (results.length === 0) {
       console.log('[Eco-RAG] No results found');
+      const contextId = `ctx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       return Response.json({
-        answer: "I couldn't find any relevant information in the Olympia city planning documents for your query. Please try rephrasing your question or asking about a different topic.",
+        context_id: contextId,
+        compressed_summary: "I couldn't find any relevant information in the Olympia city planning documents for your query. Please try rephrasing your question or asking about a different topic.",
         sources: [],
         query,
         processingTimeMs: Date.now() - startTime,
+        tokenCount: 0,
       } as RAGResponse);
     }
 
-    // Step 3: Build context from results
-    const context = buildContext(results);
+    // Step 3: Compress context using GPT-4o-mini (instead of generating full answer)
+    const { summary, tokenCount } = await compressContext(openai, query, results);
 
-    // Step 4: Generate answer with GPT-4o
-    const answer = await generateAnswer(openai, query, context);
-
-    // Step 5: Format sources for citation system
+    // Step 4: Format sources for citation system
     const sources = results.map((result, index) => ({
       doc_id: result.metadata?.doc_id || 'unknown',
       title: result.metadata?.title || 'Unknown Document',
@@ -247,13 +300,39 @@ export async function POST(req: Request) {
     }));
 
     const processingTimeMs = Date.now() - startTime;
+
+    // Step 5: Generate context_id and store full context in database
+    const contextId = `ctx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Store full context in DB if sessionId provided
+    if (sessionId) {
+      try {
+        const rawContext = buildContext(results);
+        await db.createRagContext({
+          id: contextId,
+          sessionId,
+          query,
+          fullContext: { results, rawContext },
+          compressedSummary: summary,
+          sources,
+          tokenCount,
+        });
+        console.log('[Eco-RAG] ✓ Stored context in database:', contextId);
+      } catch (error) {
+        console.error('[Eco-RAG] Failed to store context in database:', error);
+        // Continue even if storage fails - don't block the response
+      }
+    }
+
     console.log('[Eco-RAG] ✓ Query completed in', processingTimeMs, 'ms');
 
     return Response.json({
-      answer,
+      context_id: contextId,
+      compressed_summary: summary,
       sources,
       query,
       processingTimeMs,
+      tokenCount,
     } as RAGResponse);
 
   } catch (error) {

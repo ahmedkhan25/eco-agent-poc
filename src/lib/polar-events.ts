@@ -137,6 +137,57 @@ export class PolarEventTracker {
   }
 
   /**
+   * Track image generation usage
+   * Uses estimated token cost based on image size and quality
+   */
+  async trackImageGeneration(
+    userId: string,
+    sessionId: string,
+    metadata: any = {}
+  ) {
+    // Skip in development
+    if (this.isDevelopment || !this.polar) {
+      return;
+    }
+
+    // Input validation
+    if (!userId || !sessionId) {
+      return;
+    }
+
+    try {
+      // Calculate cost based on estimated tokens
+      // GPT Image pricing: ~$0.02 per 1000 tokens (approximate)
+      const estimatedTokens = metadata.estimatedTokens || 1056; // Default to medium quality
+      const baseCostDollars = (estimatedTokens / 1000) * 0.02;
+      
+      // Apply 20% markup and multiply by 100 for $0.01 unit pricing
+      const markupMultiplier = 1.2;
+      const billableAmount = Math.ceil(baseCostDollars * markupMultiplier * 100);
+
+      
+      // Send event to Polar
+      await this.polar.events.ingest({
+        events: [{
+          name: 'image_generation',
+          externalCustomerId: userId,
+          metadata: {
+            billable_amount: billableAmount, // This will be summed in Polar meter
+            estimated_tokens: estimatedTokens,
+            session_id: sessionId,
+            base_cost_dollars: baseCostDollars,
+            markup_multiplier: markupMultiplier,
+            timestamp: new Date().toISOString(),
+            ...metadata
+          }
+        }]
+      });
+
+    } catch (error) {
+    }
+  }
+
+  /**
    * Track dark mode theme switching usage
    * $0.01 per toggle for pay-per-use plan
    */

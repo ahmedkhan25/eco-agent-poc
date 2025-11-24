@@ -1721,30 +1721,32 @@ export function ChatInterface({
     // Create a smart title from the first user message
     const cleaned = firstMessage.trim();
     
-    // Biomedical keywords to prioritize in titles
-    const biomedKeywords = [
-      'drug', 'drugs', 'medication', 'clinical', 'trial', 'trials', 'study', 'studies',
-      'patient', 'patients', 'disease', 'therapy', 'treatment', 'diagnosis', 'cancer',
-      'covid', 'virus', 'vaccine', 'antibody', 'protein', 'gene', 'crispr', 'genome',
-      'fda', 'approval', 'phase', 'efficacy', 'safety', 'adverse', 'pubmed', 'research',
-      'molecular', 'cellular', 'pathology', 'pharmacology', 'immunotherapy', 'biomarker'
+    // City planning, climate, and sustainability keywords to prioritize in titles
+    const relevantKeywords = [
+      'climate', 'carbon', 'emissions', 'greenhouse', 'sustainability', 'renewable',
+      'olympia', 'city', 'budget', 'capital', 'facilities', 'infrastructure', 'planning',
+      'transportation', 'transit', 'bike', 'pedestrian', 'stormwater', 'water', 'wastewater',
+      'parks', 'recreation', 'urban', 'forestry', 'trees', 'green', 'environmental',
+      'resilience', 'sea level', 'flooding', 'emergency', 'hazard', 'energy', 'solar',
+      'building', 'housing', 'zoning', 'comprehensive plan', 'investment', 'funding',
+      'project', 'projects', 'program', 'initiative', 'policy', 'development', 'community'
     ];
 
     if (cleaned.length <= 50) {
       return cleaned;
     }
 
-    // Try to find a sentence with biomedical context
+    // Try to find a sentence with city planning/climate context
     const sentences = cleaned.split(/[.!?]+/);
     for (const sentence of sentences) {
       const trimmed = sentence.trim();
       if (trimmed.length > 10 && trimmed.length <= 50) {
-        // Check if this sentence contains biomedical keywords
-        const hasBiomedContext = biomedKeywords.some(keyword =>
+        // Check if this sentence contains relevant keywords
+        const hasRelevantContext = relevantKeywords.some(keyword =>
           trimmed.toLowerCase().includes(keyword.toLowerCase())
         );
 
-        if (hasBiomedContext) {
+        if (hasRelevantContext) {
           return trimmed;
         }
       }
@@ -1763,9 +1765,16 @@ export function ChatInterface({
   }, []);
 
   const createSession = useCallback(async (firstMessage: string): Promise<string | null> => {
-    if (!user) return null;
-    
     try {
+      // Generate session ID for BOTH authenticated AND anonymous users
+      const sessionId = crypto.randomUUID();
+      
+      // If not authenticated, just return the session ID (no DB insert)
+      if (!user) {
+        console.log('[Chat Interface] Created anonymous session:', sessionId);
+        return sessionId;
+      }
+      
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -2422,15 +2431,18 @@ export function ChatInterface({
       }
 
       // Create session BEFORE sending message for proper usage tracking
-      if (user && !currentSessionId && messages.length === 0) {
+      // CRITICAL: Create session for BOTH authenticated AND anonymous users
+      if (!currentSessionId && messages.length === 0) {
         try {
           const newSessionId = await createSession(queryText);
           if (newSessionId) {
             sessionIdRef.current = newSessionId;
             setCurrentSessionId(newSessionId);
             onSessionCreated?.(newSessionId);
+            console.log('[Chat Interface] Session created:', newSessionId, 'User:', user?.id || 'anonymous');
           }
         } catch (error) {
+          console.error('[Chat Interface] Failed to create session:', error);
           // Continue with message sending even if session creation fails
         }
       }
