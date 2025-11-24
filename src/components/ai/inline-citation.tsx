@@ -85,7 +85,14 @@ export const InlineCitationCardTrigger = React.forwardRef<
           <img
             src="/eco/eco-logo-trans.png"
             alt="Ecoheart"
-            className="h-6 w-6 inline-block"
+            className="h-6 w-6 inline-block dark:hidden"
+            loading="eager"
+            decoding="async"
+          />
+          <img
+            src="/eco/eco-logo.png"
+            alt="Ecoheart"
+            className="h-6 w-6 inline-block hidden dark:block"
             loading="eager"
             decoding="async"
           />

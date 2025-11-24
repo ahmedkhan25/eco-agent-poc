@@ -252,7 +252,7 @@ function HomeContent() {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-100 via-gray-200 to-slate-300 dark:from-slate-900 dark:via-gray-900 dark:to-slate-800 flex animate-gradient-shift'>
+    <div className='min-h-screen bg-gradient-to-br from-slate-100 via-gray-200 to-slate-300 dark:from-slate-700 dark:via-gray-700 dark:to-slate-600 flex animate-gradient-shift'>
       {/* Enterprise Banner */}
       <EnterpriseBanner />
 
@@ -339,7 +339,15 @@ function HomeContent() {
                       alt="Ecoheart"
                       width={300}
                       height={120}
-                      className="h-16 sm:h-20 w-auto"
+                      className="h-16 sm:h-20 w-auto dark:hidden"
+                      priority
+                    />
+                    <Image
+                      src="/eco/eco-logo.png"
+                      alt="Ecoheart"
+                      width={300}
+                      height={120}
+                      className="h-16 sm:h-20 w-auto hidden dark:block"
                       priority
                     />
                   </motion.div>

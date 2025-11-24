@@ -475,7 +475,14 @@ function BiomedicalChartComponent({
                 alt="Ecoheart"
                 width={70}
                 height={70}
-                className="opacity-80"
+                className="opacity-80 dark:hidden"
+              />
+              <Image
+                src="/eco/eco-logo.png"
+                alt="Ecoheart"
+                width={70}
+                height={70}
+                className="opacity-80 hidden dark:block"
               />
             </div>
           </div>

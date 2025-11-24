@@ -9,14 +9,15 @@ export function ThemeSelector() {
   const { tier, hasPolarCustomer } = useRateLimit();
   
   const hasSubscription = tier !== 'free' && tier !== 'anonymous';
+  const isDevelopment = process.env.NEXT_PUBLIC_APP_MODE === 'development';
 
   return (
     <ThemeSwitcher 
       value={theme as 'light' | 'dark' | 'system'}
       onChange={(newTheme) => setTheme(newTheme)}
       defaultValue="light"
-      requiresSubscription={true}
-      hasSubscription={hasSubscription}
+      requiresSubscription={!isDevelopment}
+      hasSubscription={hasSubscription || isDevelopment}
     />
   );
 }
@@ -54,14 +55,15 @@ export function ThemeMenuItem() {
   const { tier, hasPolarCustomer } = useRateLimit();
   
   const hasSubscription = tier !== 'free' && tier !== 'anonymous';
+  const isDevelopment = process.env.NEXT_PUBLIC_APP_MODE === 'development';
 
   return (
     <ThemeSwitcher 
       value={theme as 'light' | 'dark' | 'system'}
       onChange={(newTheme) => setTheme(newTheme)}
       defaultValue="light"
-      requiresSubscription={true}
-      hasSubscription={hasSubscription}
+      requiresSubscription={!isDevelopment}
+      hasSubscription={hasSubscription || isDevelopment}
     />
   );
 }

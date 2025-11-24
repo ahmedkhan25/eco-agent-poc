@@ -2995,7 +2995,14 @@ export function ChatInterface({
                     alt="Ecoheart"
                     width={60}
                     height={60}
-                    className="h-4 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+                    className="h-4 opacity-60 hover:opacity-100 transition-opacity cursor-pointer dark:hidden"
+                  />
+                  <Image
+                    src="/eco/eco-logo.png"
+                    alt="Ecoheart"
+                    width={60}
+                    height={60}
+                    className="h-4 opacity-60 hover:opacity-100 transition-opacity cursor-pointer hidden dark:block"
                   />
                 </a>
               </motion.div>

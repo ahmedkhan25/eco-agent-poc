@@ -46,11 +46,11 @@ export function useSubscription(): UserSubscription {
   // Return development mode permissions early (after all hooks)
   if (isDevelopment) {
     return {
-      tier: 'unlimited',
-      status: 'active',
+      tier: 'free',
+      status: 'inactive',
       isAnonymous: false,
-      isFree: false,
-      isPaid: true,
+      isFree: true,
+      isPaid: false,
       canDownloadReports: true,
       canAccessHistory: true,
     };

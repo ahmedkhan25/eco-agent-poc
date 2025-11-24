@@ -179,28 +179,8 @@ export function Sidebar({
     }
   };
 
-  const handleViewUsage = async () => {
-    try {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-
-      const response = await fetch('/api/customer-portal', {
-        headers: {
-          'Authorization': `Bearer ${session?.access_token}`
-        }
-      });
-
-      if (response.ok) {
-        const { redirectUrl } = await response.json();
-        window.open(redirectUrl, '_blank');
-      }
-    } catch (error) {
-    }
-  };
-
   // Get subscription status from database
   const subscription = useSubscription();
-  const { isPaid } = subscription;
 
   return (
     <>
@@ -349,37 +329,21 @@ export function Sidebar({
               </div>
 
               {/* Divider */}
-              {user && !isDevelopment && <div className="w-10 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent my-1" />}
+              {user && <div className="w-10 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent my-1" />}
 
-              {/* Billing/Subscription - Hidden in development mode */}
-              {user && !isDevelopment && (
-                <>
-                  {!isPaid ? (
-                    <div className="relative group/tooltip">
-                      <button
-                        onClick={() => setShowSubscription(true)}
-                        className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[20px] transition-all duration-200 group hover:scale-110 active:scale-95"
-                      >
-                        <CreditCard className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors" />
-                      </button>
-                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                        Upgrade
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="relative group/tooltip">
-                      <button
-                        onClick={handleViewUsage}
-                        className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[20px] transition-all duration-200 group hover:scale-110 active:scale-95"
-                      >
-                        <BarChart3 className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors" />
-                      </button>
-                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                        Usage & Billing
-                      </div>
-                    </div>
-                  )}
-                </>
+              {/* Contact Form */}
+              {user && (
+                <div className="relative group/tooltip">
+                  <button
+                    onClick={() => setShowSubscription(true)}
+                    className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[20px] transition-all duration-200 group hover:scale-110 active:scale-95"
+                  >
+                    <CreditCard className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors" />
+                  </button>
+                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                    Contact Us
+                  </div>
+                </div>
               )}
 
               {/* Enterprise */}
