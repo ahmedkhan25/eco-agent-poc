@@ -583,6 +583,9 @@ export const healthcareTools = {
   across 26 indexed city documents covering climate action, comprehensive planning, budgets, 
   transportation, infrastructure, public safety, and municipal operations.
   
+  LIMIT: Maximum 4 RAG searches per conversation. After reaching limit, use getRAGContext to retrieve 
+  previously searched data by context_id instead of searching again.
+  
   Available Documents (26 total):
   - Climate & Environment: Climate Risk Assessment, Sea Level Rise Plan, GHG Inventory, Water Quality/System Plans, Stormwater, Urban Forestry
   - Planning: Neighborhood Centers, Comprehensive Plan 2045 EIS, Housing Action Plan
@@ -615,7 +618,57 @@ export const healthcareTools = {
       const userId = (options as any)?.experimental_context?.userId;
       const sessionId = (options as any)?.experimental_context?.sessionId;
       
+      const MAX_RAG_CALLS_PER_SESSION = 5;
+      
+      console.log(`[RAG Tool] Starting search - sessionId: ${sessionId}, query: "${query.substring(0, 50)}..."`);
+      
       try {
+        // Check RAG call limit for this session
+        if (sessionId) {
+          const { count: ragCallCount, error: countError } = await db.countRagContextsForSession(sessionId);
+          console.log(`[RAG Tool] RAG count for session ${sessionId}: ${ragCallCount}/${MAX_RAG_CALLS_PER_SESSION}`, countError ? `(error: ${countError})` : '');
+          
+          if (ragCallCount >= MAX_RAG_CALLS_PER_SESSION) {
+            console.log(`[RAG Tool] LIMIT REACHED - returning error to agent`);
+            // Get existing contexts WITH their brief summaries
+            const { data: existingContexts } = await db.listRagContextsForSession(sessionId);
+            
+            // Build a helpful message with the data that IS available
+            const availableData = existingContexts?.map((c: any) => ({
+              context_id: c.id,
+              query: c.query,
+              // Include first 500 chars of summary so AI has usable data
+              preview: c.compressed_summary?.substring(0, 500) + (c.compressed_summary?.length > 500 ? '...' : '') || 'No preview',
+            })) || [];
+            
+            // Format readable list
+            const readableList = availableData.map((d: any, i: number) => 
+              `${i + 1}. Query: "${d.query}"\n   Context ID: ${d.context_id}\n   Preview: ${d.preview.substring(0, 200)}...`
+            ).join('\n\n');
+            
+            return `⚠️ **RAG SEARCH LIMIT REACHED - NO NEW SEARCH PERFORMED**
+
+You have already made ${MAX_RAG_CALLS_PER_SESSION} RAG searches in this conversation. This search was NOT executed and returned NO NEW DATA.
+
+**DO NOT call olympiaRAGSearch again.** Instead, use the data from your previous searches below.
+
+---
+
+## YOUR PREVIOUS RAG SEARCH RESULTS (${availableData.length} searches):
+
+${readableList}
+
+---
+
+## WHAT TO DO NOW:
+1. **USE THE DATA ABOVE** to answer the user's question - you already have relevant information
+2. If you need MORE DETAIL from a previous search, call: \`getRAGContext("context_id")\`
+3. **DO NOT call olympiaRAGSearch again** - it will fail every time
+
+The previews above contain key facts. If you need the full ~4000 token summary from any search, use getRAGContext with its context_id.`;
+          }
+        }
+        
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
         const response = await fetch(`${baseUrl}/api/eco-rag`, {
           method: 'POST',
@@ -637,26 +690,101 @@ export const healthcareTools = {
           tokenCount: data.tokenCount,
         });
         
-        // Format response to emphasize document sources
-        const sourceList = data.sources?.map((s: any) => `${s.title} (page ${s.page})`).join(', ') || 'None';
+        // Format sources for citations (include content for frontend display)
+        const sourcesMinimal = data.sources?.map((s: any) => ({
+          title: s.title,
+          page: s.page,
+          url: s.url,
+          relevanceScore: s.relevanceScore,
+          content: s.content,  // Include content for frontend summary display
+          source: s.source,
+          toolType: s.toolType,
+        })) || [];
         
-        // Return compressed format with context_id (~800 tokens vs 5-10KB)
+        // Create a brief summary (~800 tokens / ~3200 chars) from the compressed summary
+        // This gives the AI enough context to make decisions without needing getRAGContext
+        const briefSummary = data.compressed_summary 
+          ? data.compressed_summary.substring(0, 3200) + (data.compressed_summary.length > 3200 ? '...' : '')
+          : 'No summary available';
+        
+        // Return format with substantial brief for immediate AI use
+        // Full compressed_summary (up to 4000 tokens) is stored in DB and retrievable via getRAGContext
         return JSON.stringify({
           type: "olympia_planning",
-          context_id: data.context_id,         // NEW: Reference to stored context
-          compressed_summary: data.compressed_summary, // NEW: Compressed context (~800 tokens)
+          context_id: data.context_id,           // Reference to stored full context
+          brief: briefSummary,                   // Summary for immediate use (~800 tokens)
           query: query,
-          sources: data.sources,                // Keep citations
-          results: data.sources,                // Use 'results' for citation system compatibility
-          sourceDocuments: sourceList,
-          resultCount: data.sources?.length || 0,
-          documentCount: data.sources?.length || 0,
-          tokenCount: data.tokenCount,          // NEW: Track compression size
-          processingTimeMs: data.processingTimeMs,
+          sources: sourcesMinimal,               // Compact source list for citations
+          results: sourcesMinimal,               // Alias for citation system
+          resultCount: sourcesMinimal.length,
+          _note: `Full context (up to 4000 tokens) stored. Use getRAGContext("${data.context_id}") for complete details if needed.`,
           displaySource: 'City of Olympia Official Documents'
         }, null, 2);
       } catch (error) {
         return `❌ Error searching Olympia documents: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+    },
+  }),
+
+  getRAGContext: tool({
+    description: `Retrieve full RAG context from a previous olympiaRAGSearch by its context_id.
+  
+  Use this tool to:
+  - Get complete search results from a prior RAG search without making a new search
+  - Access detailed compressed summaries that weren't included in the original brief response
+  - Review previous search results when you need more information
+  
+  IMPORTANT: Always use this tool instead of making a new olympiaRAGSearch if:
+  - You've already searched for similar information in this conversation
+  - You hit the RAG search limit (4 per conversation)
+  - You need to reference data from an earlier search
+  
+  The context_id is returned by every olympiaRAGSearch call.`,
+    
+    inputSchema: z.object({
+      contextId: z.string().describe('The context_id from a previous olympiaRAGSearch result (format: ctx_timestamp_randomstring)'),
+    }),
+    
+    execute: async ({ contextId }) => {
+      try {
+        const { data: context, error } = await db.getRagContext(contextId);
+        
+        if (error || !context) {
+          return JSON.stringify({
+            type: "rag_context_error",
+            error: `Could not find RAG context with ID: ${contextId}`,
+            suggestion: "Make sure the context_id is correct. You can use olympiaRAGSearch to perform a new search if needed.",
+          }, null, 2);
+        }
+        
+        // Parse stored JSON fields
+        const fullContext = typeof context.fullContext === 'string' 
+          ? JSON.parse(context.fullContext) 
+          : context.fullContext;
+        const sources = typeof context.sources === 'string' 
+          ? JSON.parse(context.sources) 
+          : context.sources;
+        
+        await track('RAG Context Retrieved', {
+          contextId,
+          query: context.query,
+          hasFullContext: !!fullContext,
+          sourceCount: sources?.length || 0,
+        });
+        
+        return JSON.stringify({
+          type: "rag_context_retrieved",
+          context_id: contextId,
+          original_query: context.query,
+          compressed_summary: context.compressedSummary || context.compressed_summary,
+          sources: sources,
+          results: sources, // Alias for citation system
+          tokenCount: context.tokenCount || context.token_count,
+          retrieved_at: new Date().toISOString(),
+          displaySource: 'City of Olympia Official Documents (cached)',
+        }, null, 2);
+      } catch (error) {
+        return `❌ Error retrieving RAG context: ${error instanceof Error ? error.message : 'Unknown error'}`;
       }
     },
   }),

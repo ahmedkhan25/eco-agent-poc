@@ -143,6 +143,7 @@ function trimMessages(messages: BiomedUIMessage[], maxTokens: number = 8000): Bi
   return trimmedMessages;
 }
 
+
 /**
  * Strip OpenAI response IDs and other API-specific metadata from message parts.
  * This prevents "Duplicate item found" errors when reloading messages from the database.
@@ -172,6 +173,111 @@ function stripResponseMetadata(parts: any[]): any[] {
   });
 }
 
+/**
+ * Count tool calls in a conversation
+ */
+function countToolCalls(messages: BiomedUIMessage[]): number {
+  let count = 0;
+  for (const msg of messages) {
+    if (Array.isArray(msg.parts)) {
+      for (const part of msg.parts) {
+        if (part && typeof part === 'object' && typeof part.type === 'string' && part.type.startsWith('tool-')) {
+          count++;
+        }
+      }
+    }
+  }
+  return count;
+}
+
+/**
+ * Summarize older messages to prevent context overflow.
+ * Triggers when conversation has 5+ tool calls.
+ * Keeps last 3 messages intact and compresses older ones.
+ * 
+ * @param messages - All messages in the conversation
+ * @returns Messages with older ones summarized
+ */
+async function summarizeOlderMessages(messages: BiomedUIMessage[]): Promise<BiomedUIMessage[]> {
+  const toolCallCount = countToolCalls(messages);
+  
+  // Only trigger summarization when we have 5+ tool calls
+  if (toolCallCount < 5 || messages.length <= 3) {
+    return messages;
+  }
+  
+  console.log(`[Chat API] Summarization triggered: ${toolCallCount} tool calls, ${messages.length} messages`);
+  
+  // Keep the last 3 messages intact
+  const recentMessages = messages.slice(-3);
+  const olderMessages = messages.slice(0, -3);
+  
+  // If no older messages to summarize, return as-is
+  if (olderMessages.length === 0) {
+    return messages;
+  }
+  
+  // Extract key information from older messages for summary
+  const summaryParts: string[] = [];
+  
+  for (const msg of olderMessages) {
+    if (!Array.isArray(msg.parts)) continue;
+    
+    for (const part of msg.parts) {
+      if (!part || typeof part !== 'object') continue;
+      
+      // Cast to any for dynamic property access on tool call parts
+      const p = part as any;
+      
+      if (p.type === 'text' && p.text) {
+        // Truncate long text parts
+        const text = p.text.length > 500 ? p.text.substring(0, 500) + '...' : p.text;
+        summaryParts.push(`[${msg.role}]: ${text}`);
+      } else if (typeof p.type === 'string' && p.type.startsWith('tool-')) {
+        const toolName = p.type.replace('tool-', '');
+        
+        // Extract key info from tool results
+        if (p.type === 'tool-olympiaRAGSearch') {
+          try {
+            const result = typeof p.result === 'string' ? JSON.parse(p.result) : p.result;
+            if (result?.context_id) {
+              summaryParts.push(`[RAG Search: ${result.query || 'unknown'} → context_id: ${result.context_id}]`);
+            }
+          } catch {
+            summaryParts.push(`[RAG Search completed]`);
+          }
+        } else if (p.type === 'tool-createChart') {
+          const title = p.toolCall?.args?.title || p.args?.title || 'chart';
+          summaryParts.push(`[Created chart: ${title}]`);
+        } else if (p.type === 'tool-createCSV') {
+          const title = p.toolCall?.args?.title || p.args?.title || 'csv';
+          summaryParts.push(`[Created CSV: ${title}]`);
+        } else if (p.type === 'tool-generateImage') {
+          summaryParts.push(`[Generated image]`);
+        } else if (p.type === 'tool-webSearch') {
+          const query = p.toolCall?.args?.query || p.args?.query || '';
+          summaryParts.push(`[Web search: "${query}"]`);
+        } else {
+          summaryParts.push(`[${toolName} completed]`);
+        }
+      }
+    }
+  }
+  
+  // Create a summary message
+  const summaryText = `**Conversation History Summary (${olderMessages.length} earlier messages):**\n\n${summaryParts.slice(0, 20).join('\n')}\n\n---\n\n*Recent conversation continues below:*`;
+  
+  const summaryMessage: BiomedUIMessage = {
+    id: `summary-${Date.now()}`,
+    role: 'user',
+    parts: [{ type: 'text', text: summaryText }],
+  };
+  
+  console.log(`[Chat API] Summarized ${olderMessages.length} older messages into 1 summary message`);
+  
+  return [summaryMessage, ...recentMessages];
+}
+
 export async function POST(req: Request) {
   try {
     const { messages: frontendMessages, sessionId }: { messages: BiomedUIMessage[], sessionId?: string } = await req.json();
@@ -186,7 +292,9 @@ export async function POST(req: Request) {
       // Reload all previous messages from database (they're already filtered)
       const { data: dbMessages } = await db.getChatMessages(sessionId);
       
-      // Convert DB messages to BiomedUIMessage format and strip response metadata
+      // Convert DB messages to BiomedUIMessage format
+      // Tool call parts are kept intact - no conversion to text
+      // stripResponseMetadata removes rs_* IDs to prevent "Duplicate item found" errors
       const loadedMessages: BiomedUIMessage[] = (dbMessages || []).map((msg: any) => ({
         id: msg.id,
         role: msg.role,
@@ -196,57 +304,43 @@ export async function POST(req: Request) {
       // Add the new message from frontend (it's not in DB yet)
       // CRITICAL: Filter it first! Frontend caches full image/tool data in memory
       const newMessage = frontendMessages[frontendMessages.length - 1];
+      
+      // Filter out images and reasoning, keep text and tool parts
+      const processedParts = Array.isArray(newMessage.parts) ? newMessage.parts : [];
+      
       const filteredNewMessage = {
         ...newMessage,
-        parts: Array.isArray(newMessage.parts) 
-          ? newMessage.parts.filter((part: any) => {
+        parts: processedParts
+          .filter((part: any) => {
               if (!part || typeof part !== 'object') return true;
               const partType = part.type;
               
-              // Keep: text and ALL tool-related parts
-              // REMOVE: reasoning (huge!), step-start/finish (UI markers)
-              // NOTE: stripResponseMetadata removes rs_* IDs to prevent "missing reasoning" errors
+              // Keep: text and tool-* parts
               if (partType === 'text' || 
                   (typeof partType === 'string' && partType.startsWith('tool-'))) {
                 return true;
               }
               
-              // Remove: images (base64 data)
-              if (partType === 'image') {
-                return false;
-              }
-              
-              // Remove unknown types by default
+              // Remove: images (base64 data), reasoning, step-*, etc
               return false;
-            }).map((part: any) => {
+            })
+          .map((part: any) => {
               // CRITICAL: Strip base64 image data from tool-generateImage results
-              if (part.type === 'tool-generateImage') {
-                console.log(`[Chat API] DEBUG - tool-generateImage from NEW frontend message:`, {
-                  type: part.type,
-                  hasResult: !!part.result,
-                  resultType: typeof part.result,
-                  resultKeys: part.result ? Object.keys(part.result) : [],
-                  hasImageData: part.result?.imageData ? 'YES' : 'NO',
-                  imageDataLength: part.result?.imageData?.length || 0,
-                });
-                
-                if (part.result && typeof part.result === 'object') {
-                  const filteredPart = { ...part };
-                  if (part.result.imageData) {
-                    const imageId = part.result.imageId || 'unknown';
-                    filteredPart.result = {
+              if (part.type === 'tool-generateImage' && part.result && typeof part.result === 'object') {
+                if (part.result.imageData) {
+                  const imageId = part.result.imageId || 'unknown';
+                  return {
+                    ...part,
+                    result: {
                       ...part.result,
                       imageData: undefined,
                       _saved: `✓ Image saved to database (ID: ${imageId}). Display using: ![image](image:${imageId})`
-                    };
-                    console.log(`[Chat API] ✓ Stripped base64 imageData from frontend tool-generateImage (imageId: ${imageId})`);
-                  }
-                  return filteredPart;
+                    }
+                  };
                 }
               }
               return part;
             })
-          : newMessage.parts
       };
       
       messages = [...loadedMessages, filteredNewMessage];
@@ -647,11 +741,15 @@ export async function POST(req: Request) {
       }
     }
 
+    // Summarize older messages when conversation has many tool calls
+    // This compresses older messages while keeping recent ones intact
+    const summarizedMessages = await summarizeOlderMessages(messages);
+    
     // Trim messages to prevent context window overflow
     // Using token-aware trimming: keep as many recent messages as fit in token budget
-    // Set to 6000 tokens - RAG tool now returns compressed ~800 token summaries
-    // instead of 5-10KB raw chunks, so we can fit more turns
-    const trimmedMessages = trimMessages(messages, 6000);
+    // Set to 10000 tokens - RAG tool now returns minimal ~150 token results
+    // (context_id + sources + brief), with full context retrievable via getRAGContext
+    const trimmedMessages = trimMessages(summarizedMessages, 10000);
     
     // Debug: Log message structure to understand format
     if (messages.length > 0) {
@@ -732,6 +830,13 @@ When users ask about Olympia planning, climate, or municipal topics:
 
 Do NOT search the web first - always check official documents via olympiaRAGSearch before using webSearch.
 
+RAG SEARCH LIMITS AND CONTEXT RETRIEVAL:
+- Maximum 4 olympiaRAGSearch calls per conversation - plan your searches carefully!
+- Each search returns a brief summary + context_id. The full context is stored in the database.
+- If you need more details from a previous search, use getRAGContext(context_id) instead of searching again.
+- When you hit the limit, you'll receive a list of existing context_ids - use getRAGContext to access them.
+- NEVER re-search for information you already have. Check your conversation history first.
+
       CRITICAL CITATION INSTRUCTIONS:
       When you use ANY search tool (Olympia RAG search, web search) and reference information from the results in your response:
 
@@ -757,7 +862,8 @@ Do NOT search the web first - always check official documents via olympiaRAGSear
       
       You can:
 
-         - Search official City of Olympia planning documents using the olympiaRAGSearch tool (comprehensive plans, climate action plans, budget reports, transportation plans, environmental assessments, municipal operations)
+         - Search official City of Olympia planning documents using the olympiaRAGSearch tool (comprehensive plans, climate action plans, budget reports, transportation plans, environmental assessments, municipal operations) - LIMITED TO 4 SEARCHES PER CONVERSATION
+         - Retrieve full context from previous RAG searches using the getRAGContext tool (pass the context_id from a prior olympiaRAGSearch result to get complete details without using another search)
          - Execute Python code for climate data analysis, budget calculations, emissions modeling, statistical analysis, and urban planning computations using the codeExecution tool (runs in a secure Daytona Sandbox)
          - The Python environment can install packages via pip at runtime inside the sandbox (e.g., numpy, pandas, scipy, scikit-learn, matplotlib)
          - Visualization libraries (matplotlib, seaborn, plotly) may work inside Daytona. However, by default, prefer the built-in chart creation tool for standard time series and comparisons. Use Daytona for advanced or custom visualizations only when necessary.
@@ -1080,6 +1186,22 @@ Do NOT search the web first - always check official documents via olympiaRAGSear
                 // Remove unknown part types by default to prevent data leaks
                 return false;
               }).map((part: any) => {
+                // DEBUG: Log RAG tool parts to understand their structure
+                if (part.type === 'tool-olympiaRAGSearch') {
+                  console.log(`[Chat API] DEBUG - tool-olympiaRAGSearch part being saved:`, JSON.stringify({
+                    type: part.type,
+                    hasResult: !!part.result,
+                    resultType: typeof part.result,
+                    hasToolCall: !!part.toolCall,
+                    toolCallId: part.toolCallId,
+                    toolName: part.toolName,
+                    hasArgs: !!part.args,
+                    partKeys: Object.keys(part),
+                    // Show first 500 chars of result if it exists
+                    resultPreview: part.result ? JSON.stringify(part.result).substring(0, 500) : 'NO RESULT',
+                  }, null, 2));
+                }
+                
                 // CRITICAL: Strip base64 image data from tool-generateImage results
                 // The result field can contain imageData which is base64 encoded (100K+ tokens)
                 if (part.type === 'tool-generateImage') {
