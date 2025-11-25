@@ -145,6 +145,30 @@ function trimMessages(messages: BiomedUIMessage[], maxTokens: number = 8000): Bi
 
 
 /**
+ * Strip base64 image data from message parts.
+ * ONLY removes imageData from tool-generateImage results (100K+ tokens).
+ * Matches finance repo approach: minimal filtering, trust AI SDK.
+ */
+function stripBase64Images(parts: any[]): any[] {
+  if (!Array.isArray(parts)) return parts;
+  
+  return parts.map((part: any) => {
+    if (part?.type === 'tool-generateImage' && part.result?.imageData) {
+      const imageId = part.result.imageId || 'unknown';
+      return {
+        ...part,
+        result: {
+          ...part.result,
+          imageData: undefined,
+          _saved: `✓ Image saved to database (ID: ${imageId})`
+        }
+      };
+    }
+    return part;
+  });
+}
+
+/**
  * Strip OpenAI response IDs and other API-specific metadata from message parts.
  * This prevents "Duplicate item found" errors when reloading messages from the database.
  */
@@ -293,129 +317,31 @@ export async function POST(req: Request) {
       const { data: dbMessages } = await db.getChatMessages(sessionId);
       
       // Convert DB messages to BiomedUIMessage format
-      // CRITICAL: Filter out tool call parts without results - they cause OpenAI API errors
-      // ("function_call was provided without its required reasoning item")
-      const loadedMessages: BiomedUIMessage[] = (dbMessages || []).map((msg: any) => {
-        const rawParts = JSON.parse(msg.content);
-        const filteredParts = Array.isArray(rawParts) ? rawParts.filter((part: any) => {
-          if (!part || typeof part !== 'object') return true;
-          
-          // Keep text parts
-          if (part.type === 'text') return true;
-          
-          // For tool-* parts, only keep if they have actual result data
-          if (typeof part.type === 'string' && part.type.startsWith('tool-')) {
-            // AI SDK v5 uses 'output' for results, not 'result'
-            const hasOutput = part.output !== undefined && part.output !== null;
-            const hasResult = part.result !== undefined && part.result !== null;
-            if (!hasOutput && !hasResult) {
-              console.log(`[Chat API] Filtering out incomplete tool call: ${part.type} (no output/result)`);
-              return false;
-            }
-            return true;
-          }
-          
-          // Filter out other types (reasoning, step-*, etc)
-          return false;
-        }) : rawParts;
-        
-        return {
-          id: msg.id,
-          role: msg.role,
-          parts: stripResponseMetadata(filteredParts),
-        };
-      });
+      // SIMPLE approach like finance repo: just parse and pass through
+      // AI SDK's convertToModelMessages handles the format conversion
+      const loadedMessages: BiomedUIMessage[] = (dbMessages || []).map((msg: any) => ({
+        id: msg.id,
+        role: msg.role,
+        parts: stripResponseMetadata(JSON.parse(msg.content)),
+      }));
       
       // Add the new message from frontend (it's not in DB yet)
-      // CRITICAL: Filter it first! Frontend caches full image/tool data in memory
+      // SIMPLE: Just strip base64 image data, keep everything else
       const newMessage = frontendMessages[frontendMessages.length - 1];
-      
-      // Filter out images and reasoning, keep text and tool parts
-      const processedParts = Array.isArray(newMessage.parts) ? newMessage.parts : [];
-      
       const filteredNewMessage = {
         ...newMessage,
-        parts: processedParts
-          .filter((part: any) => {
-              if (!part || typeof part !== 'object') return true;
-              const partType = part.type;
-              
-              // Keep: text and tool-* parts
-              if (partType === 'text' || 
-                  (typeof partType === 'string' && partType.startsWith('tool-'))) {
-                return true;
-              }
-              
-              // Remove: images (base64 data), reasoning, step-*, etc
-              return false;
-            })
-          .map((part: any) => {
-              // CRITICAL: Strip base64 image data from tool-generateImage results
-              if (part.type === 'tool-generateImage' && part.result && typeof part.result === 'object') {
-                if (part.result.imageData) {
-                  const imageId = part.result.imageId || 'unknown';
-                  return {
-                    ...part,
-                    result: {
-                      ...part.result,
-                      imageData: undefined,
-                      _saved: `✓ Image saved to database (ID: ${imageId}). Display using: ![image](image:${imageId})`
-                    }
-                  };
-                }
-              }
-              return part;
-            })
+        parts: stripBase64Images(Array.isArray(newMessage.parts) ? newMessage.parts : [])
       };
       
       messages = [...loadedMessages, filteredNewMessage];
-      
-      console.log(`[Chat API] Reloaded ${loadedMessages.length} messages from DB + 1 new (filtered) from frontend`);
+      console.log(`[Chat API] Reloaded ${loadedMessages.length} messages from DB + 1 new from frontend`);
     } else {
-      // First message in conversation - filter frontend messages too!
-      // Frontend might have cached data from previous sessions
+      // First message in conversation - strip base64 images only
       messages = frontendMessages.map((msg: BiomedUIMessage) => ({
         ...msg,
-        parts: Array.isArray(msg.parts)
-          ? msg.parts.filter((part: any) => {
-              if (!part || typeof part !== 'object') return true;
-              const partType = part.type;
-              
-              // Keep: text and ALL tool-related parts
-              // REMOVE: reasoning (huge!), step-start/finish (UI markers)
-              // NOTE: stripResponseMetadata removes rs_* IDs to prevent "missing reasoning" errors
-              if (partType === 'text' || 
-                  (typeof partType === 'string' && partType.startsWith('tool-'))) {
-                return true;
-              }
-              
-              // Remove: images (base64 data)
-              if (partType === 'image') {
-                return false;
-              }
-              
-              // Remove unknown types
-              return false;
-            }).map((part: any) => {
-              // CRITICAL: Strip base64 image data from tool-generateImage results
-              if (part.type === 'tool-generateImage' && part.result && typeof part.result === 'object') {
-                const filteredPart = { ...part };
-                if (part.result.imageData) {
-                  const imageId = part.result.imageId || 'unknown';
-                  filteredPart.result = {
-                    ...part.result,
-                    imageData: undefined,
-                    _saved: `✓ Image saved to database (ID: ${imageId}). Display using: ![image](image:${imageId})`
-                  };
-                  console.log(`[Chat API] Stripped base64 imageData from frontend tool-generateImage (first message, imageId: ${imageId})`);
-                }
-                return filteredPart;
-              }
-              return part;
-            })
-          : msg.parts
+        parts: stripBase64Images(Array.isArray(msg.parts) ? msg.parts : [])
       }));
-      console.log("[Chat API] Using filtered frontend messages (first in conversation)");
+      console.log("[Chat API] Using frontend messages (first in conversation)");
     }
     
     console.log("[Chat API] Total messages:", messages.length);
@@ -1158,121 +1084,29 @@ RAG SEARCH LIMITS AND CONTEXT RETRIEVAL:
           // This replaces all messages in the session with the complete, up-to-date conversation
           const { randomUUID } = await import('crypto');
           
-          // DEBUG: Log what we're receiving
-          console.log('[Chat API] DEBUG - allMessages structure:');
-          allMessages.forEach((msg: any, idx: number) => {
-            console.log(`  Message ${idx}: role=${msg.role}, parts count=${msg.parts?.length || 0}`);
-            if (msg.parts) {
-              msg.parts.forEach((part: any, partIdx: number) => {
-                console.log(`    Part ${partIdx}: type=${part.type || 'unknown'}`);
-              });
-            }
-          });
-          
+          // SIMPLE approach like finance repo: save message.parts directly
+          // ONLY modification: strip base64 image data to prevent context overflow
           const messagesToSave = allMessages.map((message: any, index: number) => {
-            // AI SDK v5 uses 'parts' array for UIMessage
             let contentToSave = [];
 
             if (message.parts && Array.isArray(message.parts)) {
-              // CRITICAL: Filter out large data to prevent context explosion
-              // KEEP: text, tool calls, step markers, reasoning (small metadata)
-              // REMOVE: tool results (RAG chunks), images (base64 data), unknown types
-              const originalPartsCount = message.parts.length;
-              contentToSave = message.parts.filter((part: any) => {
-                // Keep user messages completely
-                if (message.role === 'user') {
-                  return true;
-                }
-                
-                // For assistant messages, filter based on part type
-                if (part && typeof part === 'object') {
-                  const partType = part.type;
-                  
-                  // Keep: text parts
-                  if (partType === 'text') {
-                    return true;
-                  }
-                  
-                  // For tool-* parts, ONLY keep if they have actual result/output data
-                  // This prevents saving incomplete tool calls that cause OpenAI API errors
-                  if (typeof partType === 'string' && partType.startsWith('tool-')) {
-                    const hasOutput = part.output !== undefined && part.output !== null;
-                    const hasResult = part.result !== undefined && part.result !== null;
-                    if (!hasOutput && !hasResult) {
-                      console.log(`[Chat API] Filtering out incomplete tool call: ${partType} (no output/result)`);
-                      return false;
+              // Map through parts, ONLY stripping base64 image data
+              contentToSave = message.parts.map((part: any) => {
+                // Strip base64 image data from tool-generateImage results (100K+ tokens)
+                if (part?.type === 'tool-generateImage' && part.result?.imageData) {
+                  const imageId = part.result.imageId || 'unknown';
+                  console.log(`[Chat API] ✓ Stripped base64 imageData from tool-generateImage (imageId: ${imageId})`);
+                  return {
+                    ...part,
+                    result: {
+                      ...part.result,
+                      imageData: undefined,
+                      _saved: `✓ Image saved to database (ID: ${imageId})`
                     }
-                    return true;
-                  }
-                  
-                  // Remove: images (base64 data)
-                  if (partType === 'image') {
-                    console.log(`[Chat API] Filtering out ${partType} part from message ${message.id}`);
-                    return false;
-                  }
-                  
-                  // Log unknown part types
-                  console.log(`[Chat API] Filtering out UNKNOWN part type '${partType}' from message ${message.id}`);
-                } else {
-                  console.log(`[Chat API] Filtering out invalid part (not an object) from message ${message.id}`, part);
-                }
-                
-                // Remove unknown part types by default to prevent data leaks
-                return false;
-              }).map((part: any) => {
-                // DEBUG: Log RAG tool parts to understand their structure
-                if (part.type === 'tool-olympiaRAGSearch') {
-                  console.log(`[Chat API] DEBUG - tool-olympiaRAGSearch part being saved:`, JSON.stringify({
-                    type: part.type,
-                    hasResult: !!part.result,
-                    resultType: typeof part.result,
-                    hasToolCall: !!part.toolCall,
-                    toolCallId: part.toolCallId,
-                    toolName: part.toolName,
-                    hasArgs: !!part.args,
-                    partKeys: Object.keys(part),
-                    // Show first 500 chars of result if it exists
-                    resultPreview: part.result ? JSON.stringify(part.result).substring(0, 500) : 'NO RESULT',
-                  }, null, 2));
-                }
-                
-                // CRITICAL: Strip base64 image data from tool-generateImage results
-                // The result field can contain imageData which is base64 encoded (100K+ tokens)
-                if (part.type === 'tool-generateImage') {
-                  console.log(`[Chat API] DEBUG - tool-generateImage part structure:`, {
-                    type: part.type,
-                    hasResult: !!part.result,
-                    resultType: typeof part.result,
-                    resultKeys: part.result ? Object.keys(part.result) : [],
-                    hasImageData: part.result?.imageData ? 'YES' : 'NO',
-                    imageDataLength: part.result?.imageData?.length || 0,
-                    has_instructions: !!part.result?._instructions,
-                    partKeys: Object.keys(part),
-                  });
-                  console.log(`[Chat API] DEBUG - Full part (first 500 chars):`, JSON.stringify(part).substring(0, 500));
-                  
-                  if (part.result && typeof part.result === 'object') {
-                    const filteredPart = { ...part };
-                    if (part.result.imageData) {
-                      const imageId = part.result.imageId || 'unknown';
-                      const imageUrl = part.result.imageUrl || `/api/images/${imageId}`;
-                      filteredPart.result = {
-                        ...part.result,
-                        imageData: undefined, // Remove base64 data
-                        _saved: `✓ Image successfully saved to database (ID: ${imageId}). Display it using: ![image](image:${imageId})`
-                      };
-                      console.log(`[Chat API] ✓ Stripped base64 imageData from tool-generateImage result (imageId: ${imageId})`);
-                    }
-                    return filteredPart;
-                  }
+                  };
                 }
                 return part;
               });
-              
-              // Log if we filtered anything
-              if (message.role === 'assistant' && contentToSave.length < originalPartsCount) {
-                console.log(`[Chat API] Filtered message parts: ${originalPartsCount} → ${contentToSave.length} (removed ${originalPartsCount - contentToSave.length} parts)`);
-              }
             } else if (message.content) {
               // Fallback for older format
               if (typeof message.content === 'string') {
@@ -1285,7 +1119,7 @@ RAG SEARCH LIMITS AND CONTEXT RETRIEVAL:
             return {
               id: message.id && message.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
                 ? message.id
-                : randomUUID(), // Generate UUID if message.id is not a valid UUID
+                : randomUUID(),
               role: message.role,
               content: contentToSave,
               processing_time_ms:
