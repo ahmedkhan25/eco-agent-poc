@@ -201,8 +201,8 @@ function countToolCalls(messages: BiomedUIMessage[]): number {
 async function summarizeOlderMessages(messages: BiomedUIMessage[]): Promise<BiomedUIMessage[]> {
   const toolCallCount = countToolCalls(messages);
   
-  // Only trigger summarization when we have 5+ tool calls
-  if (toolCallCount < 5 || messages.length <= 3) {
+  // Trigger summarization when we have 3+ tool calls (more aggressive to manage large RAG responses)
+  if (toolCallCount < 3 || messages.length <= 3) {
     return messages;
   }
   
@@ -648,9 +648,8 @@ export async function POST(req: Request) {
     
     // Trim messages to prevent context window overflow
     // Using token-aware trimming: keep as many recent messages as fit in token budget
-    // Set to 10000 tokens - RAG tool now returns minimal ~150 token results
-    // (context_id + sources + brief), with full context retrievable via getRAGContext
-    const trimmedMessages = trimMessages(summarizedMessages, 10000);
+    // Set to 50000 tokens - GPT-5.1 supports 128K+ context, giving room for RAG data + charts
+    const trimmedMessages = trimMessages(summarizedMessages, 50000);
     
     // Debug: Log message structure to understand format
     if (messages.length > 0) {
@@ -663,6 +662,56 @@ export async function POST(req: Request) {
           ? sampleMessage.parts[0].type 
           : 'none',
       });
+    }
+
+    // Pre-check RAG limit and build dynamic warning for system prompt
+    const MAX_RAG_CALLS = 4;
+    let ragLimitWarning = '';
+    let ragContextData = ''; // Inject actual data when limit reached
+    
+    if (sessionId) {
+      const { count: ragCallCount } = await db.countRagContextsForSession(sessionId);
+      const remaining = MAX_RAG_CALLS - (ragCallCount || 0);
+      console.log(`[Chat API] RAG usage check: ${ragCallCount}/${MAX_RAG_CALLS} used, ${remaining} remaining`);
+      
+      if (remaining <= 0) {
+        // Limit reached - get existing contexts WITH their full compressed summaries
+        const { data: existingContexts } = await db.listRagContextsForSession(sessionId);
+        
+        // Build context data with actual content (up to 4000 chars each to fit in context)
+        const contextSummaries = existingContexts?.map((c: any, i: number) => {
+          const summary = c.compressed_summary || c.compressedSummary || '';
+          // Truncate each summary to ~4000 chars (~1000 tokens) to fit multiple in context
+          const truncatedSummary = summary.substring(0, 4000) + (summary.length > 4000 ? '...' : '');
+          return `
+=== SEARCH ${i + 1}: "${c.query}" ===
+Context ID: ${c.id}
+${truncatedSummary}
+`;
+        }).join('\n') || '';
+        
+        ragLimitWarning = `
+⛔⛔⛔ CRITICAL: RAG SEARCH LIMIT REACHED ⛔⛔⛔
+You have used ALL ${MAX_RAG_CALLS} olympiaRAGSearch calls for this conversation.
+DO NOT call olympiaRAGSearch - it will ALWAYS fail.
+
+YOUR PREVIOUS SEARCH DATA IS BELOW - USE THIS TO ANSWER THE USER:
+`;
+        ragContextData = contextSummaries + `
+---
+To get MORE DETAIL from any search above, use: getRAGContext("context_id")
+If data above is insufficient, tell user to start a new chat.
+DO NOT attempt any new olympiaRAGSearch calls.
+`;
+      } else if (remaining === 1) {
+        ragLimitWarning = `
+⚠️ WARNING: Only 1 RAG search remaining! Make it count - use a comprehensive query.
+`;
+      } else if (remaining <= 2) {
+        ragLimitWarning = `
+⚠️ NOTICE: ${remaining} RAG searches remaining. Plan queries carefully.
+`;
+      }
     }
 
     const result = streamText({
@@ -678,6 +727,7 @@ export async function POST(req: Request) {
       providerOptions,
       // DON'T pass abortSignal - we want the stream to continue even if user switches tabs
       system: `You are an expert AI research assistant for the City of Olympia, Washington, specializing in city planning, climate action, environmental initiatives, smart city operations, infrastructure, and municipal sustainability.
+${ragLimitWarning}${ragContextData}
 
 AVAILABLE OLYMPIA DOCUMENTS (26 indexed documents):
 
@@ -729,7 +779,7 @@ When users ask about Olympia planning, climate, or municipal topics:
 3. ALWAYS prioritize official document citations over web sources
 4. Cite document titles and page numbers from RAG results
 
-Do NOT search the web first - always check official documents via olympiaRAGSearch before using webSearch.
+Do NOT search the web first - always check official documents via olympiaRAGSearch before using webSearch. You CAN use webSearch if the RAG search is insufficient, but always prioritize the RAG search first.
 
 RAG SEARCH LIMITS AND CONTEXT RETRIEVAL:
 - Maximum 4 olympiaRAGSearch calls per conversation - plan your searches carefully!

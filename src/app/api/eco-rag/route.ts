@@ -130,21 +130,22 @@ async function compressContext(
   
   const rawContext = buildContext(results);
   
-  const systemPrompt = `You are a context compression assistant. Your job is to take long document excerpts and compress them into concise, fact-dense summaries (max 4000 tokens).
+  const systemPrompt = `You are a context compression assistant. Your job is to take long document excerpts and compress them into concise, fact-dense summaries (max 8000 tokens).
 
 Rules:
-1. Preserve all key facts, numbers, dates, and policy decisions
+1. PRESERVE ALL EXACT NUMBERS - dollar amounts, percentages, dates, quantities, budgets, targets, timelines (e.g., "$14,523,847" NOT "$14.5M")
 2. Keep document citations (titles and page numbers)
 3. Remove redundancy and verbose explanations
 4. Output ONLY the compressed facts, no meta-commentary
-5. Stay under 4000 tokens`;
+5. Stay under 8000 tokens
+6. For budget/financial data: include ALL line items, categories, and exact figures - never summarize or round financial numbers`;
 
   const userPrompt = `Compress this context for the query: "${query}"
 
 RAW CONTEXT:
 ${rawContext}
 
-COMPRESSED SUMMARY (max 4000 tokens):`;
+COMPRESSED SUMMARY (max 8000 tokens, preserve ALL exact numbers and dollar amounts):`;
 
   // Use GPT-4o for clean summarization (no reasoning artifacts)
   const completion = await openai.chat.completions.create({
@@ -153,8 +154,8 @@ COMPRESSED SUMMARY (max 4000 tokens):`;
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
     ],
-    max_tokens: 4500,
-    temperature: 0.2, // Low temp for factual consistency
+    max_tokens: 8500,
+    temperature: 0.1, // Very low temp for exact factual preservation
   });
 
   // Extract summary from chat completion response
@@ -228,7 +229,7 @@ export async function POST(req: Request) {
     
     // Parse request
     const body: QueryRequest = await req.json();
-    const { query, topK = 5, sessionId } = body;
+    const { query, topK = 8, sessionId } = body;
 
     if (!query || query.trim().length === 0) {
       return Response.json(
@@ -293,9 +294,9 @@ export async function POST(req: Request) {
       url: result.metadata?.s3_pdf_key 
         ? `https://olympia-plans-raw.s3.us-west-2.amazonaws.com/${result.metadata.s3_pdf_key}#page=${result.metadata.page || 1}`
         : `#source-${index + 1}`,
-      // Add content/description for citation preview - use snippet from metadata (300 char preview)
+      // Add content/description for citation preview - use snippet from metadata (1000 char preview)
       content: result.metadata?.snippet 
-        ? result.metadata.snippet.substring(0, 300).trim() + (result.metadata.snippet.length > 300 ? '...' : '')
+        ? result.metadata.snippet.substring(0, 1000).trim() + (result.metadata.snippet.length > 1000 ? '...' : '')
         : '',
       description: `${result.metadata?.title} - Page ${result.metadata?.page}`,
       source: 'City of Olympia Official Documents',

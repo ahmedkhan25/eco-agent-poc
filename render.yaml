@@ -34,7 +34,7 @@ services:
       - key: DAYTONA_API_URL
         value: https://api.daytona.io
       - key: DAYTONA_TARGET
-        value: latest
+        value: us
       
       # App URL (will be set after deployment)
       - key: NEXT_PUBLIC_APP_URL

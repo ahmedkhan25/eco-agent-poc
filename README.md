@@ -102,8 +102,8 @@ Bio supports two distinct operating modes:
 
    # Daytona Configuration (Required for Python execution)
    DAYTONA_API_KEY=your-daytona-api-key
-   DAYTONA_API_URL=https://api.daytona.io  # Optional
-   DAYTONA_TARGET=latest  # Optional
+   DAYTONA_API_URL=https://app.daytona.io/api  # Required
+   DAYTONA_TARGET=us  # Optional: 'us', 'eu', or 'asia'
 
    # Local LLM Configuration (Optional - for unlimited, private queries)
    OLLAMA_BASE_URL=http://localhost:11434   # Default Ollama URL
@@ -525,8 +525,8 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # Daytona Configuration (Code Execution)
 DAYTONA_API_KEY=your-daytona-api-key
-DAYTONA_API_URL=https://api.daytona.io
-DAYTONA_TARGET=latest
+DAYTONA_API_URL=https://app.daytona.io/api
+DAYTONA_TARGET=us
 
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxxx.supabase.co

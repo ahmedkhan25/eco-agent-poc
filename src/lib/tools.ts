@@ -584,7 +584,7 @@ export const healthcareTools = {
   transportation, infrastructure, public safety, and municipal operations.
   
   LIMIT: Maximum 4 RAG searches per conversation. After reaching limit, use getRAGContext to retrieve 
-  previously searched data by context_id instead of searching again.
+  previously searched data by context_id instead of searching again. Plan your queries carefully!
   
   Available Documents (26 total):
   - Climate & Environment: Climate Risk Assessment, Sea Level Rise Plan, GHG Inventory, Water Quality/System Plans, Stormwater, Urban Forestry
@@ -611,14 +611,14 @@ export const healthcareTools = {
     
     inputSchema: z.object({
       query: z.string().describe('Natural language question about Olympia city planning, climate, or municipal operations'),
-      topK: z.number().min(1).max(10).optional().default(5).describe('Number of relevant document chunks to retrieve (default: 5)'),
+      topK: z.number().min(1).max(15).optional().default(8).describe('Number of relevant document chunks to retrieve (default: 8, max: 15 for comprehensive budget/financial queries)'),
     }),
     
     execute: async ({ query, topK }, options) => {
       const userId = (options as any)?.experimental_context?.userId;
       const sessionId = (options as any)?.experimental_context?.sessionId;
       
-      const MAX_RAG_CALLS_PER_SESSION = 5;
+      const MAX_RAG_CALLS_PER_SESSION = 4;
       
       console.log(`[RAG Tool] Starting search - sessionId: ${sessionId}, query: "${query.substring(0, 50)}..."`);
       
@@ -646,26 +646,26 @@ export const healthcareTools = {
               `${i + 1}. Query: "${d.query}"\n   Context ID: ${d.context_id}\n   Preview: ${d.preview.substring(0, 200)}...`
             ).join('\n\n');
             
-            return `⚠️ **RAG SEARCH LIMIT REACHED - NO NEW SEARCH PERFORMED**
+            return `⛔ **STOP - RAG SEARCH LIMIT REACHED**
 
-You have already made ${MAX_RAG_CALLS_PER_SESSION} RAG searches in this conversation. This search was NOT executed and returned NO NEW DATA.
+This search was BLOCKED. You have used all ${MAX_RAG_CALLS_PER_SESSION} RAG searches for this conversation.
 
-**DO NOT call olympiaRAGSearch again.** Instead, use the data from your previous searches below.
+**CRITICAL: Do NOT call olympiaRAGSearch again - it will always fail.**
+
+Instead, answer the user using your previous search results below:
 
 ---
-
-## YOUR PREVIOUS RAG SEARCH RESULTS (${availableData.length} searches):
 
 ${readableList}
 
 ---
 
-## WHAT TO DO NOW:
-1. **USE THE DATA ABOVE** to answer the user's question - you already have relevant information
-2. If you need MORE DETAIL from a previous search, call: \`getRAGContext("context_id")\`
-3. **DO NOT call olympiaRAGSearch again** - it will fail every time
+**YOUR OPTIONS:**
+1. Answer using the previews above (they contain key facts)
+2. Call \`getRAGContext("context_id")\` for full details from any previous search
+3. If data is insufficient, tell the user to start a new chat
 
-The previews above contain key facts. If you need the full ~4000 token summary from any search, use getRAGContext with its context_id.`;
+**NEVER call olympiaRAGSearch again in this conversation.**`;
           }
         }
         
@@ -701,23 +701,42 @@ The previews above contain key facts. If you need the full ~4000 token summary f
           toolType: s.toolType,
         })) || [];
         
-        // Create a brief summary (~800 tokens / ~3200 chars) from the compressed summary
+        // Create a brief summary (~1500 tokens / ~6000 chars) from the compressed summary
         // This gives the AI enough context to make decisions without needing getRAGContext
         const briefSummary = data.compressed_summary 
-          ? data.compressed_summary.substring(0, 3200) + (data.compressed_summary.length > 3200 ? '...' : '')
+          ? data.compressed_summary.substring(0, 6000) + (data.compressed_summary.length > 6000 ? '...' : '')
           : 'No summary available';
         
+        // Get updated count after this search
+        let remainingSearches = MAX_RAG_CALLS_PER_SESSION;
+        if (sessionId) {
+          const { count: newCount } = await db.countRagContextsForSession(sessionId);
+          remainingSearches = MAX_RAG_CALLS_PER_SESSION - (newCount || 0);
+        }
+        
+        // Build warning based on remaining searches
+        let searchWarning = '';
+        if (remainingSearches <= 0) {
+          searchWarning = '⛔ NO MORE SEARCHES ALLOWED. Use getRAGContext for follow-up queries.';
+        } else if (remainingSearches === 1) {
+          searchWarning = '⚠️ LAST SEARCH REMAINING. Make it comprehensive!';
+        } else {
+          searchWarning = `${remainingSearches} searches remaining.`;
+        }
+        
         // Return format with substantial brief for immediate AI use
-        // Full compressed_summary (up to 4000 tokens) is stored in DB and retrievable via getRAGContext
+        // Full compressed_summary (up to 8000 tokens) is stored in DB and retrievable via getRAGContext
         return JSON.stringify({
           type: "olympia_planning",
           context_id: data.context_id,           // Reference to stored full context
-          brief: briefSummary,                   // Summary for immediate use (~800 tokens)
+          brief: briefSummary,                   // Summary for immediate use (~1500 tokens)
           query: query,
           sources: sourcesMinimal,               // Compact source list for citations
           results: sourcesMinimal,               // Alias for citation system
           resultCount: sourcesMinimal.length,
-          _note: `Full context (up to 4000 tokens) stored. Use getRAGContext("${data.context_id}") for complete details if needed.`,
+          searchesRemaining: remainingSearches,
+          _warning: searchWarning,
+          _note: `Full context (up to 8000 tokens) stored. Use getRAGContext("${data.context_id}") for complete details if needed.`,
           displaySource: 'City of Olympia Official Documents'
         }, null, 2);
       } catch (error) {
@@ -824,9 +843,14 @@ The previews above contain key facts. If you need the full ~4000 token summary f
           return '❌ **Configuration Error**: Daytona API key is not configured.';
         }
 
+        const serverUrl = process.env.DAYTONA_API_URL;
+        if (!serverUrl) {
+          return '❌ **Configuration Error**: Daytona API URL is not configured. Set DAYTONA_API_URL in your environment.';
+        }
+
         const daytona = new Daytona({
           apiKey: daytonaApiKey,
-          serverUrl: process.env.DAYTONA_API_URL,
+          apiUrl: serverUrl,
           target: (process.env.DAYTONA_TARGET as any) || undefined,
         });
 
@@ -884,7 +908,19 @@ ${execution.result || '(No output produced)'}
           }
         }
       } catch (error: any) {
-        return `❌ **Error**: ${error.message || 'Unknown error occurred'}`;
+        const errorMessage = error.message || 'Unknown error occurred';
+        
+        // Detect if Daytona returned HTML instead of JSON (rate limit or API error)
+        if (errorMessage.includes('<!doctype') || errorMessage.includes('<html') || errorMessage.includes('Framer')) {
+          return `❌ **Daytona API Error**: The Daytona service returned an error page instead of a response. This usually means:
+- Rate limit exceeded on Daytona's free tier
+- API key is invalid or expired
+- Service is temporarily unavailable
+
+Please check your Daytona dashboard at https://app.daytona.io to verify your account status.`;
+        }
+        
+        return `❌ **Error**: ${errorMessage}`;
       }
     },
   }),
