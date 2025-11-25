@@ -2891,7 +2891,7 @@ export function ChatInterface({
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Search the web for Olympia WA current season and climate tips. Search Olympia docs for tree density guidelines. Create a simple infographic showing why trees matter for Olympia's climate - use minimal text, icons, and visuals only."
+                        "Search Olympia docs for tree density info. Create a fun, colorful infographic for kids explaining why Olympia needs lots of trees. Use cartoon trees, happy animals, simple icons, bright colors, and very few words. Make it playful and easy for children to understand!"
                       )
                     }
                     className="bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 dark:from-green-900/30 dark:via-emerald-900/30 dark:to-blue-900/30 rounded-xl border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 transition-all hover:shadow-xl dark:hover:shadow-green-900/30 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
@@ -2909,7 +2909,7 @@ export function ChatInterface({
                         Doc & Web Search
                       </div>
                       <div className="text-xs text-green-600 dark:text-green-400 line-clamp-1">
-                        Tree density infographic
+                        Kids tree infographic 🌳
                       </div>
                     </div>
                   </motion.button>
