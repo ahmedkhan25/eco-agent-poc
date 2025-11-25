@@ -52,7 +52,7 @@ export function useRateLimit(): UseRateLimitReturn {
       // Anonymous user - handle cookies client-side
       const today = new Date().toISOString().split('T')[0];
       const COOKIE_NAME = '$dekcuf_teg';
-      const ANONYMOUS_LIMIT = 3;
+      const ANONYMOUS_LIMIT = 1;
       
       const getCookie = (name: string): string | null => {
         if (typeof window === 'undefined') return null;
@@ -118,7 +118,7 @@ export function useRateLimit(): UseRateLimitReturn {
       
       const today = new Date().toISOString().split('T')[0];
       const COOKIE_NAME = '$dekcuf_teg';
-      const ANONYMOUS_LIMIT = 3;
+      const ANONYMOUS_LIMIT = 1;
       
       // Cookie handling functions
       const getCookie = (name: string): string | null => {

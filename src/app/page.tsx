@@ -63,8 +63,8 @@ function HomeContent() {
       const newCount = messageCount + 1;
       setMessageCount(newCount);
 
-      // Show signup prompt after 3 messages
-      if (newCount === 3) {
+      // Show signup prompt after 1 message
+      if (newCount === 1) {
         setTimeout(() => {
           setShowSignupPrompt(true);
         }, 2000); // Show after 2 seconds
@@ -337,17 +337,17 @@ function HomeContent() {
                     <Image
                       src="/eco/eco-logo-trans.png"
                       alt="Ecoheart"
-                      width={300}
-                      height={120}
-                      className="h-16 sm:h-20 w-auto dark:hidden"
+                      width={400}
+                      height={160}
+                      className="h-24 sm:h-32 w-auto dark:hidden"
                       priority
                     />
                     <Image
                       src="/eco/eco-logo.png"
                       alt="Ecoheart"
-                      width={300}
-                      height={120}
-                      className="h-16 sm:h-20 w-auto hidden dark:block"
+                      width={400}
+                      height={160}
+                      className="h-24 sm:h-32 w-auto hidden dark:block"
                       priority
                     />
                   </motion.div>
@@ -366,7 +366,7 @@ function HomeContent() {
                   
                   <motion.button
                     onClick={() => setIsInfoModalOpen(true)}
-                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white transition-colors flex items-center gap-2 text-sm font-medium shadow-md"
+                    className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 text-white transition-colors flex items-center gap-2 text-sm font-medium shadow-md"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                     aria-label="Learn more about this AI"

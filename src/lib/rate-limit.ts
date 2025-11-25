@@ -13,7 +13,7 @@ export interface RateLimitResult {
 }
 
 // Constants for rate limiting
-const ANONYMOUS_LIMIT = 3;
+const ANONYMOUS_LIMIT = 1;
 const FREE_LIMIT = 5;
 const UNLIMITED_LIMIT = 999999;
 

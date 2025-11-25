@@ -2738,7 +2738,7 @@ export function ChatInterface({
       >
         {messages.length === 0 && (
           <motion.div
-            className="pt-2 sm:pt-4"
+            className="pt-12 sm:pt-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
