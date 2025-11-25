@@ -45,11 +45,20 @@ export function calculateMessageMetrics(messageParts: any[]): MessageMetrics {
   };
 
   for (const part of messageParts) {
-    // Handle tool parts - the type is like 'tool-clinicalTrialsSearch', 'tool-webSearch', etc.
-    if (part.type?.startsWith('tool-')) {
-      // Extract tool name from type (e.g., 'tool-clinicalTrialsSearch' -> 'clinicalTrialsSearch')
-      const toolName = part.type.replace('tool-', '');
-
+    // Handle tool parts - support both live streaming and saved message formats:
+    // Live streaming: part.type = 'tool-webSearch' (tool- prefix + tool name)
+    // Saved messages: part.type = 'tool-result' with part.toolName = 'webSearch'
+    let toolName: string | null = null;
+    
+    if (part.type?.startsWith('tool-') && part.type !== 'tool-result') {
+      // Live streaming format: extract tool name from type
+      toolName = part.type.replace('tool-', '');
+    } else if (part.type === 'tool-result' && part.toolName) {
+      // Saved message format: use toolName property directly
+      toolName = part.toolName;
+    }
+    
+    if (toolName) {
       // The part structure is: { type, input, state, output, toolCallId, callProviderMetadata }
       // The actual result is in 'output'
       let result = part.output || part.result || part.args || part;
@@ -63,14 +72,16 @@ export function calculateMessageMetrics(messageParts: any[]): MessageMetrics {
         }
       }
 
-      // Search tools: web search, clinical trials, drug info, biomedical literature
+      // Search tools: web search, clinical trials, drug info, biomedical literature, RAG
       if (
         toolName === 'webSearch' ||
         toolName === 'search' ||
         toolName === 'clinicalTrialsSearch' ||
         toolName === 'drugInformationSearch' ||
         toolName === 'biomedicalLiteratureSearch' ||
-        toolName === 'researchSearch'
+        toolName === 'researchSearch' ||
+        toolName === 'olympiaRAGSearch' ||
+        toolName === 'getRAGContext'
       ) {
         // The result is structured as: { type, query, resultCount, results: [...] }
         const resultsArray = result?.results || [];

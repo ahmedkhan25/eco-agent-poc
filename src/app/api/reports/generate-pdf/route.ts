@@ -7,6 +7,9 @@ import { Citation } from '@/lib/citation-utils';
 import { csvToMarkdownTable, formatCsvForMarkdown, CSVData } from '@/lib/csv-utils';
 import * as fs from 'fs';
 import * as path from 'path';
+import { getLocalDb } from '@/lib/local-db/client';
+import { eq } from 'drizzle-orm';
+import * as schema from '@/lib/local-db/schema';
 
 // Dynamic import for chromium in production
 let chromium: any = null;
@@ -43,42 +46,94 @@ export async function POST(request: NextRequest) {
 
     console.log('[PDF Generation] Starting PDF generation for session:', sessionId);
 
-    const supabase = await createClient();
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    let sessionData: { title: string } | null = null;
+    let messages: any[] = [];
 
-    // Step 1: Fetch session and messages
-    const { data: sessionData, error: sessionError } = await supabase
-      .from('chat_sessions')
-      .select('title')
-      .eq('id', sessionId)
-      .single();
+    // Step 1: Fetch session and messages (from local SQLite in dev, Supabase in prod)
+    if (isDevelopment) {
+      console.log('[PDF Generation] Using local SQLite database (development mode)');
+      const localDb = getLocalDb();
+      
+      // Fetch session from local SQLite
+      const localSession = localDb
+        .select({ title: schema.chatSessions.title })
+        .from(schema.chatSessions)
+        .where(eq(schema.chatSessions.id, sessionId))
+        .get();
 
-    if (sessionError || !sessionData) {
-      console.error('[PDF Generation] Session not found:', sessionError);
-      return NextResponse.json(
-        { error: 'Session not found' },
-        { status: 404 }
-      );
-    }
+      if (!localSession) {
+        console.error('[PDF Generation] Session not found in local SQLite:', sessionId);
+        return NextResponse.json(
+          { error: 'Session not found' },
+          { status: 404 }
+        );
+      }
+      sessionData = localSession;
 
-    const { data: messages, error: messagesError } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .eq('session_id', sessionId)
-      .order('created_at', { ascending: true });
+      // Fetch messages from local SQLite
+      const localMessages = localDb
+        .select()
+        .from(schema.chatMessages)
+        .where(eq(schema.chatMessages.sessionId, sessionId))
+        .orderBy(schema.chatMessages.createdAt)
+        .all();
 
-    if (messagesError) {
-      console.error('[PDF Generation] Error fetching messages:', messagesError);
-      return NextResponse.json(
-        { error: 'Failed to fetch messages' },
-        { status: 500 }
-      );
-    }
+      if (!localMessages || localMessages.length === 0) {
+        return NextResponse.json(
+          { error: 'No messages found in session' },
+          { status: 404 }
+        );
+      }
 
-    if (!messages || messages.length === 0) {
-      return NextResponse.json(
-        { error: 'No messages found in session' },
-        { status: 404 }
-      );
+      // Transform local messages to match Supabase format
+      messages = localMessages.map(m => ({
+        ...m,
+        content: typeof m.content === 'string' ? JSON.parse(m.content) : m.content,
+        session_id: m.sessionId,
+        created_at: new Date(m.createdAt).toISOString(),
+        processing_time_ms: m.processingTimeMs,
+      }));
+    } else {
+      // Production: Use Supabase
+      const supabase = await createClient();
+
+      const { data: supabaseSession, error: sessionError } = await supabase
+        .from('chat_sessions')
+        .select('title')
+        .eq('id', sessionId)
+        .single();
+
+      if (sessionError || !supabaseSession) {
+        console.error('[PDF Generation] Session not found:', sessionError);
+        return NextResponse.json(
+          { error: 'Session not found' },
+          { status: 404 }
+        );
+      }
+      sessionData = supabaseSession;
+
+      const { data: supabaseMessages, error: messagesError } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true });
+
+      if (messagesError) {
+        console.error('[PDF Generation] Error fetching messages:', messagesError);
+        return NextResponse.json(
+          { error: 'Failed to fetch messages' },
+          { status: 500 }
+        );
+      }
+
+      if (!supabaseMessages || supabaseMessages.length === 0) {
+        return NextResponse.json(
+          { error: 'No messages found in session' },
+          { status: 404 }
+        );
+      }
+      messages = supabaseMessages;
     }
 
     console.log('[PDF Generation] Found', messages.length, 'messages');
@@ -181,13 +236,37 @@ export async function POST(request: NextRequest) {
     // Fetch CSV data and convert to markdown tables
     const csvMarkdownMap = new Map<string, string>();
     for (const csvId of csvIds) {
-      const { data: csvData, error } = await supabase
-        .from('csvs')
-        .select('*')
-        .eq('id', csvId)
-        .single();
+      let csvData: any = null;
+      
+      if (isDevelopment) {
+        const localDb = getLocalDb();
+        const localCsv = localDb
+          .select()
+          .from(schema.csvs)
+          .where(eq(schema.csvs.id, csvId))
+          .get();
+        
+        if (localCsv) {
+          csvData = {
+            ...localCsv,
+            headers: typeof localCsv.headers === 'string' ? JSON.parse(localCsv.headers) : localCsv.headers,
+            rows: typeof localCsv.rows === 'string' ? JSON.parse(localCsv.rows) : localCsv.rows,
+          };
+        }
+      } else {
+        const supabase = await createClient();
+        const { data, error } = await supabase
+          .from('csvs')
+          .select('*')
+          .eq('id', csvId)
+          .single();
+        
+        if (!error) {
+          csvData = data;
+        }
+      }
 
-      if (!error && csvData) {
+      if (csvData) {
         // Parse rows if they're stored as JSON string
         let parsedRows = csvData.rows;
         if (typeof csvData.rows === 'string') {
@@ -265,13 +344,13 @@ export async function POST(request: NextRequest) {
       }
 
       // Step 7: Build HTML template with logo
-      const logoPath = path.join(process.cwd(), 'public', 'valyu.svg');
-      const logoSvg = fs.readFileSync(logoPath, 'utf-8');
-      const logoBase64 = Buffer.from(logoSvg).toString('base64');
-      const logoDataUrl = `data:image/svg+xml;base64,${logoBase64}`;
+      const logoPath = path.join(process.cwd(), 'public', 'eco', 'eco-logo-trans.png');
+      const logoPng = fs.readFileSync(logoPath);
+      const logoBase64 = logoPng.toString('base64');
+      const logoDataUrl = `data:image/png;base64,${logoBase64}`;
 
       const htmlContent = buildPdfHtmlTemplate({
-        title: sessionData.title || 'BioMed Research Report',
+        title: sessionData.title || 'Ecoheart Research Report',
         content: markdownWithPlaceholders,
         citations: citations,
         logoDataUrl: logoDataUrl,
@@ -299,7 +378,7 @@ export async function POST(request: NextRequest) {
         displayHeaderFooter: true,
         footerTemplate: `
           <div style="font-size: 9px; color: #6b7280; text-align: center; width: 100%; padding-top: 10px; border-top: 1px solid #e5e7eb;">
-            <span style="margin-right: 20px;">Valyu</span>
+            <span style="margin-right: 20px;">Ecoheart</span>
             <span style="margin-right: 20px;">CONFIDENTIAL</span>
             <span class="pageNumber"></span> of <span class="totalPages"></span>
           </div>
@@ -347,19 +426,36 @@ async function renderChartAsImage(
 ): Promise<string> {
   console.log('[PDF Generation] Rendering chart:', chartId);
 
-  const supabase = await createClient();
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  let chartData: { chart_data: any } | null = null;
 
-  // Fetch chart data
-  const { data: chartData, error } = await supabase
-    .from('charts')
-    .select('chart_data')
-    .eq('id', chartId)
-    .single();
+  // Fetch chart data from local SQLite in dev, Supabase in prod
+  if (isDevelopment) {
+    const localDb = getLocalDb();
+    const localChart = localDb
+      .select({ chart_data: schema.charts.chartData })
+      .from(schema.charts)
+      .where(eq(schema.charts.id, chartId))
+      .get();
+    
+    if (localChart) {
+      chartData = { chart_data: localChart.chart_data };
+    }
+  } else {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('charts')
+      .select('chart_data')
+      .eq('id', chartId)
+      .single();
+    
+    if (!error && data) {
+      chartData = data;
+    }
+  }
 
-  if (error || !chartData) {
+  if (!chartData) {
     console.error('[PDF Generation] Chart not found:', chartId);
-    console.error('[PDF Generation] Error details:', JSON.stringify(error, null, 2));
-    console.error('[PDF Generation] Chart data:', chartData);
     return '';
   }
 
@@ -456,8 +552,10 @@ async function renderChartAsImage(
  * This approach is based on the atlas app's proven PDF chart rendering
  */
 function createRechartsHtml(chartData: any): string {
-  const logoPath = path.join(process.cwd(), 'public', 'valyu.svg');
-  const logoSvg = fs.readFileSync(logoPath, 'utf-8');
+  const logoPath = path.join(process.cwd(), 'public', 'eco', 'eco-logo-trans.png');
+  const logoPng = fs.readFileSync(logoPath);
+  const logoBase64 = logoPng.toString('base64');
+  const logoDataUrl = `data:image/png;base64,${logoBase64}`;
 
   const { chartType, title, description, dataSeries } = chartData;
   const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -524,7 +622,7 @@ function createRechartsHtml(chartData: any): string {
             <div class="chart-title">${title || 'Chart'}</div>
             ${description ? `<div class="chart-description">${description}</div>` : ''}
           </div>
-          <div class="logo">${logoSvg}</div>
+          <div class="logo"><img src="${logoDataUrl}" alt="Ecoheart" /></div>
         </div>
         <div class="chart-content">
           ${svgChart}
@@ -685,8 +783,10 @@ function generateSVGChart(chartData: any, colors: string[]): string {
  */
 function createChartComponentHtml(chartData: any): string {
   // Read logo
-  const logoPath = path.join(process.cwd(), 'public', 'valyu.svg');
-  const logoSvg = fs.readFileSync(logoPath, 'utf-8');
+  const logoPath = path.join(process.cwd(), 'public', 'eco', 'eco-logo-trans.png');
+  const logoPng = fs.readFileSync(logoPath);
+  const logoBase64 = logoPng.toString('base64');
+  const logoDataUrl = `data:image/png;base64,${logoBase64}`;
 
   // Encode chart data for URL
   const chartDataEncoded = encodeURIComponent(JSON.stringify(chartData));
@@ -767,7 +867,7 @@ function createChartComponentHtml(chartData: any): string {
             <div class="description">${chartData.description || ''}</div>
           </div>
           <div class="logo-box">
-            ${logoSvg}
+            <img src="${logoDataUrl}" alt="Ecoheart" />
           </div>
         </div>
         <div class="chart-content">

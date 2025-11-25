@@ -789,7 +789,7 @@ export function buildPdfHtmlTemplate(options: {
     <body>
       <!-- Letterhead -->
       <div class="letterhead">
-        <img src="${logoDataUrl}" alt="Valyu Logo" class="logo" />
+        <img src="${logoDataUrl}" alt="Ecoheart" class="logo" />
         <div class="date">${date}</div>
       </div>
 

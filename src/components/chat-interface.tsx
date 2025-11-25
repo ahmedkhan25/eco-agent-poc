@@ -2787,7 +2787,7 @@ export function ChatInterface({
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "What are Olympia's climate action goals? Search the Climate Risk and Vulnerability Assessment and Sea Level Rise Response Plan. Extract key milestones, adaptation strategies, and implementation timelines."
+                        "What are Olympia's climate action goals? Search the Climate Risk and Vulnerability Assessment and Sea Level Rise Response Plan. Extract high level milestones, adaptation strategies, and implementation timelines. keep it short"
                       )
                     }
                     className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all hover:shadow-lg dark:hover:shadow-emerald-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
