@@ -63,11 +63,33 @@ export async function GET(request: Request) {
       }
 
       // Success - redirect to app
-      return NextResponse.redirect(`${origin}${next}`)
+      // Handle load balancer/proxy by checking x-forwarded-host header
+      const forwardedHost = request.headers.get('x-forwarded-host');
+      const isLocalEnv = process.env.NODE_ENV === 'development';
+      
+      if (isLocalEnv) {
+        // No load balancer in local dev
+        return NextResponse.redirect(`${origin}${next}`);
+      } else if (forwardedHost) {
+        // Use the original host from before the load balancer
+        return NextResponse.redirect(`https://${forwardedHost}${next}`);
+      } else {
+        return NextResponse.redirect(`${origin}${next}`);
+      }
     }
   }
 
   // OAuth failed - redirect with error
   console.error('[Auth Callback] OAuth failed or no code provided');
+  
+  // Handle load balancer for error redirect too
+  const forwardedHost = request.headers.get('x-forwarded-host');
+  const isLocalEnv = process.env.NODE_ENV === 'development';
+  
+  if (isLocalEnv) {
+    return NextResponse.redirect(`${origin}/?error=auth_failed`);
+  } else if (forwardedHost) {
+    return NextResponse.redirect(`https://${forwardedHost}/?error=auth_failed`);
+  }
   return NextResponse.redirect(`${origin}/?error=auth_failed`)
 }
