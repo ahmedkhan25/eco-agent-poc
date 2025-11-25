@@ -2865,7 +2865,7 @@ export function ChatInterface({
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Compare Olympia's Capital Facilities Plans for 2025-2030 and 2026-2031. Create a CSV with project priorities, infrastructure investments, and funding sources. Generate visualizations showing: 1) Spending by department, 2) Project timelines, 3) Climate impact investments over time."
+                        "Search Olympia's Capital Facilities Plan 2025-2030. Show year-over-year project spending from 2025 to 2030. Create a chart showing infrastructure investment trends by year."
                       )
                     }
                     className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all hover:shadow-lg dark:hover:shadow-indigo-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
@@ -2883,7 +2883,7 @@ export function ChatInterface({
                         Infrastructure Plans
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
-                        Multi-year capital investments
+                        2025-2030 spending chart
                       </div>
                     </div>
                   </motion.button>
