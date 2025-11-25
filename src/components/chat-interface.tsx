@@ -2761,7 +2761,7 @@ export function ChatInterface({
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Analyze Olympia's greenhouse gas emissions trends from the GHG Inventory. Calculate the reduction rate needed to meet the 2030 target of 50% reduction. Use Python to model emission scenarios and visualize the trajectory with confidence intervals."
+                        "Analyze Olympia's greenhouse gas emissions trends from the GHG Inventory. What reduction rate is needed to meet the 2030 target of 50% reduction? Show emission scenarios and trajectory."
                       )
                     }
                     className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all hover:shadow-lg dark:hover:shadow-blue-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
@@ -2779,7 +2779,7 @@ export function ChatInterface({
                         Climate Modeling
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
-                        Python analysis & projections
+                        GHG analysis & projections
                       </div>
                     </div>
                   </motion.button>
