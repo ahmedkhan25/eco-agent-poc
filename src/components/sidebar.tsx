@@ -136,50 +136,6 @@ export function Sidebar({
     return () => window.removeEventListener('show-upgrade-modal', handleShowUpgradeModal);
   }, []);
 
-  const handleLogoClick = () => {
-    // If there's an active chat (either with session ID or just messages), warn before leaving
-    if (currentSessionId || hasMessages) {
-      const confirmed = window.confirm(
-        user
-          ? 'Leave this conversation? Your chat history will be saved.'
-          : 'Start a new chat? Your current conversation will be lost.'
-      );
-
-      if (confirmed) {
-        // Only close sidebar if not in alwaysOpen mode
-        if (!alwaysOpen) {
-          setIsOpen(false);
-        }
-        setShowHistory(false);
-        onNewChat?.(); // Call onNewChat to properly reset the chat interface
-      }
-      return;
-    }
-
-    // If on homepage without active chat, collapse sidebar only if not in alwaysOpen mode
-    if (pathname === '/') {
-      if (!alwaysOpen) {
-        setIsOpen(false);
-      }
-      setShowHistory(false);
-      return;
-    }
-
-    // If on other pages, warn before leaving
-    const confirmed = window.confirm(
-      'Leave this page? Your current session will be saved, but any unsaved changes will be lost.'
-    );
-
-    if (confirmed) {
-      // Only close sidebar if not in alwaysOpen mode
-      if (!alwaysOpen) {
-        setIsOpen(false);
-      }
-      setShowHistory(false);
-      router.push('/');
-    }
-  };
-
   // Get subscription status from database
   const subscription = useSubscription();
 
@@ -255,28 +211,6 @@ export function Sidebar({
                 </button>
                 <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                   {alwaysOpen ? 'Always Open (On)' : 'Always Open (Off)'}
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="w-10 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
-
-              {/* Logo */}
-              <div className="relative group/tooltip">
-                <button
-                  onClick={handleLogoClick}
-                  className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[20px] transition-all duration-200 hover:scale-110 active:scale-95"
-                >
-                  <Image
-                    src="/nabla.png"
-                    alt="Home"
-                    width={28}
-                    height={28}
-                    className="rounded-lg"
-                  />
-                </button>
-                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                  Home
                 </div>
               </div>
 
