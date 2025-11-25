@@ -133,13 +133,36 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         );
       }
-      messages = supabaseMessages;
+      // Transform Supabase messages to ensure content is parsed correctly
+      // Supabase may return content as a string (if TEXT column) or as JSONB
+      messages = supabaseMessages.map((m: any) => {
+        let parsedContent = m.content;
+        
+        if (typeof m.content === 'string') {
+          try {
+            parsedContent = JSON.parse(m.content);
+            console.log('[PDF Generation] Parsed content for message', m.id, '- parts:', 
+              Array.isArray(parsedContent) ? parsedContent.length : 'not-array');
+          } catch (e) {
+            console.error('[PDF Generation] Failed to parse content JSON for message', m.id, ':', e);
+            // If it's not valid JSON, wrap it as a text part
+            parsedContent = [{ type: 'text', text: m.content }];
+          }
+        }
+        
+        return {
+          ...m,
+          content: parsedContent,
+        };
+      });
     }
 
     console.log('[PDF Generation] Found', messages.length, 'messages');
 
     // Step 2: Extract markdown content from assistant messages only
     const assistantMessages = messages.filter((m: any) => m.role === 'assistant');
+    console.log('[PDF Generation] Found', assistantMessages.length, 'assistant messages');
+    
     let markdownContent = '';
     const citations: Citation[] = [];
     let citationNumber = 1;
@@ -147,7 +170,18 @@ export async function POST(request: NextRequest) {
 
     for (const message of assistantMessages) {
       const content = message.content;
-      if (!content || !Array.isArray(content)) continue;
+      
+      // Debug logging to understand content structure
+      console.log('[PDF Generation] Message content type:', typeof content);
+      console.log('[PDF Generation] Message content isArray:', Array.isArray(content));
+      if (content) {
+        console.log('[PDF Generation] Content preview:', JSON.stringify(content).slice(0, 200));
+      }
+      
+      if (!content || !Array.isArray(content)) {
+        console.log('[PDF Generation] Skipping message - content is not an array');
+        continue;
+      }
 
       // Accumulate processing time from assistant messages
       if (message.processing_time_ms) {
@@ -155,14 +189,43 @@ export async function POST(request: NextRequest) {
       }
 
       for (const part of content) {
+        console.log('[PDF Generation] Processing part type:', part.type);
+        
+        // Extract text content
         if (part.type === 'text' && part.text) {
+          console.log('[PDF Generation] Found text part, length:', part.text.length);
           markdownContent += part.text + '\n\n';
         }
         // Extract citations from tool results
-        else if (part.type === 'tool-result' && part.result) {
+        // Handle both formats: 'tool-result' (old) and 'tool-{toolName}' (new AI SDK format)
+        else if ((part.type === 'tool-result' || part.type?.startsWith('tool-')) && (part.result || part.output)) {
           try {
-            const result = typeof part.result === 'string' ? JSON.parse(part.result) : part.result;
-            if (result.results && Array.isArray(result.results)) {
+            // Handle both 'result' and 'output' field names
+            const rawResult = part.result || part.output;
+            const result = typeof rawResult === 'string' ? JSON.parse(rawResult) : rawResult;
+            
+            console.log('[PDF Generation] Found tool result for:', part.type);
+            
+            // Handle RAG results with sources array
+            if (result.sources && Array.isArray(result.sources)) {
+              for (const item of result.sources) {
+                citations.push({
+                  number: citationNumber.toString(),
+                  title: item.title || `Source ${citationNumber}`,
+                  url: item.url || '',
+                  description: item.content || item.summary || item.description,
+                  source: item.source || 'City of Olympia Official Documents',
+                  date: item.date,
+                  authors: Array.isArray(item.authors) ? item.authors : undefined,
+                  doi: item.doi,
+                  relevanceScore: item.relevanceScore || item.relevance_score,
+                  toolType: getToolType(part.type?.replace('tool-', '') || part.toolName),
+                });
+                citationNumber++;
+              }
+            }
+            // Handle other tool results with results array
+            else if (result.results && Array.isArray(result.results)) {
               for (const item of result.results) {
                 citations.push({
                   number: citationNumber.toString(),
@@ -174,13 +237,13 @@ export async function POST(request: NextRequest) {
                   authors: Array.isArray(item.authors) ? item.authors : undefined,
                   doi: item.doi,
                   relevanceScore: item.relevanceScore || item.relevance_score,
-                  toolType: getToolType(part.toolName),
+                  toolType: getToolType(part.type?.replace('tool-', '') || part.toolName),
                 });
                 citationNumber++;
               }
             }
           } catch (error) {
-            // Ignore parsing errors
+            console.log('[PDF Generation] Failed to parse tool result:', error);
           }
         }
       }
@@ -189,6 +252,27 @@ export async function POST(request: NextRequest) {
     console.log('[PDF Generation] Extracted content length:', markdownContent.length);
     console.log('[PDF Generation] Found', citations.length, 'citations');
     console.log('[PDF Generation] Total processing time:', totalProcessingTimeMs, 'ms');
+
+    // Check if we extracted any content
+    if (markdownContent.trim().length === 0) {
+      console.error('[PDF Generation] No text content found in messages!');
+      console.log('[PDF Generation] Assistant messages structure:', 
+        JSON.stringify(assistantMessages.map(m => ({
+          id: m.id,
+          contentType: typeof m.content,
+          contentLength: JSON.stringify(m.content).length,
+          partTypes: Array.isArray(m.content) ? m.content.map((p: any) => p.type) : 'not-array'
+        })), null, 2)
+      );
+      
+      return NextResponse.json(
+        { 
+          error: 'No text content found in session messages',
+          details: 'The assistant messages do not contain any text parts. This might be a data format issue.'
+        },
+        { status: 400 }
+      );
+    }
 
     // Step 3: Extract chart IDs and CSV IDs from markdown
     const chartPattern = /!\[.*?\]\(\/api\/charts\/([^\/]+)\/image\)/g;
