@@ -79,8 +79,21 @@ export async function checkAnonymousRateLimit(): Promise<RateLimitResult> {
 
 /**
  * Authenticated users - Database-based rate limiting
+ * NOTE: For POC, all signed-in users get unlimited queries
  */
 export async function checkUserRateLimit(userId: string): Promise<RateLimitResult> {
+  // POC: All authenticated users get unlimited queries
+  // Keeping the code structure for future use, but returning unlimited for all signed-in users
+  return {
+    allowed: true,
+    remaining: UNLIMITED_LIMIT,
+    limit: UNLIMITED_LIMIT,
+    resetTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    tier: 'unlimited',
+    used: 0
+  };
+
+  /* Original rate limiting code - kept for future use
   if (isDevelopment) {
     return {
       allowed: true,
@@ -130,6 +143,7 @@ export async function checkUserRateLimit(userId: string): Promise<RateLimitResul
     tier,
     used
   };
+  */
 }
 
 /**
@@ -197,6 +211,7 @@ export async function transferAnonymousToUser(userId: string): Promise<void> {
 
 /**
  * Increment usage (handles both anonymous and authenticated)
+ * NOTE: For POC, authenticated users have unlimited queries so no increment needed
  */
 export async function incrementRateLimit(userId?: string): Promise<RateLimitResult> {
   if (isDevelopment) {
@@ -206,8 +221,8 @@ export async function incrementRateLimit(userId?: string): Promise<RateLimitResu
   }
 
   if (userId) {
-    // Authenticated user - increment in database
-    return await incrementUserRateLimit(userId);
+    // POC: Authenticated users have unlimited queries, just return unlimited status
+    return await checkUserRateLimit(userId);
   } else {
     // Anonymous user - increment cookies
     return await incrementAnonymousRateLimit();

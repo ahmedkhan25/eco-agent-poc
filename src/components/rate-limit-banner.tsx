@@ -49,7 +49,8 @@ export function RateLimitBanner() {
   }, [shouldShow, noQueriesLeft, remaining, subscription.tier, isLastQuery, isDevelopment, rateLimit]);
 
   // All early returns after all hooks
-  if (isDevelopment || !rateLimit || isDismissed || subscription.isPaid) {
+  // POC: Don't show rate limit banner for authenticated users (they have unlimited queries)
+  if (isDevelopment || !rateLimit || isDismissed || subscription.isPaid || user) {
     return null;
   }
 
