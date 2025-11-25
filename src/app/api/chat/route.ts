@@ -285,40 +285,14 @@ export async function POST(req: Request) {
     console.log("[Chat API] Received sessionId:", sessionId);
     console.log("[Chat API] Frontend messages count:", frontendMessages.length);
     
-    // CRITICAL: Reload messages from database instead of trusting frontend
-    // Frontend keeps full image/tool result data in memory, causing context overflow
-    let messages: BiomedUIMessage[];
-    if (sessionId && frontendMessages.length > 1) {
-      // Reload all previous messages from database (they're already filtered)
-      const { data: dbMessages } = await db.getChatMessages(sessionId);
-      
-      // Convert DB messages to BiomedUIMessage format
-      // SIMPLE approach like finance repo: just parse and pass through
-      // AI SDK's convertToModelMessages handles the format conversion
-      const loadedMessages: BiomedUIMessage[] = (dbMessages || []).map((msg: any) => ({
-        id: msg.id,
-        role: msg.role,
-        parts: JSON.parse(msg.content),  // Direct like finance - no stripping
-      }));
-      
-      // Add the new message from frontend (it's not in DB yet)
-      // SIMPLE: Just strip base64 image data, keep everything else
-      const newMessage = frontendMessages[frontendMessages.length - 1];
-      const filteredNewMessage = {
-        ...newMessage,
-        parts: stripBase64Images(Array.isArray(newMessage.parts) ? newMessage.parts : [])
-      };
-      
-      messages = [...loadedMessages, filteredNewMessage];
-      console.log(`[Chat API] Reloaded ${loadedMessages.length} messages from DB + 1 new from frontend`);
-    } else {
-      // First message in conversation - strip base64 images only
-      messages = frontendMessages.map((msg: BiomedUIMessage) => ({
-        ...msg,
-        parts: stripBase64Images(Array.isArray(msg.parts) ? msg.parts : [])
-      }));
-      console.log("[Chat API] Using frontend messages (first in conversation)");
-    }
+    // MATCH FINANCE REPO: Use frontend messages directly, just strip base64 images
+    // Don't reload from DB - that causes duplicate rs_* IDs with OpenAI Responses API
+    // Frontend maintains conversation state, we just need to strip large data
+    const messages: BiomedUIMessage[] = frontendMessages.map((msg: BiomedUIMessage) => ({
+      ...msg,
+      parts: stripBase64Images(Array.isArray(msg.parts) ? msg.parts : [])
+    }));
+    console.log("[Chat API] Using frontend messages directly (like finance repo)");
     
     console.log("[Chat API] Total messages:", messages.length);
 
