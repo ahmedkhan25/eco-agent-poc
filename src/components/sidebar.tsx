@@ -19,6 +19,7 @@ import {
   BarChart3,
   Plus,
   Building2,
+  Home,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -282,17 +283,17 @@ export function Sidebar({
               {/* Divider */}
               <div className="w-10 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
 
-              {/* New Chat */}
+              {/* Home / New Chat */}
               {user && (
                 <div className="relative group/tooltip">
                   <button
                     onClick={handleNewChat}
                     className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[20px] transition-all duration-200 group hover:scale-110 active:scale-95"
                   >
-                    <MessageCirclePlus className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors" />
+                    <Home className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors" />
                   </button>
                   <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                    New Chat
+                    Home
                   </div>
                 </div>
               )}
