@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useAuthStore } from '@/lib/stores/use-auth-store';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog';
 import { FaGoogle } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -123,10 +123,15 @@ export function AuthModal({ open, onClose, onSignUpSuccess }: AuthModalProps) {
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-xs border-0 shadow-2xl bg-white dark:bg-gray-950 p-8">
-        <DialogHeader className="text-center pb-6">
-          <DialogTitle className="text-xl font-normal text-gray-900 dark:text-gray-100">
-            Bio.
-          </DialogTitle>
+        <DialogHeader className="flex items-center justify-center pb-6">
+          <Image
+            src="/eco/eco-logo-trans.png"
+            alt="Ecoheart Logo"
+            width={140}
+            height={56}
+            className="dark:invert"
+            priority
+          />
         </DialogHeader>
 
         {/* Success Message */}
