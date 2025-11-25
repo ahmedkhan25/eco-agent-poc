@@ -2761,7 +2761,7 @@ export function ChatInterface({
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Analyze Olympia's greenhouse gas emissions trends from the GHG Inventory. What reduction rate is needed to meet the 2030 target of 50% reduction? Show emission scenarios and trajectory."
+                        "Analyze Olympia's greenhouse gas emissions trends from the GHG Inventory. What reduction rate is needed to meet the 2030 target of 50% reduction? Visualize the emission scenarios and trajectory with a chart."
                       )
                     }
                     className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all hover:shadow-lg dark:hover:shadow-blue-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
