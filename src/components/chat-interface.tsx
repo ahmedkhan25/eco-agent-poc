@@ -2839,7 +2839,7 @@ export function ChatInterface({
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Analyze Olympia's 2025 Operating Budget. Compare budget allocations across climate action, transportation, and environmental departments. Create a comprehensive CSV with spending categories, year-over-year changes, and per capita costs."
+                        "Explain Olympia's 2025 adopted operating budget in clear, plain language for a general audience. Focus on: The total 2025 operating budget amount, the main fund groups (at a high level only), and how the 2025 budget compares to 2024 (total amount and percent change). Keep the comparison high level, not super detailed.\n\nRequirements: First, use the official City of Olympia 2025 Adopted Operating Budget and any related Olympia financial/planning documents as your primary sources.\n\nProvide:\n- A short executive summary (3–5 bullet points)\n- A simple markdown table comparing 2024 vs 2025 total operating budget (amount, dollar change, percent change)\n- Create one simple chart: Type: bar chart, X‑axis: \"Year\", Y‑axis: \"Total Adopted Operating Budget ($ millions)\", Two bars only: 2024 and 2025 totals\n\nAfter generating the chart with your tools, embed it in the answer and briefly explain what it shows in 2–3 sentences. Be concise and avoid deep departmental or line‑item detail. This is just a high‑level overview.\n\nFinally, summarize the key takeaway in 2–3 bullet points at the end (e.g., how much the budget grew and what that implies for city services)."
                       )
                     }
                     className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-600 transition-all hover:shadow-lg dark:hover:shadow-amber-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
@@ -2891,7 +2891,7 @@ export function ChatInterface({
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Do a comprehensive analysis of Olympia's climate resilience strategy. Search the Comprehensive Plan 2045 EIS, Climate Risk Assessment, and Neighborhood Centers Strategy. Analyze urban planning priorities, environmental impact mitigation, and community development goals. Use Python to create a comprehensive CSV with: Planning areas, climate adaptation measures, timeline projections, and implementation budgets. Generate charts comparing sustainability metrics across different neighborhoods and policy areas."
+                        "Create a resident-friendly infographic about Olympia's winter climate preparedness. Search the Climate Risk Assessment, Comprehensive Plan 2045, and city emergency preparedness documents. Also search the web for current Pacific Northwest winter weather forecasts and climate trends. Combine document insights with web data to create a visual guide showing: 1) Expected winter weather patterns for Olympia, 2) City climate adaptation measures residents should know about, 3) Neighborhood-specific resources and warming centers, 4) Sustainability tips for the season. Generate an engaging infographic image that residents can easily understand and share."
                       )
                     }
                     className="bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 dark:from-green-900/30 dark:via-emerald-900/30 dark:to-blue-900/30 rounded-xl border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 transition-all hover:shadow-xl dark:hover:shadow-green-900/30 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
@@ -2906,10 +2906,10 @@ export function ChatInterface({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-green-700 dark:text-green-300 text-xs font-semibold group-hover:text-green-800 dark:group-hover:text-green-200 transition-colors">
-                        Deep Investigation
+                        Doc & Web Search
                       </div>
                       <div className="text-xs text-green-600 dark:text-green-400 line-clamp-1">
-                        Multi-source analysis + Climate data
+                        Seasonal infographic for residents
                       </div>
                     </div>
                   </motion.button>
