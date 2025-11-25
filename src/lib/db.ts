@@ -554,3 +554,50 @@ export async function getRagContext(contextId: string) {
     .single();
   return { data, error };
 }
+
+export async function countRagContextsForSession(sessionId: string) {
+  if (isDevelopmentMode()) {
+    const db = getLocalDb();
+    const contexts = await db.query.ragContexts.findMany({
+      where: eq(schema.ragContexts.sessionId, sessionId),
+      columns: { id: true },
+    });
+    return { count: contexts.length, error: null };
+  }
+
+  const supabase = await createSupabaseClient();
+  const { count, error } = await supabase
+    .from("rag_contexts")
+    .select("*", { count: "exact", head: true })
+    .eq("session_id", sessionId);
+  return { count: count || 0, error };
+}
+
+export async function listRagContextsForSession(sessionId: string) {
+  if (isDevelopmentMode()) {
+    const db = getLocalDb();
+    const contexts = await db.query.ragContexts.findMany({
+      where: eq(schema.ragContexts.sessionId, sessionId),
+      columns: { id: true, query: true, compressedSummary: true, createdAt: true },
+      orderBy: desc(schema.ragContexts.createdAt),
+    });
+    // Map to consistent field name
+    return { 
+      data: contexts.map(c => ({ 
+        id: c.id, 
+        query: c.query, 
+        compressed_summary: c.compressedSummary,
+        created_at: c.createdAt 
+      })), 
+      error: null 
+    };
+  }
+
+  const supabase = await createSupabaseClient();
+  const { data, error } = await supabase
+    .from("rag_contexts")
+    .select("id, query, compressed_summary, created_at")
+    .eq("session_id", sessionId)
+    .order("created_at", { ascending: false });
+  return { data, error };
+}

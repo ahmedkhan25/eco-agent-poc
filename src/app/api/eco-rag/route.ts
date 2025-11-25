@@ -117,49 +117,51 @@ function buildContext(results: VectorResult[]): string {
 }
 
 /**
- * Compress retrieved context using GPT-4o-mini
- * Budget: max 800 tokens output
+ * Compress retrieved context using GPT-4o
+ * Budget: max 4000 tokens output for comprehensive summaries
+ * Using GPT-4o instead of reasoning models to avoid reasoning artifacts in summaries
  */
 async function compressContext(
   openai: OpenAI,
   query: string,
   results: VectorResult[]
 ): Promise<{ summary: string; tokenCount: number }> {
-  console.log('[Eco-RAG] Compressing context with GPT-4o-mini...');
+  console.log('[Eco-RAG] Compressing context with GPT-4o...');
   
   const rawContext = buildContext(results);
   
-  const systemPrompt = `You are a context compression assistant. Your job is to take long document excerpts and compress them into concise, fact-dense summaries (max 800 tokens).
+  const systemPrompt = `You are a context compression assistant. Your job is to take long document excerpts and compress them into concise, fact-dense summaries (max 4000 tokens).
 
 Rules:
 1. Preserve all key facts, numbers, dates, and policy decisions
 2. Keep document citations (titles and page numbers)
 3. Remove redundancy and verbose explanations
 4. Output ONLY the compressed facts, no meta-commentary
-5. Stay under 800 tokens`;
+5. Stay under 4000 tokens`;
 
   const userPrompt = `Compress this context for the query: "${query}"
 
 RAW CONTEXT:
 ${rawContext}
 
-COMPRESSED SUMMARY (max 800 tokens):`;
+COMPRESSED SUMMARY (max 4000 tokens):`;
 
+  // Use GPT-4o for clean summarization (no reasoning artifacts)
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-4o",
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
     ],
-    temperature: 0.2,
-    max_tokens: 900, // Slightly higher to allow completion
+    max_tokens: 4500,
+    temperature: 0.2, // Low temp for factual consistency
   });
 
-  const summary = completion.choices[0].message.content || "";
+  // Extract summary from chat completion response
+  const summary = completion.choices[0]?.message?.content || "";
   const tokenCount = completion.usage?.completion_tokens || 0;
   
   console.log(`[Eco-RAG] ✓ Compressed to ${tokenCount} tokens`);
-  
   return { summary, tokenCount };
 }
 
@@ -291,8 +293,10 @@ export async function POST(req: Request) {
       url: result.metadata?.s3_pdf_key 
         ? `https://olympia-plans-raw.s3.us-west-2.amazonaws.com/${result.metadata.s3_pdf_key}#page=${result.metadata.page || 1}`
         : `#source-${index + 1}`,
-      // Add content/description for citation preview
-      content: result.metadata?.snippet || '',
+      // Add content/description for citation preview - use snippet from metadata (300 char preview)
+      content: result.metadata?.snippet 
+        ? result.metadata.snippet.substring(0, 300).trim() + (result.metadata.snippet.length > 300 ? '...' : '')
+        : '',
       description: `${result.metadata?.title} - Page ${result.metadata?.page}`,
       source: 'City of Olympia Official Documents',
       relevanceScore: 1 - result.distance, // Convert distance to relevance (0-1)
