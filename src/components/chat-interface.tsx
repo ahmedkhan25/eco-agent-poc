@@ -2813,7 +2813,7 @@ export function ChatInterface({
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
-                        "Search Olympia's Transportation Master Plan and Street Safety Plan. Create a CSV with project details, implementation phases, budget allocations, and safety metrics. Generate charts showing infrastructure investment trends over time."
+                        "Search Olympia's Transportation Master Plan and Street Safety Plan. Review details, implementation phases, budget allocations, and safety metrics. Then do a web search for transportation plans from other American cities of comparable size (~55,000 population). Compare Olympia's plan with those cities and create a chart showing the differences."
                       )
                     }
                     className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600 transition-all hover:shadow-lg dark:hover:shadow-purple-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
@@ -2831,7 +2831,7 @@ export function ChatInterface({
                         Transportation Plans
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
-                        Infrastructure & safety planning
+                        Compare with other US cities
                       </div>
                     </div>
                   </motion.button>
