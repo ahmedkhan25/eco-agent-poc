@@ -66,6 +66,8 @@ import {
   Table,
   BarChart3,
   Check,
+  ImageIcon,
+  Sparkles,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -3987,6 +3989,96 @@ export function ChatInterface({
                                           results={olympiaResults}
                                           type="olympia"
                                         />
+                                      )}
+                                    </TimelineStep>
+                                  </div>
+                                );
+                              }
+
+                              // Image Generation Tool
+                              case "tool-generateImage": {
+                                const callId = part.toolCallId;
+                                const isStreaming = part.state === "input-streaming" || part.state === "input-available";
+                                const hasOutput = part.state === "output-available";
+                                const hasError = part.state === "output-error";
+
+                                if (hasError) {
+                                  return (
+                                    <div key={callId}>
+                                      <TimelineStep
+                                        part={part}
+                                        messageId={message.id}
+                                        index={index}
+                                        status="error"
+                                        type="tool"
+                                        title="Image Generation Error"
+                                        subtitle={part.errorText}
+                                        icon={<AlertCircle />}
+                                        expandedTools={expandedTools}
+                                        toggleToolExpansion={toggleToolExpansion}
+                                      />
+                                    </div>
+                                  );
+                                }
+
+                                const prompt = part.input?.prompt || "";
+                                const truncatedPrompt = prompt.length > 60 ? prompt.substring(0, 60) + "..." : prompt;
+                                
+                                // Get image info from output
+                                const imageId = hasOutput && part.output?.imageId;
+                                const title = part.input?.title || "Generated Image";
+
+                                return (
+                                  <div key={callId}>
+                                    <TimelineStep
+                                      part={part}
+                                      messageId={message.id}
+                                      index={index}
+                                      status={isStreaming ? "streaming" : "complete"}
+                                      type="tool"
+                                      title={isStreaming ? "Generating Image..." : title}
+                                      subtitle={isStreaming ? (
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs text-gray-500 dark:text-gray-400">{truncatedPrompt}</span>
+                                        </div>
+                                      ) : (
+                                        <span className="text-xs text-emerald-600 dark:text-emerald-400">✓ Image saved</span>
+                                      )}
+                                      icon={isStreaming ? <Sparkles className="animate-pulse" /> : <ImageIcon />}
+                                      expandedTools={expandedTools}
+                                      toggleToolExpansion={toggleToolExpansion}
+                                    >
+                                      {isStreaming && (
+                                        <div className="flex flex-col items-center justify-center py-8 px-4">
+                                          {/* Animated image generation indicator */}
+                                          <div className="relative w-24 h-24 mb-4">
+                                            {/* Outer glow ring */}
+                                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 opacity-20 blur-xl animate-pulse" />
+                                            {/* Main container */}
+                                            <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 border border-violet-200 dark:border-violet-700/50 flex items-center justify-center overflow-hidden">
+                                              {/* Shimmer effect */}
+                                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 dark:via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                                              {/* Icon */}
+                                              <Sparkles className="w-10 h-10 text-violet-500 dark:text-violet-400 animate-pulse" />
+                                            </div>
+                                          </div>
+                                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Creating your image</p>
+                                          <p className="text-xs text-gray-500 dark:text-gray-500 text-center max-w-xs">This may take up to a minute...</p>
+                                        </div>
+                                      )}
+                                      {hasOutput && imageId && (
+                                        <div className="mt-2">
+                                          <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 max-w-sm">
+                                            <Image 
+                                              src={`/api/images/${imageId}`} 
+                                              alt={title}
+                                              width={400}
+                                              height={400}
+                                              className="w-full h-auto"
+                                              unoptimized
+                                            />
+                                          </div>
+                                        </div>
                                       )}
                                     </TimelineStep>
                                   </div>
