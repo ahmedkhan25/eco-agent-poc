@@ -193,6 +193,11 @@ export function RateLimitDialog({ open, onOpenChange, resetTime, onShowAuth }: R
   -H "Content-Type: application/json" \\
   -d '{"query": "latest tesla MD&A 10-k", "max_results": 2}'`;
 
+  // POC: Don't show rate limit dialog for authenticated users (they have unlimited queries)
+  if (user) {
+    return null;
+  }
+
   return (
     <AnimatePresence>
       {open && (
