@@ -168,34 +168,10 @@ function stripBase64Images(parts: any[]): any[] {
   });
 }
 
-/**
- * Strip OpenAI response IDs and other API-specific metadata from message parts.
- * This prevents "Duplicate item found" errors when reloading messages from the database.
- */
-function stripResponseMetadata(parts: any[]): any[] {
-  if (!Array.isArray(parts)) return parts;
-  
-  return parts.map((part: any) => {
-    if (!part || typeof part !== 'object') return part;
-    
-    // Deep clean: remove all fields that might contain response IDs
-    const cleaned = JSON.parse(JSON.stringify(part, (key, value) => {
-      // Skip any fields that look like they contain response IDs
-      if (key === 'response' || 
-          key === 'responseId' || 
-          key === 'rs_id' ||
-          key === 'response_id' ||
-          key === 'requestId' ||
-          key === 'request_id' ||
-          (typeof value === 'string' && value.startsWith('rs_'))) {
-        return undefined; // Don't include this field
-      }
-      return value;
-    }));
-    
-    return cleaned;
-  });
-}
+// NOTE: We intentionally do NOT strip response metadata (rs_* IDs, etc.)
+// Finance repo doesn't do this - it trusts the AI SDK's convertToModelMessages
+// Stripping rs_* IDs breaks OpenAI's Responses API which requires reasoning items
+// to be paired with function calls
 
 /**
  * Count tool calls in a conversation
@@ -322,7 +298,7 @@ export async function POST(req: Request) {
       const loadedMessages: BiomedUIMessage[] = (dbMessages || []).map((msg: any) => ({
         id: msg.id,
         role: msg.role,
-        parts: stripResponseMetadata(JSON.parse(msg.content)),
+        parts: JSON.parse(msg.content),  // Direct like finance - no stripping
       }));
       
       // Add the new message from frontend (it's not in DB yet)
