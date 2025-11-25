@@ -293,13 +293,38 @@ export async function POST(req: Request) {
       const { data: dbMessages } = await db.getChatMessages(sessionId);
       
       // Convert DB messages to BiomedUIMessage format
-      // Tool call parts are kept intact - no conversion to text
-      // stripResponseMetadata removes rs_* IDs to prevent "Duplicate item found" errors
-      const loadedMessages: BiomedUIMessage[] = (dbMessages || []).map((msg: any) => ({
-        id: msg.id,
-        role: msg.role,
-        parts: stripResponseMetadata(JSON.parse(msg.content)),
-      }));
+      // CRITICAL: Filter out tool call parts without results - they cause OpenAI API errors
+      // ("function_call was provided without its required reasoning item")
+      const loadedMessages: BiomedUIMessage[] = (dbMessages || []).map((msg: any) => {
+        const rawParts = JSON.parse(msg.content);
+        const filteredParts = Array.isArray(rawParts) ? rawParts.filter((part: any) => {
+          if (!part || typeof part !== 'object') return true;
+          
+          // Keep text parts
+          if (part.type === 'text') return true;
+          
+          // For tool-* parts, only keep if they have actual result data
+          if (typeof part.type === 'string' && part.type.startsWith('tool-')) {
+            // AI SDK v5 uses 'output' for results, not 'result'
+            const hasOutput = part.output !== undefined && part.output !== null;
+            const hasResult = part.result !== undefined && part.result !== null;
+            if (!hasOutput && !hasResult) {
+              console.log(`[Chat API] Filtering out incomplete tool call: ${part.type} (no output/result)`);
+              return false;
+            }
+            return true;
+          }
+          
+          // Filter out other types (reasoning, step-*, etc)
+          return false;
+        }) : rawParts;
+        
+        return {
+          id: msg.id,
+          role: msg.role,
+          parts: stripResponseMetadata(filteredParts),
+        };
+      });
       
       // Add the new message from frontend (it's not in DB yet)
       // CRITICAL: Filter it first! Frontend caches full image/tool data in memory
@@ -1163,11 +1188,20 @@ RAG SEARCH LIMITS AND CONTEXT RETRIEVAL:
                 if (part && typeof part === 'object') {
                   const partType = part.type;
                   
-                  // Keep: text and ALL tool-related parts
-                  // REMOVE: reasoning (huge!), step-start/finish (UI markers)
-                  // NOTE: stripResponseMetadata removes rs_* IDs to prevent "missing reasoning" errors
-                  if (partType === 'text' || 
-                      (typeof partType === 'string' && partType.startsWith('tool-'))) {
+                  // Keep: text parts
+                  if (partType === 'text') {
+                    return true;
+                  }
+                  
+                  // For tool-* parts, ONLY keep if they have actual result/output data
+                  // This prevents saving incomplete tool calls that cause OpenAI API errors
+                  if (typeof partType === 'string' && partType.startsWith('tool-')) {
+                    const hasOutput = part.output !== undefined && part.output !== null;
+                    const hasResult = part.result !== undefined && part.result !== null;
+                    if (!hasOutput && !hasResult) {
+                      console.log(`[Chat API] Filtering out incomplete tool call: ${partType} (no output/result)`);
+                      return false;
+                    }
                     return true;
                   }
                   
