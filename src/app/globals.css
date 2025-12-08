@@ -219,3 +219,67 @@
   }
 }
 
+/* Safe area insets for modern devices (notches, home indicators) */
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-inset-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-inset-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Padding-safe shorthand classes */
+.pt-safe {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.pl-safe {
+  padding-left: max(1rem, env(safe-area-inset-left));
+}
+
+.pr-safe {
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+/* Mobile touch target minimum size (44px per Apple HIG) */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Prevent text selection on interactive elements for mobile */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Smooth momentum scrolling on iOS */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix for iOS input zoom issue */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+

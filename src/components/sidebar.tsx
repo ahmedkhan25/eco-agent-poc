@@ -20,6 +20,8 @@ import {
   Plus,
   Building2,
   Home,
+  Menu,
+  X,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -65,6 +67,7 @@ export function Sidebar({
   const [showSubscription, setShowSubscription] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showEnterpriseModal, setShowEnterpriseModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Fetch chat sessions
   const { data: sessions = [], isLoading: loadingSessions } = useQuery({
@@ -139,15 +142,184 @@ export function Sidebar({
   // Get subscription status from database
   const subscription = useSubscription();
 
+  // Close mobile menu when clicking an action
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false);
+  }, []);
+
   return (
     <>
-      {/* Chevron Toggle Button - Left Edge, Centered */}
+      {/* Mobile Hamburger Button - Top Left */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        onClick={() => setIsMobileMenuOpen(true)}
+        className="fixed left-4 top-4 z-50 md:hidden w-11 h-11 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg active:scale-95 transition-transform"
+        title="Open Menu"
+      >
+        <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+      </motion.button>
+
+      {/* Mobile Slide-Out Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 md:hidden"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            {/* Mobile Drawer */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed left-0 top-0 bottom-0 w-72 bg-white dark:bg-gray-900 z-50 md:hidden shadow-2xl flex flex-col safe-area-inset-left"
+            >
+              {/* Mobile Drawer Header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Menu</h2>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                </button>
+              </div>
+
+              {/* Mobile Menu Items */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                {/* Home / New Chat */}
+                {user && (
+                  <button
+                    onClick={() => { handleNewChat(); closeMobileMenu(); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                  >
+                    <Home className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Home</span>
+                  </button>
+                )}
+
+                {/* History */}
+                <button
+                  onClick={() => {
+                    if (!user) {
+                      window.dispatchEvent(new CustomEvent('show-auth-modal'));
+                      closeMobileMenu();
+                    } else {
+                      setShowHistory(!showHistory);
+                      closeMobileMenu();
+                    }
+                  }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left ${
+                    !user ? 'opacity-50' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <MessagesSquare className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {!user ? 'History (Sign in)' : 'History'}
+                  </span>
+                </button>
+
+                {/* Divider */}
+                {user && <div className="h-px bg-gray-200 dark:bg-gray-700 my-2" />}
+
+                {/* Contact Form */}
+                {user && (
+                  <button
+                    onClick={() => { setShowSubscription(true); closeMobileMenu(); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                  >
+                    <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Contact Us</span>
+                  </button>
+                )}
+
+                {/* Enterprise */}
+                {user && process.env.NEXT_PUBLIC_APP_MODE !== 'development' && process.env.NEXT_PUBLIC_ENTERPRISE === 'true' && (
+                  <button
+                    onClick={() => { setShowEnterpriseModal(true); closeMobileMenu(); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                  >
+                    <Building2 className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Enterprise Solutions</span>
+                  </button>
+                )}
+
+                {/* Settings */}
+                {user && (
+                  <button
+                    onClick={() => { setShowSettings(true); closeMobileMenu(); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                  >
+                    <Settings className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Settings</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Mobile Drawer Footer */}
+              <div className="p-4 border-t border-gray-200 dark:border-gray-800 safe-area-inset-bottom">
+                {!user ? (
+                  <button
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('show-auth-modal'));
+                      closeMobileMenu();
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-emerald-700 transition-all"
+                  >
+                    <LogOut className="h-5 w-5 rotate-180" />
+                    <span>Log in</span>
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 px-2">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={user.user_metadata?.avatar_url} />
+                        <AvatarFallback className="text-sm bg-gradient-to-br from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 font-semibold">
+                          {user.email?.[0]?.toUpperCase() || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        closeMobileMenu();
+                        const confirmed = window.confirm('Are you sure you want to sign out?');
+                        if (confirmed) {
+                          signOut();
+                        }
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-red-600 dark:text-red-400 font-medium rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Sign out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop: Chevron Toggle Button - Left Edge, Centered */}
       {!isOpen && (
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={toggleSidebar}
-          className="fixed left-0 top-1/2 -translate-y-1/2 z-50 w-10 h-16 flex items-center justify-center bg-white dark:bg-gray-900 border-r-2 border-t-2 border-b-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-r-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:w-12 group"
+          className="hidden md:flex fixed left-0 top-1/2 -translate-y-1/2 z-50 w-10 h-16 items-center justify-center bg-white dark:bg-gray-900 border-r-2 border-t-2 border-b-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-r-2xl transition-all duration-200 shadow-lg hover:shadow-xl hover:w-12 group"
           title="Open Menu"
         >
           <svg
@@ -166,7 +338,7 @@ export function Sidebar({
         </motion.button>
       )}
 
-      {/* macOS Dock-Style Navigation - Left Side */}
+      {/* Desktop: macOS Dock-Style Navigation - Left Side */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -178,7 +350,7 @@ export function Sidebar({
               damping: 30,
               stiffness: 300
             }}
-            className="fixed left-6 top-1/2 -translate-y-1/2 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border border-gray-200 dark:border-gray-700 rounded-[32px] shadow-2xl py-4 px-3"
+            className="hidden md:block fixed left-6 top-1/2 -translate-y-1/2 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border border-gray-200 dark:border-gray-700 rounded-[32px] shadow-2xl py-4 px-3"
           >
             <div className="flex flex-col items-center gap-2">
               {/* Always Open Toggle */}
@@ -451,7 +623,7 @@ export function Sidebar({
               onClick={() => setShowHistory(false)}
             />
 
-            {/* Panel */}
+            {/* Panel - positioned differently on mobile vs desktop */}
             <motion.div
               initial={{ x: -280 }}
               animate={{ x: 0 }}
@@ -461,12 +633,20 @@ export function Sidebar({
                 damping: 30,
                 stiffness: 300
               }}
-              className="fixed left-20 top-4 bottom-4 w-64 bg-white dark:bg-gray-900 rounded-3xl z-50 shadow-xl ml-2 flex flex-col border border-gray-200 dark:border-gray-800"
+              className="fixed left-0 md:left-20 top-0 md:top-4 bottom-0 md:bottom-4 w-full md:w-64 bg-white dark:bg-gray-900 md:rounded-3xl z-50 shadow-xl md:ml-2 flex flex-col border-r md:border border-gray-200 dark:border-gray-800 safe-area-inset-left safe-area-inset-bottom"
             >
               {/* Header */}
-              <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+              <div className="p-4 pt-safe border-b border-gray-200 dark:border-gray-800">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">Chat History</h3>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowHistory(false)}
+                      className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <X className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">Chat History</h3>
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"

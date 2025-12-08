@@ -2726,7 +2726,7 @@ export function ChatInterface({
   }, [messages, liveProcessingTime]);
 
   return (
-    <div className="w-full max-w-3xl mx-auto relative min-h-0">
+    <div className="w-full max-w-3xl mx-auto relative min-h-0 px-3 sm:px-0">
       {/* Removed duplicate New Chat button - handled by parent page */}
 
       {/* Messages */}
@@ -2734,18 +2734,18 @@ export function ChatInterface({
         ref={messagesContainerRef}
         className={`space-y-4 sm:space-y-8 min-h-[300px] overflow-y-auto overflow-x-hidden ${
           messages.length > 0 ? "pt-20 sm:pt-24" : "pt-0"
-        } ${isFormAtBottom ? "pb-44 sm:pb-36" : "pb-4 sm:pb-8"}`}
+        } ${isFormAtBottom ? "pb-56 sm:pb-36" : "pb-4 sm:pb-8"}`}
       >
         {messages.length === 0 && (
           <motion.div
-            className="pt-12 sm:pt-16"
+            className="pt-4 sm:pt-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
             <div className="text-center mb-3 sm:mb-4">
               {/* Capabilities */}
-              <div className="max-w-6xl mx-auto">
+              <div className="w-full max-w-6xl mx-auto">
                 <motion.div
                   className="text-center mb-3"
                   initial={{ opacity: 0, y: 20 }}
@@ -2757,7 +2757,7 @@ export function ChatInterface({
                   </h3>
                 </motion.div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 px-2 sm:px-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 px-0 sm:px-4">
                   <motion.button
                     onClick={() =>
                       handlePromptClick(
@@ -4203,7 +4203,7 @@ export function ChatInterface({
         {(isFormAtBottom || isMobile) && (
           <>
             <motion.div
-              className="fixed left-1/2 -translate-x-1/2 bottom-0 w-full max-w-3xl h-36 pointer-events-none z-45"
+              className="fixed left-0 right-0 md:left-24 bottom-0 h-36 pointer-events-none z-45"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -4276,7 +4276,7 @@ export function ChatInterface({
       <AnimatePresence>
         {(isFormAtBottom || isMobile) && (
           <motion.div
-            className="fixed left-1/2 -translate-x-1/2 bottom-0 w-full max-w-3xl px-3 sm:px-6 pt-4 pb-5 sm:pb-6 z-50"
+            className="fixed left-0 right-0 md:left-24 bottom-0 px-3 sm:px-6 pt-4 pb-safe z-50"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
@@ -4284,13 +4284,13 @@ export function ChatInterface({
           >
             {/* Metrics Pills - connected to input box */}
             {messages.length > 0 && (
-              <div className="mb-2">
+              <div className="mb-2 max-w-3xl mx-auto">
                 <MetricsPills metrics={cumulativeMetrics} />
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 px-4 py-2.5 relative flex items-center">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 px-3 sm:px-4 py-2.5 relative flex items-center">
                 <Textarea
                   value={input}
                   onChange={handleInputChange}

@@ -289,23 +289,23 @@ function HomeContent() {
         hasMessages={hasMessages}
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col pt-0">
+      {/* Main Content Area - Add left padding on desktop for sidebar */}
+      <div className="flex-1 flex flex-col pt-0 md:pl-24 w-full overflow-x-hidden">
         {/* Header - Animate out when messages appear */}
         <AnimatePresence mode="wait">
             {!hasMessages && (
               <motion.div 
-                className="pt-6 sm:pt-8 pb-4 px-4 sm:px-6"
+                className="pt-4 md:pt-8 pb-2 px-4 sm:px-6 w-full"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
               >
-              {/* 2-Column Hero Layout */}
-              <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                {/* Left Column - Logo */}
+              {/* Hero Section - Stacked on mobile, side-by-side on desktop */}
+              <div className="w-full max-w-4xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-3 md:gap-6 items-center mt-14 md:mt-0">
+                {/* Logo */}
                 <motion.div 
-                  className="relative flex justify-center md:justify-end"
+                  className="relative flex justify-center md:justify-end w-full"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1, duration: 0.6, ease: "easeOut" }}
@@ -339,7 +339,7 @@ function HomeContent() {
                       alt="Ecoheart"
                       width={400}
                       height={160}
-                      className="h-24 sm:h-32 w-auto dark:hidden"
+                      className="h-16 sm:h-32 w-auto max-w-[240px] sm:max-w-none dark:hidden"
                       priority
                     />
                     <Image
@@ -347,37 +347,37 @@ function HomeContent() {
                       alt="Ecoheart"
                       width={400}
                       height={160}
-                      className="h-24 sm:h-32 w-auto hidden dark:block"
+                      className="h-16 sm:h-32 w-auto max-w-[240px] sm:max-w-none hidden dark:block"
                       priority
                     />
                   </motion.div>
                 </motion.div>
 
-                {/* Right Column - Text & Button */}
+                {/* Text & Button */}
                 <motion.div
-                  className="flex flex-col items-center md:items-start text-center md:text-left gap-3"
+                  className="flex flex-col items-center md:items-start text-center md:text-left gap-1.5 md:gap-3 w-full px-2"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
                 >
-                  <h1 className="text-gray-800 dark:text-gray-200 text-lg sm:text-xl font-semibold">
+                  <h1 className="text-gray-800 dark:text-gray-200 text-sm sm:text-xl font-semibold">
                     City of Olympia AI Researcher
                   </h1>
                   
                   <motion.button
                     onClick={() => setIsInfoModalOpen(true)}
-                    className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 text-white transition-colors flex items-center gap-2 text-sm font-medium shadow-md"
+                    className="px-3 py-1.5 sm:py-2 rounded-lg bg-slate-700 hover:bg-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 text-white transition-colors flex items-center gap-2 text-xs sm:text-sm font-medium shadow-md"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                     aria-label="Learn more about this AI"
                   >
-                    <Info className="w-4 h-4" />
-                    About & Indexed Documents
+                    <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span>About & Indexed Documents</span>
                   </motion.button>
 
-                  <p className="text-amber-600 dark:text-amber-500 text-[10px] sm:text-xs font-medium flex items-center gap-1">
-                    <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
-                    Proof of Concept - Not for Production Use
+                  <p className="text-amber-600 dark:text-amber-500 text-[9px] sm:text-xs font-medium flex items-center gap-1">
+                    <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-500 rounded-full animate-pulse flex-shrink-0"></span>
+                    <span>Proof of Concept - Not for Production Use</span>
                   </p>
                 </motion.div>
               </div>
