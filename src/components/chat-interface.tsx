@@ -140,7 +140,7 @@ const TimelineStep = memo(({
       {/* Minimal, refined design */}
       <div
         className={`relative flex items-start gap-4 py-4 px-3 sm:px-4 -mx-1 sm:-mx-2 rounded-md transition-all duration-150 ${
-          isStreaming ? 'bg-blue-50/50 dark:bg-blue-950/10' : ''
+          isStreaming ? 'bg-teal-50/50 dark:bg-teal-950/10' : ''
         } ${
           hasContent ? 'hover:bg-gray-50 dark:hover:bg-white/[0.02] cursor-pointer' : ''
         }`}
@@ -169,7 +169,7 @@ const TimelineStep = memo(({
         {/* Clean icon */}
         {icon && (
           <div className={`flex-shrink-0 w-4 h-4 ${
-            isStreaming ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-500'
+            isStreaming ? 'text-teal-600 dark:text-teal-400' : 'text-gray-500 dark:text-gray-500'
           }`}>
             {icon}
           </div>
@@ -237,10 +237,10 @@ const LiveReasoningPreview = memo(({ title, lines }: { title: string; lines: str
       transition={{ duration: 0.12, ease: 'easeOut' }}
       className="my-1 ml-3 sm:ml-8 mr-3 sm:mr-0"
     >
-      <div className="bg-blue-50/50 dark:bg-blue-950/20 border-l-2 border-blue-300 dark:border-blue-700 rounded-r px-2 sm:px-2.5 py-1.5 space-y-1 overflow-hidden max-w-full">
+      <div className="bg-teal-50/50 dark:bg-teal-950/20 border-l-2 border-teal-300 dark:border-teal-700 rounded-r px-2 sm:px-2.5 py-1.5 space-y-1 overflow-hidden max-w-full">
         {/* Show the latest **title** */}
         {title && (
-          <div className="text-xs font-semibold text-blue-700 dark:text-blue-300 truncate">
+          <div className="text-xs font-semibold text-teal-700 dark:text-teal-300 truncate">
             {title}
           </div>
         )}
@@ -526,9 +526,9 @@ const markdownComponents = {
   },
   // Handle academic XML tags commonly found in Wiley content
   note: ({ children }: any) => (
-    <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 pl-4 py-2 my-2 text-sm">
+    <div className="bg-teal-50 dark:bg-teal-900/20 border-l-4 border-teal-400 pl-4 py-2 my-2 text-sm">
       <div className="flex items-start gap-2">
-        <span className="text-blue-600 dark:text-blue-400 font-medium">Note:</span>
+        <span className="text-teal-600 dark:text-teal-400 font-medium">Note:</span>
         <div>{children}</div>
       </div>
     </div>
@@ -543,7 +543,7 @@ const markdownComponents = {
   ),
   // Handle other common academic tags
   ref: ({ children }: any) => (
-    <span className="text-blue-600 dark:text-blue-400 text-sm">
+    <span className="text-teal-600 dark:text-teal-400 text-sm">
       [{children}]
     </span>
   ),
@@ -1054,7 +1054,7 @@ const SearchResultCard = ({
                   </div>
                 ) : type === "clinical" ? (
                   <div className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
-                    <Search className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <Search className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                   </div>
                 ) : (
                   <div className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
@@ -1090,7 +1090,7 @@ const SearchResultCard = ({
                   <span
                     className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
                       result.isStructured
-                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                        ? "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300"
                         : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
                     }`}
                   >
@@ -1141,7 +1141,7 @@ const SearchResultCard = ({
                   </div>
                 ) : type === "clinical" ? (
                   <div className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
-                    <Search className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <Search className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                   </div>
                 ) : (
                   <div className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
@@ -1177,7 +1177,7 @@ const SearchResultCard = ({
                   <span
                     className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
                       result.isStructured
-                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                        ? "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300"
                         : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
                     }`}
                   >
@@ -1240,7 +1240,7 @@ const SearchResultCard = ({
                 href={result.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                className="inline-flex items-center gap-1 text-teal-600 hover:text-teal-800 dark:text-teal-400"
               >
                 <Favicon
                   url={result.url}
@@ -1262,7 +1262,7 @@ const SearchResultCard = ({
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <FileText className="h-4 w-4" />
                   Structured Data
-                  <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
+                  <span className="text-xs bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 px-2 py-1 rounded">
                     {result.dataType}
                   </span>
                 </div>
@@ -2764,18 +2764,18 @@ export function ChatInterface({
                         "Analyze Olympia's greenhouse gas emissions trends from the GHG Inventory. What reduction rate is needed to meet the 2030 target of 50% reduction? Visualize the emission scenarios and trajectory with a chart."
                       )
                     }
-                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all hover:shadow-lg dark:hover:shadow-blue-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-600 transition-all hover:shadow-lg dark:hover:shadow-teal-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg flex items-center justify-center">
+                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-900/30 dark:to-teal-800/30 rounded-lg flex items-center justify-center">
                       <Image src="/eco/home-cards/climate.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                         Climate Modeling
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
@@ -2790,7 +2790,7 @@ export function ChatInterface({
                         "What are Olympia's climate action goals? Search the Climate Risk and Vulnerability Assessment and Sea Level Rise Response Plan. Extract high level milestones, adaptation strategies, and implementation timelines. keep it short"
                       )
                     }
-                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all hover:shadow-lg dark:hover:shadow-emerald-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-600 transition-all hover:shadow-lg dark:hover:shadow-teal-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4, duration: 0.5 }}
@@ -2801,7 +2801,7 @@ export function ChatInterface({
                       <Image src="/eco/home-cards/climate-goals.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                         Climate Goals
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
@@ -2816,7 +2816,7 @@ export function ChatInterface({
                         "Search Olympia's Transportation Master Plan. What are the key projects and budget? Create a chart showing project timelines."
                       )
                     }
-                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600 transition-all hover:shadow-lg dark:hover:shadow-purple-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-600 transition-all hover:shadow-lg dark:hover:shadow-teal-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.5 }}
@@ -2827,7 +2827,7 @@ export function ChatInterface({
                       <Image src="/eco/home-cards/trans.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                         Transportation Plans
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
@@ -2842,7 +2842,7 @@ export function ChatInterface({
                         "Explain Olympia's 2025 adopted operating budget in clear, plain language for a general audience. Focus on: The total 2025 operating budget amount, the main fund groups (at a high level only), and how the 2025 budget compares to 2024 (total amount and percent change). Keep the comparison high level, not super detailed.\n\nRequirements: First, use the official City of Olympia 2025 Adopted Operating Budget and any related Olympia financial/planning documents as your primary sources.\n\nProvide:\n- A short executive summary (3–5 bullet points)\n- A simple markdown table comparing 2024 vs 2025 total operating budget (amount, dollar change, percent change)\n- Create one simple chart: Type: bar chart, X‑axis: \"Year\", Y‑axis: \"Total Adopted Operating Budget ($ millions)\", Two bars only: 2024 and 2025 totals\n\nAfter generating the chart with your tools, embed it in the answer and briefly explain what it shows in 2–3 sentences. Be concise and avoid deep departmental or line‑item detail. This is just a high‑level overview.\n\nFinally, summarize the key takeaway in 2–3 bullet points at the end (e.g., how much the budget grew and what that implies for city services)."
                       )
                     }
-                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-600 transition-all hover:shadow-lg dark:hover:shadow-amber-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-600 transition-all hover:shadow-lg dark:hover:shadow-teal-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6, duration: 0.5 }}
@@ -2853,7 +2853,7 @@ export function ChatInterface({
                       <Image src="/eco/home-cards/budget.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                         Budget Analysis
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
@@ -2868,7 +2868,7 @@ export function ChatInterface({
                         "Search Olympia's Capital Facilities Plan 2025-2030. Show year-over-year project spending from 2025 to 2030. Create a chart showing infrastructure investment trends by year."
                       )
                     }
-                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all hover:shadow-lg dark:hover:shadow-indigo-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
+                    className="bg-white dark:bg-gray-800/70 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-600 transition-all hover:shadow-lg dark:hover:shadow-teal-900/20 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7, duration: 0.5 }}
@@ -2879,7 +2879,7 @@ export function ChatInterface({
                       <Image src="/eco/home-cards/infra-plan.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                         Infrastructure Plans
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
@@ -2894,21 +2894,21 @@ export function ChatInterface({
                         "Search Olympia docs for tree density requirements and canopy coverage goals. Create a fun infographic for kids explaining what tree density means - show the difference between low density (few trees, hot streets) vs high density (lots of trees, cool shade). Use simple visuals comparing neighborhoods with 10% vs 40% tree cover. Bright colors, cartoon style, minimal text!"
                       )
                     }
-                    className="bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 dark:from-green-900/30 dark:via-emerald-900/30 dark:to-blue-900/30 rounded-xl border-2 border-green-300 dark:border-green-600 hover:border-green-400 dark:hover:border-green-500 transition-all hover:shadow-xl dark:hover:shadow-green-900/30 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
+                    className="bg-gradient-to-br from-teal-50 via-teal-50 to-cyan-50 dark:from-teal-900/30 dark:via-teal-900/30 dark:to-cyan-900/30 rounded-xl border-2 border-teal-300 dark:border-teal-600 hover:border-teal-400 dark:hover:border-teal-500 transition-all hover:shadow-xl dark:hover:shadow-teal-900/30 text-left group backdrop-blur-sm overflow-hidden flex items-center gap-3 p-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.5 }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-800/40 dark:to-emerald-700/40 rounded-lg flex items-center justify-center">
+                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-teal-100 to-cyan-200 dark:from-teal-800/40 dark:to-cyan-700/40 rounded-lg flex items-center justify-center">
                       <Image src="/eco/home-cards/deep.png" alt="" width={48} height={48} className="w-10 h-10" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-green-700 dark:text-green-300 text-xs font-semibold group-hover:text-green-800 dark:group-hover:text-green-200 transition-colors">
+                      <div className="text-teal-700 dark:text-teal-300 text-xs font-semibold group-hover:text-teal-800 dark:group-hover:text-teal-200 transition-colors">
                         Doc & Web Search
                       </div>
-                      <div className="text-xs text-green-600 dark:text-green-400 line-clamp-1">
+                      <div className="text-xs text-teal-600 dark:text-teal-400 line-clamp-1">
                         Kids tree density guide 🌳
                       </div>
                     </div>
@@ -4213,7 +4213,7 @@ export function ChatInterface({
                 className="dark:hidden absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(to top, rgb(245,245,245) 0%, rgba(245,245,245,0.98) 30%, rgba(245,245,245,0.8) 60%, rgba(245,245,245,0) 100%)",
+                    "linear-gradient(to top, rgb(250,249,246) 0%, rgba(250,249,246,0.98) 30%, rgba(250,249,246,0.8) 60%, rgba(250,249,246,0) 100%)",
                 }}
               />
               <div

@@ -245,14 +245,14 @@ function HomeContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#F5F5F5] dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      <div className="flex items-center justify-center min-h-screen bg-[#FAF9F6] dark:bg-slate-900">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
       </div>
     );
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-100 via-gray-200 to-slate-300 dark:from-slate-700 dark:via-gray-700 dark:to-slate-600 flex animate-gradient-shift'>
+    <div className='min-h-screen bg-gradient-to-br from-[#FAF9F6] via-[#F5F5F0] to-[#EDE8E3] dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 flex'>
       {/* Enterprise Banner */}
       <EnterpriseBanner />
 
@@ -366,7 +366,7 @@ function HomeContent() {
                   
                   <motion.button
                     onClick={() => setIsInfoModalOpen(true)}
-                    className="px-3 py-1.5 sm:py-2 rounded-lg bg-slate-700 hover:bg-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 text-white transition-colors flex items-center gap-2 text-xs sm:text-sm font-medium shadow-md"
+                    className="px-3 py-1.5 sm:py-2 rounded-lg bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 text-white transition-colors flex items-center gap-2 text-xs sm:text-sm font-medium shadow-md"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                     aria-label="Learn more about this AI"
@@ -453,8 +453,8 @@ function HomeContent() {
 export default function Home() {
   return (
     <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen bg-[#F5F5F5] dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+      <div className="flex items-center justify-center min-h-screen bg-[#FAF9F6] dark:bg-slate-900">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 dark:border-teal-400"></div>
       </div>
     }>
       <HomeContent />
