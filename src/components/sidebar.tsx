@@ -22,7 +22,9 @@ import {
   Home,
   Menu,
   X,
+  Info,
 } from 'lucide-react';
+import { EcoheartLogo } from '@/components/ecoheart-logo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -36,6 +38,7 @@ interface SidebarProps {
   onSessionSelect?: (sessionId: string) => void;
   onNewChat?: () => void;
   hasMessages?: boolean;
+  onAboutClick?: () => void;
 }
 
 interface ChatSession {
@@ -51,6 +54,7 @@ export function Sidebar({
   onSessionSelect,
   onNewChat,
   hasMessages = false,
+  onAboutClick,
 }: SidebarProps) {
   const { user } = useAuthStore();
   const signOut = useAuthStore((state) => state.signOut);
@@ -149,16 +153,60 @@ export function Sidebar({
 
   return (
     <>
-      {/* Mobile Hamburger Button - Top Left */}
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        onClick={() => setIsMobileMenuOpen(true)}
-        className="fixed left-4 top-4 z-50 md:hidden w-11 h-11 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg active:scale-95 transition-transform"
-        title="Open Menu"
-      >
-        <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-      </motion.button>
+      {/* Top Navigation Header - Like Business Website */}
+      <header className="fixed top-0 left-0 right-0 z-50">
+        {/* Indigo accent bar */}
+        <div className="h-1 bg-indigo-600" />
+        
+        {/* Main nav bar */}
+        <nav className="bg-slate-900/95 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+            <div className="flex items-center justify-between">
+              {/* Logo + Brand */}
+              <div className="flex items-center gap-3">
+                <EcoheartLogo className="h-9 w-9 sm:h-10 sm:w-10" />
+                <span className="text-white font-semibold text-lg sm:text-xl tracking-tight">
+                  ecoheart
+                </span>
+              </div>
+              
+              {/* Right side buttons */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* About Button */}
+                {onAboutClick && (
+                  <button
+                    onClick={onAboutClick}
+                    className="hidden sm:flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    <Info className="w-4 h-4" />
+                    <span>About</span>
+                  </button>
+                )}
+                
+                {/* Mobile About Icon */}
+                {onAboutClick && (
+                  <button
+                    onClick={onAboutClick}
+                    className="sm:hidden w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                    title="About"
+                  >
+                    <Info className="w-5 h-5" />
+                  </button>
+                )}
+                
+                {/* Mobile Menu Button */}
+                <button
+                  onClick={() => setIsMobileMenuOpen(true)}
+                  className="md:hidden w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                  title="Open Menu"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
 
       {/* Mobile Slide-Out Drawer */}
       <AnimatePresence>

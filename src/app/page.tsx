@@ -5,10 +5,7 @@ import { RateLimitDialog } from '@/components/rate-limit-dialog';
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomBar from '@/components/bottom-bar';
-import Image from 'next/image';
-import { track } from '@vercel/analytics';
 import { createClient } from '@/utils/supabase/client';
-import { Button } from '@/components/ui/button';
 import {
   CheckCircle,
   AlertCircle,
@@ -31,9 +28,6 @@ function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [hasMessages, setHasMessages] = useState(false);
-  const [isHoveringTitle, setIsHoveringTitle] = useState(false);
-  const [autoTiltTriggered, setAutoTiltTriggered] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [showRateLimitDialog, setShowRateLimitDialog] = useState(false);
   const [rateLimitResetTime, setRateLimitResetTime] = useState(new Date());
   
@@ -160,54 +154,6 @@ function HomeContent() {
     }
   }, [searchParams, router, notification, user]);
 
-  // Detect mobile device for touch interactions
-  useEffect(() => {
-    const checkMobile = () => {
-      const isMobileDevice = window.innerWidth <= 768 || 
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      setIsMobile(isMobileDevice);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Handle title click on mobile
-  const handleTitleClick = useCallback(() => {
-    if (isMobile) {
-      track('Title Click', {
-        trigger: 'mobile_touch'
-      });
-      setIsHoveringTitle(true);
-      // Keep it tilted for 3 seconds then close
-      setTimeout(() => {
-        setIsHoveringTitle(false);
-      }, 3000);
-    }
-  }, [isMobile]);
-
-  
-  // Auto-trigger tilt animation after 2 seconds
-  useEffect(() => {
-    if (!hasMessages && !autoTiltTriggered) {
-      const timer = setTimeout(() => {
-        track('Title Hover', {
-          trigger: 'auto_tilt'
-        });
-        setIsHoveringTitle(true);
-        setAutoTiltTriggered(true);
-        
-        // Keep it tilted for 2 seconds then close
-        setTimeout(() => {
-          setIsHoveringTitle(false);
-        }, 2000);
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [hasMessages, autoTiltTriggered]);
 
   const updateUrlWithSession = useCallback((sessionId: string | null) => {
     const url = new URL(window.location.href);
@@ -256,14 +202,14 @@ function HomeContent() {
       {/* Enterprise Banner */}
       <EnterpriseBanner />
 
-      {/* Notification Toast */}
+      {/* Notification Toast - below header */}
       <AnimatePresence>
         {notification && (
           <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+            className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40"
           >
             <div className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${
               notification.type === 'success'
@@ -281,16 +227,17 @@ function HomeContent() {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
+      {/* Sidebar with Header */}
       <Sidebar
         currentSessionId={currentSessionId}
         onSessionSelect={handleSessionSelect}
         onNewChat={handleNewChat}
         hasMessages={hasMessages}
+        onAboutClick={() => setIsInfoModalOpen(true)}
       />
 
-      {/* Main Content Area - Add left padding on desktop for sidebar */}
-      <div className="flex-1 flex flex-col pt-0 md:pl-24 w-full overflow-x-hidden">
+      {/* Main Content Area - Add top padding for header, left padding on desktop for sidebar */}
+      <div className="flex-1 flex flex-col pt-16 md:pl-24 w-full overflow-x-hidden">
         {/* Header - Animate out when messages appear */}
         <AnimatePresence mode="wait">
             {!hasMessages && (
@@ -301,81 +248,30 @@ function HomeContent() {
                 exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
               >
-              {/* Hero Section - Stacked on mobile, side-by-side on desktop */}
-              <div className="w-full max-w-4xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-3 md:gap-6 items-center mt-14 md:mt-0">
-                {/* Logo */}
-                <motion.div 
-                  className="relative flex justify-center md:justify-end w-full"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1, duration: 0.6, ease: "easeOut" }}
-                  onHoverStart={() => {
-                    if (!isMobile) {
-                      track('Title Hover', {
-                        trigger: 'user_hover'
-                      });
-                      setIsHoveringTitle(true);
-                    }
-                  }}
-                  onHoverEnd={() => {
-                    if (!isMobile) {
-                      setIsHoveringTitle(false);
-                    }
-                  }}
-                  onClick={handleTitleClick}
-                >
-                  <motion.div
-                    className={`relative z-10 ${
-                      isMobile ? 'cursor-pointer' : 'cursor-default'
-                    }`}
-                    style={{ transformOrigin: '15% 100%' }}
-                    animate={{
-                      rotateZ: isHoveringTitle ? -8 : 0,
-                    }}
-                    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                  >
-                    <Image
-                      src="/eco/eco-logo-trans.png"
-                      alt="Ecoheart"
-                      width={400}
-                      height={160}
-                      className="h-16 sm:h-32 w-auto max-w-[240px] sm:max-w-none dark:hidden"
-                      priority
-                    />
-                    <Image
-                      src="/eco/eco-logo.png"
-                      alt="Ecoheart"
-                      width={400}
-                      height={160}
-                      className="h-16 sm:h-32 w-auto max-w-[240px] sm:max-w-none hidden dark:block"
-                      priority
-                    />
-                  </motion.div>
-                </motion.div>
-
-                {/* Text & Button */}
+              {/* Hero Section - Title and CTA (logo now in header) */}
+              <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-3 md:gap-4 mt-4 md:mt-8">
                 <motion.div
-                  className="flex flex-col items-center md:items-start text-center md:text-left gap-1.5 md:gap-3 w-full px-2"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+                  className="flex flex-col items-center text-center gap-2 md:gap-3 w-full px-2"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.6, ease: "easeOut" }}
                 >
-                  <h1 className="text-gray-800 dark:text-gray-200 text-sm sm:text-xl font-semibold">
+                  <h1 className="text-gray-800 dark:text-gray-200 text-lg sm:text-2xl font-semibold">
                     City of Olympia AI Researcher
                   </h1>
                   
                   <motion.button
                     onClick={() => setIsInfoModalOpen(true)}
-                    className="px-3 py-1.5 sm:py-2 rounded-lg bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 text-white transition-colors flex items-center gap-2 text-xs sm:text-sm font-medium shadow-md"
+                    className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 text-white transition-colors flex items-center gap-2 text-sm font-medium shadow-md"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                     aria-label="Learn more about this AI"
                   >
-                    <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <Info className="w-4 h-4 flex-shrink-0" />
                     <span>About & Indexed Documents</span>
                   </motion.button>
 
-                  <p className="text-amber-600 dark:text-amber-500 text-[9px] sm:text-xs font-medium flex items-center gap-1">
+                  <p className="text-amber-600 dark:text-amber-500 text-[10px] sm:text-xs font-medium flex items-center gap-1">
                     <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-500 rounded-full animate-pulse flex-shrink-0"></span>
                     <span>Proof of Concept - Not for Production Use</span>
                   </p>
