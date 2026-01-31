@@ -202,6 +202,14 @@ export async function POST(request: NextRequest) {
           try {
             // Handle both 'result' and 'output' field names
             const rawResult = part.result || part.output;
+            
+            // Skip non-JSON results (e.g., codeExecution returns markdown, not JSON)
+            // These tool results don't have citations to extract
+            if (typeof rawResult === 'string' && !rawResult.trim().startsWith('{') && !rawResult.trim().startsWith('[')) {
+              console.log('[PDF Generation] Skipping non-JSON tool result for:', part.type);
+              continue;
+            }
+            
             const result = typeof rawResult === 'string' ? JSON.parse(rawResult) : rawResult;
             
             console.log('[PDF Generation] Found tool result for:', part.type);
