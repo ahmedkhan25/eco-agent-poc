@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecoheart Architecture | Smart Data for Cities</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --teal: #14B8A6;
+            --teal-light: #5EEAD4;
+            --teal-dark: #0D9488;
+            --navy-dark: #0F172A;
+            --navy: #1E3A5F;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748B;
+            --slate-400: #94A3B8;
+            --slate-200: #E2E8F0;
+            --slate-100: #F1F5F9;
+            --background: #F8FAFC;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--background);
+            color: var(--navy-dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-bottom: 1px solid var(--slate-200);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-brand img {
+            height: 40px;
+        }
+
+        .nav-brand span {
+            font-size: 0.875rem;
+            color: var(--slate-500);
+            border-left: 1px solid var(--slate-200);
+            padding-left: 1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--slate-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--teal);
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+            border-radius: 1.5rem;
+            color: var(--white);
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--slate-400);
+            margin-bottom: 1.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--teal);
+            color: var(--white);
+            padding: 0.375rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Section Styling */
+        section {
+            margin-bottom: 4rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--teal);
+        }
+
+        .section-number {
+            background: var(--teal);
+            color: var(--white);
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--navy-dark);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: var(--slate-600);
+            margin-bottom: 1rem;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--slate-200);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .card h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--navy-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 0.875rem;
+            color: var(--slate-500);
+            margin-bottom: 0;
+        }
+
+        .card-badge {
+            display: inline-block;
+            background: var(--slate-100);
+            color: var(--slate-600);
+            padding: 0.25rem 0.625rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.75rem;
+        }
+
+        /* Tech Stack Badges */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .tech-badge {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--slate-700);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tech-badge.primary {
+            background: var(--teal);
+            color: var(--white);
+            border-color: var(--teal);
+        }
+
+        /* Diagram Container */
+        .diagram-container {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid var(--slate-200);
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Table Styling */
+        .table-container {
+            background: var(--white);
+            border-radius: 1rem;
+            border: 1px solid var(--slate-200);
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--navy-dark);
+            color: var(--white);
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--slate-200);
+            font-size: 0.875rem;
+            color: var(--slate-700);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--slate-100);
+        }
+
+        code {
+            background: var(--slate-100);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 0.8125rem;
+            color: var(--teal-dark);
+        }
+
+        /* Specs Box */
+        .specs-box {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: var(--white);
+            margin: 1.5rem 0;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .spec-item {
+            text-align: center;
+        }
+
+        .spec-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--teal-light);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .spec-label {
+            font-size: 0.75rem;
+            color: var(--slate-400);
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Tier Cards */
+        .tier-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .tier-card {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 2px solid var(--slate-200);
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .tier-card.featured {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+        }
+
+        .tier-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--navy-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--teal);
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-desc {
+            font-size: 0.875rem;
+            color: var(--slate-500);
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--slate-200);
+            color: var(--slate-700);
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            background: var(--teal);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .col-box {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--slate-200);
+        }
+
+        .col-box h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--navy-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Value Props */
+        .value-section {
+            background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            color: var(--white);
+            margin-top: 2rem;
+        }
+
+        .value-section h2 {
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .value-col h3 {
+            color: var(--white);
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .value-col ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .value-col li {
+            padding: 0.5rem 0;
+            font-size: 0.9375rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .value-col li::before {
+            content: "→";
+            color: var(--navy-dark);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--slate-500);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .two-col, .tier-cards, .value-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            nav {
+                position: static;
+                box-shadow: none;
+            }
+            
+            .card:hover, .tier-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <img src="eco/eco-logo-trans.png" alt="Ecoheart Logo">
+            <span>Architecture Documentation</span>
+        </div>
+        <div class="nav-links">
+            <a href="#overview">Overview</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#rag">RAG Pipeline</a>
+            <a href="#tools">AI Tools</a>
+            <a href="#database">Database</a>
+            <a href="#scaling">Scaling</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>City of Olympia AI Researcher</h1>
+            <p>Smart data access for city planning documents</p>
+            <span class="badge">Proof of Concept</span>
+        </section>
+
+        <!-- Executive Summary -->
+        <section id="overview">
+            <div class="section-header">
+                <span class="section-number">1</span>
+                <h2>Executive Summary</h2>
+            </div>
+            
+            <p>An AI-powered research assistant that enables city planners and researchers to query complex planning documents using natural language, execute data analysis, and generate visualizations—all in a single conversational interface.</p>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">📄</div>
+                    <h4>Document Intelligence</h4>
+                    <p>RAG-powered semantic search across city planning documents with context-aware responses</p>
+                    <span class="card-badge">AWS S3 Vectors</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🐍</div>
+                    <h4>Code Execution</h4>
+                    <p>Secure Python sandbox for data analysis, calculations, and custom computations</p>
+                    <span class="card-badge">Daytona Sandbox</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <h4>Visualizations</h4>
+                    <p>AI-generated charts, CSV exports, and PDF reports for presentations</p>
+                    <span class="card-badge">Recharts + Puppeteer</span>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Technology Stack</h3>
+            <div class="tech-stack">
+                <span class="tech-badge primary">Next.js 15</span>
+                <span class="tech-badge primary">OpenAI GPT-4o</span>
+                <span class="tech-badge">AWS S3 Vectors</span>
+                <span class="tech-badge">Supabase</span>
+                <span class="tech-badge">Daytona</span>
+                <span class="tech-badge">Valyu API</span>
+                <span class="tech-badge">Polar Billing</span>
+                <span class="tech-badge">Render</span>
+            </div>
+        </section>
+
+        <!-- High-Level Architecture -->
+        <section id="architecture">
+            <div class="section-header">
+                <span class="section-number">2</span>
+                <h2>High-Level Architecture</h2>
+            </div>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TB
+    subgraph UserLayer["👤 User Layer"]
+        User[City Researcher]
+    end
+
+    subgraph AppLayer["🖥️ Application Layer"]
+        direction LR
+        Chat[Chat Interface]
+        Viz[Visualizations]
+        PDF[PDF Reports]
+    end
+
+    subgraph AgentLayer["🤖 AI Agent Core"]
+        LLM[OpenAI GPT-4o]
+        Tools[Tool Orchestration]
+    end
+
+    subgraph ToolsLayer["🔧 Specialized Tools"]
+        direction LR
+        RAG[Document Search]
+        Code[Python Execution]
+        Web[Web Search]
+        Charts[Chart Generation]
+        Images[Image Generation]
+    end
+
+    subgraph DataLayer["💾 Data & Storage"]
+        direction LR
+        Vectors[AWS S3 Vectors]
+        DB[Supabase]
+        S3[S3 Documents]
+    end
+
+    subgraph ComputeLayer["☁️ Compute Services"]
+        direction LR
+        Daytona[Daytona Sandbox]
+        Valyu[Valyu API]
+        OpenAI[OpenAI API]
+    end
+
+    User --> Chat
+    Chat --> LLM
+    LLM --> Tools
+    Tools --> ToolsLayer
+    RAG --> Vectors
+    RAG --> S3
+    Code --> Daytona
+    Web --> Valyu
+    Charts --> DB
+    Images --> OpenAI
+    LLM --> DB
+                </div>
+            </div>
+        </section>
+
+        <!-- RAG Pipeline -->
+        <section id="rag">
+            <div class="section-header">
+                <span class="section-number">3</span>
+                <h2>RAG Pipeline Architecture</h2>
+            </div>
+
+            <p>The Retrieval-Augmented Generation pipeline enables semantic search across city planning documents. Documents are processed offline, vectorized, and stored in AWS S3 Vectors. At query time, embeddings are generated and matched against the vector index, with results compressed to fit the context window.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart LR
+    subgraph Ingestion["📥 Offline Ingestion"]
+        PDFs[City PDFs] --> Extract[Page Extraction]
+        Extract --> Chunk[Token-Aware Chunking]
+        Chunk --> Embed[OpenAI Embeddings]
+        Embed --> S3V[S3 Vectors Index]
+    end
+    
+    subgraph Query["🔍 Runtime Query"]
+        UserQ[User Query] --> QEmbed[Query Embedding]
+        QEmbed --> Search[Vector Search]
+        Search --> TopK[Top-K Results]
+        TopK --> Compress[GPT-4o Compression]
+        Compress --> Response[Compressed Context]
+    end
+    
+    S3V --> Search
+                </div>
+            </div>
+
+            <div class="specs-box">
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <div class="spec-value">text-embedding-3-small</div>
+                        <div class="spec-label">Embedding Model</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-value">1024</div>
+                        <div class="spec-label">Dimensions</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-value">8,000</div>
+                        <div class="spec-label">Compression Budget (tokens)</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-value">4</div>
+                        <div class="spec-label">Queries per Session</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="col-box">
+                    <h4>🗂️ Vector Configuration</h4>
+                    <table style="width: 100%;">
+                        <tr><td><strong>Bucket</strong></td><td><code>olympia-rag-vectors</code></td></tr>
+                        <tr><td><strong>Index</strong></td><td><code>olympia-pages-idx</code></td></tr>
+                        <tr><td><strong>Region</strong></td><td>us-west-2</td></tr>
+                        <tr><td><strong>Type</strong></td><td>Serverless (auto-scaling)</td></tr>
+                    </table>
+                </div>
+                <div class="col-box">
+                    <h4>⚡ Context Compression</h4>
+                    <p style="font-size: 0.875rem;">GPT-4o compresses retrieved chunks to fit within token limits, reducing usage by ~80% while preserving relevant information for the query.</p>
+                    <p style="font-size: 0.875rem; margin-bottom: 0;"><strong>Model:</strong> <code>gpt-4o</code> for summarization</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Tools Ecosystem -->
+        <section id="tools">
+            <div class="section-header">
+                <span class="section-number">4</span>
+                <h2>AI Tools Ecosystem</h2>
+            </div>
+
+            <p>The agent has access to 7 specialized tools that extend its capabilities beyond text generation. Each tool integrates with external services or local functions to provide specific functionality.</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Purpose</th>
+                            <th>External Service</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>olympiaRAGSearch</code></td>
+                            <td>Search indexed city documents</td>
+                            <td>AWS S3 Vectors + OpenAI</td>
+                        </tr>
+                        <tr>
+                            <td><code>getRAGContext</code></td>
+                            <td>Retrieve cached RAG results</td>
+                            <td>Supabase / SQLite</td>
+                        </tr>
+                        <tr>
+                            <td><code>codeExecution</code></td>
+                            <td>Run Python in sandbox</td>
+                            <td>Daytona</td>
+                        </tr>
+                        <tr>
+                            <td><code>webSearch</code></td>
+                            <td>General web search</td>
+                            <td>Valyu API</td>
+                        </tr>
+                        <tr>
+                            <td><code>createChart</code></td>
+                            <td>Generate visualizations</td>
+                            <td>Local (Recharts)</td>
+                        </tr>
+                        <tr>
+                            <td><code>createCSV</code></td>
+                            <td>Generate data tables</td>
+                            <td>Local</td>
+                        </tr>
+                        <tr>
+                            <td><code>generateImage</code></td>
+                            <td>AI image generation</td>
+                            <td>OpenAI GPT Image</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h4>🔍 olympiaRAGSearch</h4>
+                    <p>Generates embeddings for user queries and performs semantic search against the S3 Vectors index to find relevant document chunks.</p>
+                </div>
+                <div class="card">
+                    <h4>🐍 codeExecution</h4>
+                    <p>Executes Python code in an isolated Daytona sandbox. Supports data analysis, calculations, and file generation.</p>
+                </div>
+                <div class="card">
+                    <h4>🌐 webSearch</h4>
+                    <p>Performs web searches using Valyu API for biomedical and general information not in the document corpus.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Database Architecture -->
+        <section id="database">
+            <div class="section-header">
+                <span class="section-number">5</span>
+                <h2>Database Architecture</h2>
+            </div>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+erDiagram
+    users ||--o{ chat_sessions : has
+    users ||--o{ user_rate_limits : has
+    chat_sessions ||--o{ chat_messages : contains
+    chat_sessions ||--o{ rag_contexts : stores
+    chat_sessions ||--o{ charts : generates
+    chat_sessions ||--o{ csvs : generates
+    chat_sessions ||--o{ images : generates
+    
+    users {
+        uuid id PK
+        text email
+        text subscription_tier
+        text subscription_status
+        text polar_customer_id
+    }
+    
+    rag_contexts {
+        text id PK
+        text session_id FK
+        text query
+        jsonb full_context
+        text compressed_summary
+        int token_count
+    }
+    
+    chat_sessions {
+        text id PK
+        uuid user_id FK
+        text title
+        timestamp created_at
+    }
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="col-box">
+                    <h4>🌐 Production: Supabase</h4>
+                    <ul class="checklist">
+                        <li><span class="check-icon">✓</span> PostgreSQL database</li>
+                        <li><span class="check-icon">✓</span> Row-Level Security (RLS)</li>
+                        <li><span class="check-icon">✓</span> Built-in authentication</li>
+                        <li><span class="check-icon">✓</span> Connection pooling</li>
+                    </ul>
+                </div>
+                <div class="col-box">
+                    <h4>💻 Development: SQLite</h4>
+                    <ul class="checklist">
+                        <li><span class="check-icon">✓</span> Local file-based database</li>
+                        <li><span class="check-icon">✓</span> No auth required</li>
+                        <li><span class="check-icon">✓</span> Drizzle ORM</li>
+                        <li><span class="check-icon">✓</span> Zero configuration</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Authentication & Billing -->
+        <section id="billing">
+            <div class="section-header">
+                <span class="section-number">6</span>
+                <h2>Authentication & Billing</h2>
+            </div>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant User
+    participant App
+    participant Supabase
+    participant Polar
+    
+    User->>App: Sign up / Sign in
+    App->>Supabase: Authenticate
+    Supabase-->>App: JWT Token
+    
+    User->>App: Subscribe to plan
+    App->>Polar: Create checkout
+    Polar-->>User: Payment page
+    User->>Polar: Complete payment
+    Polar->>App: Webhook (subscription.active)
+    App->>Supabase: Update subscription_tier
+    
+    User->>App: Use AI features
+    App->>Polar: Track usage events
+                </div>
+            </div>
+
+            <h3>Subscription Tiers</h3>
+            <div class="tier-cards">
+                <div class="tier-card">
+                    <div class="tier-name">Free</div>
+                    <div class="tier-price">$0</div>
+                    <div class="tier-desc">5 queries/day<br>Rate limited</div>
+                </div>
+                <div class="tier-card featured">
+                    <div class="tier-name">Pay-per-use</div>
+                    <div class="tier-price">Metered</div>
+                    <div class="tier-desc">20% markup<br>Pay as you go</div>
+                </div>
+                <div class="tier-card">
+                    <div class="tier-name">Unlimited</div>
+                    <div class="tier-price">$XX/mo</div>
+                    <div class="tier-desc">Fixed monthly<br>Unlimited queries</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deployment -->
+        <section id="deployment">
+            <div class="section-header">
+                <span class="section-number">7</span>
+                <h2>Deployment Architecture</h2>
+            </div>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TB
+    subgraph Render["🚀 Render.com (Oregon)"]
+        NextJS[Next.js App]
+        Puppeteer[Chromium for PDF]
+    end
+    
+    subgraph AWS["☁️ AWS (us-west-2)"]
+        S3Raw[S3: olympia-plans-raw]
+        S3Vec[S3 Vectors: olympia-rag-vectors]
+    end
+    
+    subgraph Cloud["🌐 Cloud Services"]
+        Supabase[Supabase PostgreSQL]
+        OpenAI[OpenAI API]
+        Daytona[Daytona Sandbox]
+        Valyu[Valyu API]
+        Polar[Polar Billing]
+    end
+    
+    NextJS --> AWS
+    NextJS --> Cloud
+                </div>
+            </div>
+
+            <div class="specs-box">
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <div class="spec-value">Node.js 20</div>
+                        <div class="spec-label">Runtime</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-value">Oregon</div>
+                        <div class="spec-label">Region</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-value">Free Tier</div>
+                        <div class="spec-label">Current Plan</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-value">us-west-2</div>
+                        <div class="spec-label">AWS Region</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scaling Considerations -->
+        <section id="scaling">
+            <div class="section-header">
+                <span class="section-number">8</span>
+                <h2>Scaling: POC to Production</h2>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Current (POC)</th>
+                            <th>Recommended (Production)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Compute</strong></td>
+                            <td>Render free tier (single instance)</td>
+                            <td>Render Pro with auto-scaling or Vercel Edge</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Database</strong></td>
+                            <td>Supabase free tier</td>
+                            <td>Supabase Pro (connection pooling, larger storage)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vector Search</strong></td>
+                            <td>AWS S3 Vectors (serverless)</td>
+                            <td>Same (scales automatically to millions of vectors)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Documents</strong></td>
+                            <td>Single city corpus</td>
+                            <td>Namespace per city, modular ingestion</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Cost Optimization Strategies</h3>
+            <div class="cards-grid">
+                <div class="card">
+                    <h4>Context Compression</h4>
+                    <p>GPT-4o compression reduces token usage by ~80%, significantly lowering API costs.</p>
+                </div>
+                <div class="card">
+                    <h4>Session Limits</h4>
+                    <p>4-query RAG limit per session controls costs while allowing meaningful research.</p>
+                </div>
+                <div class="card">
+                    <h4>Tiered Billing</h4>
+                    <p>Pay-per-use tier passes costs to heavy users; unlimited tier provides predictable revenue.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security -->
+        <section id="security">
+            <div class="section-header">
+                <span class="section-number">9</span>
+                <h2>Security Architecture</h2>
+            </div>
+
+            <div class="col-box" style="max-width: 600px;">
+                <ul class="checklist">
+                    <li><span class="check-icon">✓</span> Row-Level Security (RLS) on all Supabase tables</li>
+                    <li><span class="check-icon">✓</span> API keys stored as environment variables</li>
+                    <li><span class="check-icon">✓</span> Supabase Auth with JWT tokens</li>
+                    <li><span class="check-icon">✓</span> Sandboxed code execution via Daytona</li>
+                    <li><span class="check-icon">✓</span> Rate limiting for anonymous users</li>
+                    <li><span class="check-icon">✓</span> HTTPS encryption in transit</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Value Proposition -->
+        <section class="value-section">
+            <h2>Technology Value Proposition</h2>
+            <div class="value-grid">
+                <div class="value-col">
+                    <h3>For City Researchers</h3>
+                    <ul>
+                        <li>Natural language access to complex planning documents</li>
+                        <li>Python code execution for data analysis</li>
+                        <li>AI-generated visualizations and reports</li>
+                        <li>PDF export for presentations</li>
+                    </ul>
+                </div>
+                <div class="value-col">
+                    <h3>Technical Differentiators</h3>
+                    <ul>
+                        <li>AWS S3 Vectors: New serverless vector DB (2024), cost-effective</li>
+                        <li>Context compression: 8x reduction in token usage</li>
+                        <li>Dual-database strategy: Easy local development</li>
+                        <li>Tool ecosystem: 7 specialized AI tools</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Ecoheart Architecture Documentation • POC for City Researchers</p>
+        <p style="margin-top: 0.5rem; color: var(--slate-400);">Generated January 2026</p>
+    </footer>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#14B8A6',
+                primaryTextColor: '#0F172A',
+                primaryBorderColor: '#0D9488',
+                lineColor: '#64748B',
+                secondaryColor: '#F1F5F9',
+                tertiaryColor: '#FFFFFF',
+                background: '#FFFFFF',
+                mainBkg: '#FFFFFF',
+                nodeBorder: '#14B8A6',
+                clusterBkg: '#F8FAFC',
+                clusterBorder: '#E2E8F0',
+                titleColor: '#0F172A',
+                edgeLabelBackground: '#FFFFFF'
+            },
+            flowchart: {
+                curve: 'basis',
+                padding: 20
+            },
+            sequence: {
+                actorMargin: 50,
+                boxMargin: 10,
+                mirrorActors: false
+            }
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
