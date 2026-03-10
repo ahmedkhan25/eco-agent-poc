@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -33,6 +33,83 @@ interface Slide {
   accentColor: string;
 }
 
+const SUBTITLES = [
+  "Visualize cause and effect across any topic",
+  "AI builds causal loop diagrams from your ideas",
+  "Discover hidden feedback loops driving outcomes",
+  "Challenge assumptions with the Aha! Paradox",
+  "Transform system dynamics into human stories",
+  "Collaborate with AI to refine your model",
+];
+
+function AboutSubtitleLoop() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % SUBTITLES.length);
+        setVisible(true);
+      }, 400);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="absolute top-3 left-0 right-0 flex justify-center pointer-events-none z-10">
+      <div
+        className={`px-4 py-1.5 rounded-full bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+          visible ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <p className="text-white/90 text-xs font-medium text-center">{SUBTITLES[index]}</p>
+      </div>
+    </div>
+  );
+}
+
+function Slide1Content() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.playbackRate = 0.5;
+  }, []);
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start w-full">
+      {/* Video with overlays */}
+      <div className="relative w-full">
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full rounded-xl shadow-lg"
+        >
+          <source src="/aha-images/ripples-pond-home1.mp4" type="video/mp4" />
+        </video>
+        {/* Title overlay */}
+        <div className="absolute bottom-0 right-0 left-0 rounded-b-xl bg-gradient-to-t from-black/80 via-black/50 to-transparent px-5 pt-10 pb-4 text-right">
+          <p className="text-white font-bold text-lg drop-shadow-lg">Systems Modeler</p>
+          <p className="text-white/80 text-xs drop-shadow-md">Inspired by the work of systems thinker Gene Bellinger</p>
+        </div>
+        {/* Rotating subtitles */}
+        <AboutSubtitleLoop />
+      </div>
+      {/* Image */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/aha-images/landing-image-sys-model-first-image.png"
+        alt="Welcome to the Universal Interactive System Modeler"
+        className="w-full rounded-xl shadow-lg"
+      />
+    </div>
+  );
+}
+
 const slides: Slide[] = [
   {
     id: 1,
@@ -40,64 +117,7 @@ const slides: Slide[] = [
     title: "Universal Interactive System Modeler",
     subtitle: "AI-Powered Systems Thinking by ecoheart.ai",
     accentColor: "from-teal-500 to-emerald-600",
-    content: (
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 items-start">
-        <div className="space-y-4">
-          {/* Video */}
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full rounded-xl shadow-lg"
-            ref={(el) => { if (el) el.playbackRate = 0.5; }}
-          >
-            <source src="/aha-images/ripples-pond-home1.mp4" type="video/mp4" />
-          </video>
-          {/* Image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/aha-images/landing-image-sys-model-first-image.png"
-            alt="Welcome to the Universal Interactive System Modeler"
-            className="w-full rounded-xl shadow-lg"
-          />
-        </div>
-        <div className="space-y-4">
-          <p className="text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-            A dynamic, AI-powered tool that helps you investigate relationships
-            and their implications across <strong>any topic</strong>. Move beyond
-            static lists and &ldquo;incomprehensible spaghetti diagrams&rdquo; into
-            interactive models that promote deep understanding.
-          </p>
-          <div className="space-y-2">
-            <div className="flex items-start gap-2">
-              <span className="text-emerald-500 font-bold text-sm mt-0.5">1.</span>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                <strong className="text-slate-800 dark:text-slate-200">Generate</strong> — AI builds a causal loop diagram from your topic, documents, or data
-              </p>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-emerald-500 font-bold text-sm mt-0.5">2.</span>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                <strong className="text-slate-800 dark:text-slate-200">Iterate</strong> — Chat with the diagram to refine it collaboratively
-              </p>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-emerald-500 font-bold text-sm mt-0.5">3.</span>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                <strong className="text-slate-800 dark:text-slate-200">Collide</strong> — The Aha! Paradox smashes your model against an unrelated concept to reveal hidden assumptions
-              </p>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-emerald-500 font-bold text-sm mt-0.5">4.</span>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                <strong className="text-slate-800 dark:text-slate-200">Humanize</strong> — Transform the model into a grounded story with real stakeholder perspectives
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
+    content: <Slide1Content />,
   },
   {
     id: 2,
