@@ -166,62 +166,62 @@ const slides: Slide[] = [
     title: 'The Breakthrough: The "Aha! Paradox"',
     accentColor: "from-red-500 to-rose-600",
     content: (
-      <div className="space-y-3">
-        <NapkinViewer />
-        <p className="text-sm text-slate-600 dark:text-slate-300 mb-2 mt-4">
-          Gene Bellinger&apos;s six-part methodology bypasses standard logic to
-          generate actionable breakthroughs:
-        </p>
-        <div className="p-2.5 bg-red-50/80 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-          <p className="text-xs font-semibold text-red-800 dark:text-red-200 mb-0.5">
-            1. The Anchor &mdash; The Load-Bearing Delusion
-          </p>
-          <p className="text-xs text-slate-600 dark:text-slate-400">
-            Identify the comfortable lie that holds the status quo together
-            and prevents change &mdash; what you &ldquo;don&apos;t know you
-            don&apos;t know.&rdquo;
-          </p>
+      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
+        {/* Left: Napkin viewer — large */}
+        <div>
+          <NapkinViewer />
         </div>
-        <div className="p-2.5 bg-orange-50/80 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
-          <p className="text-xs font-semibold text-orange-800 dark:text-orange-200 mb-0.5">
-            2. The Default &amp; 3. The Bottleneck
+        {/* Right: Step cards */}
+        <div className="space-y-2">
+          <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
+            Gene Bellinger&apos;s six-part methodology bypasses standard logic to
+            generate actionable breakthroughs:
           </p>
-          <p className="text-xs text-slate-600 dark:text-slate-400">
-            Map the standard path that feeds the delusion, then impose
-            constraints that forbid the system&apos;s normal language. Strip labels
-            &mdash; there are no &ldquo;things,&rdquo; only processes.
-          </p>
-        </div>
-        <div className="p-2.5 bg-rose-50/80 dark:bg-rose-900/20 rounded-lg border border-rose-200 dark:border-rose-800">
-          <p className="text-xs font-semibold text-rose-800 dark:text-rose-200 mb-0.5">
-            4. The Collision &mdash; The Isomorph
-          </p>
-          <p className="text-xs text-slate-600 dark:text-slate-400">
-            Collide the model with a completely unrelated concept (e.g.,
-            mycelial networks, tidal erosion). Use Scale-Shift or Biological
-            Shift to find structural matches that reveal hidden &ldquo;bundles
-            of relationships.&rdquo;
-          </p>
-        </div>
-        <div className="p-2.5 bg-pink-50/80 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
-          <p className="text-xs font-semibold text-pink-800 dark:text-pink-200 mb-0.5">
-            5. The Reversal &amp; 6. The Stop Rule
-          </p>
-          <p className="text-xs text-slate-600 dark:text-slate-400">
-            Flip the core assumption on its head &mdash; treat the
-            &ldquo;truth&rdquo; as a lie. Then commit: what must you
-            painfully stop doing to align with this new reality?
-          </p>
-        </div>
-        <div className="p-2.5 bg-purple-50/80 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-          <p className="text-xs font-semibold text-purple-800 dark:text-purple-200 mb-0.5">
-            7. The Kinetic Result &mdash; The Aha! Insight
-          </p>
-          <p className="text-xs text-slate-600 dark:text-slate-400">
-            A single high-leverage insight plus one concrete &ldquo;First
-            Domino&rdquo; action, grounded in First Principles, Core Wisdom,
-            and the system&apos;s highest Leverage Points.
-          </p>
+          <div className="p-2.5 bg-red-50/80 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+            <p className="text-xs font-semibold text-red-800 dark:text-red-200 mb-0.5">
+              1. The Anchor &mdash; The Load-Bearing Delusion
+            </p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Identify the comfortable lie that holds the status quo together
+              and prevents change.
+            </p>
+          </div>
+          <div className="p-2.5 bg-orange-50/80 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+            <p className="text-xs font-semibold text-orange-800 dark:text-orange-200 mb-0.5">
+              2. The Default &amp; 3. The Bottleneck
+            </p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Map the standard path that feeds the delusion, then forbid the
+              system&apos;s normal language. Strip labels &mdash; only processes.
+            </p>
+          </div>
+          <div className="p-2.5 bg-rose-50/80 dark:bg-rose-900/20 rounded-lg border border-rose-200 dark:border-rose-800">
+            <p className="text-xs font-semibold text-rose-800 dark:text-rose-200 mb-0.5">
+              4. The Collision &mdash; The Isomorph
+            </p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Collide with an unrelated concept. Use Scale-Shift or Biological
+              Shift to find structural matches.
+            </p>
+          </div>
+          <div className="p-2.5 bg-pink-50/80 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
+            <p className="text-xs font-semibold text-pink-800 dark:text-pink-200 mb-0.5">
+              5. The Reversal &amp; 6. The Stop Rule
+            </p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Flip the core assumption. What must you painfully stop doing to
+              align with this new reality?
+            </p>
+          </div>
+          <div className="p-2.5 bg-purple-50/80 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+            <p className="text-xs font-semibold text-purple-800 dark:text-purple-200 mb-0.5">
+              7. The Kinetic Result &mdash; The Aha! Insight
+            </p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              One high-leverage insight plus a concrete &ldquo;First Domino&rdquo;
+              action, grounded in First Principles and Leverage Points.
+            </p>
+          </div>
         </div>
       </div>
     ),
@@ -386,7 +386,7 @@ export function SystemsModelerAboutModal({ isOpen, onClose }: AboutModalProps) {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden pointer-events-auto border border-slate-200 dark:border-slate-700 flex flex-col"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-[92vw] w-full max-h-[95vh] overflow-hidden pointer-events-auto border border-slate-200 dark:border-slate-700 flex flex-col"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
