@@ -163,67 +163,11 @@ const slides: Slide[] = [
   {
     id: 4,
     icon: <Zap className="w-6 h-6" />,
-    title: 'The Breakthrough: The "Aha! Paradox"',
-    accentColor: "from-red-500 to-rose-600",
+    title: 'The "Aha! Paradox"',
+    subtitle: "Systems Thinker Gene Bellinger's Breakthrough Methodology",
+    accentColor: "from-emerald-600 to-teal-700",
     content: (
-      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
-        {/* Left: Napkin viewer — large */}
-        <div>
-          <NapkinViewer />
-        </div>
-        {/* Right: Step cards */}
-        <div className="space-y-2">
-          <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
-            Gene Bellinger&apos;s six-part methodology bypasses standard logic to
-            generate actionable breakthroughs:
-          </p>
-          <div className="p-2.5 bg-red-50/80 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-            <p className="text-xs font-semibold text-red-800 dark:text-red-200 mb-0.5">
-              1. The Anchor &mdash; The Load-Bearing Delusion
-            </p>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Identify the comfortable lie that holds the status quo together
-              and prevents change.
-            </p>
-          </div>
-          <div className="p-2.5 bg-orange-50/80 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
-            <p className="text-xs font-semibold text-orange-800 dark:text-orange-200 mb-0.5">
-              2. The Default &amp; 3. The Bottleneck
-            </p>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Map the standard path that feeds the delusion, then forbid the
-              system&apos;s normal language. Strip labels &mdash; only processes.
-            </p>
-          </div>
-          <div className="p-2.5 bg-rose-50/80 dark:bg-rose-900/20 rounded-lg border border-rose-200 dark:border-rose-800">
-            <p className="text-xs font-semibold text-rose-800 dark:text-rose-200 mb-0.5">
-              4. The Collision &mdash; The Isomorph
-            </p>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Collide with an unrelated concept. Use Scale-Shift or Biological
-              Shift to find structural matches.
-            </p>
-          </div>
-          <div className="p-2.5 bg-pink-50/80 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
-            <p className="text-xs font-semibold text-pink-800 dark:text-pink-200 mb-0.5">
-              5. The Reversal &amp; 6. The Stop Rule
-            </p>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Flip the core assumption. What must you painfully stop doing to
-              align with this new reality?
-            </p>
-          </div>
-          <div className="p-2.5 bg-purple-50/80 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-            <p className="text-xs font-semibold text-purple-800 dark:text-purple-200 mb-0.5">
-              7. The Kinetic Result &mdash; The Aha! Insight
-            </p>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              One high-leverage insight plus a concrete &ldquo;First Domino&rdquo;
-              action, grounded in First Principles and Leverage Points.
-            </p>
-          </div>
-        </div>
-      </div>
+      <NapkinViewer />
     ),
   },
   {
@@ -392,43 +336,41 @@ export function SystemsModelerAboutModal({ isOpen, onClose }: AboutModalProps) {
               exit={{ scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
             >
-              {/* Header with gradient accent */}
+              {/* Compact header with gradient accent */}
               <div
-                className={`relative bg-gradient-to-r ${slide.accentColor} p-5 flex-shrink-0`}
+                className={`relative bg-gradient-to-r ${slide.accentColor} px-4 py-2.5 flex-shrink-0 flex items-center gap-3`}
               >
-                <button
-                  onClick={onClose}
-                  className="absolute top-3 right-3 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-                >
-                  <X className="w-4 h-4 text-white" />
-                </button>
-
-                {/* Slide counter */}
-                <div className="absolute top-3 left-4 text-xs font-medium text-white/70">
-                  {currentSlide + 1} / {slides.length}
+                <div className="p-1.5 bg-white/20 rounded-md text-white">
+                  {slide.icon}
                 </div>
-
-                <div className="flex items-center gap-3 mt-4">
-                  <div className="p-2 bg-white/20 rounded-lg text-white">
-                    {slide.icon}
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-white leading-tight">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-medium text-white/60">
+                      {currentSlide + 1}/{slides.length}
+                    </span>
+                    <h2 className="text-sm font-bold text-white leading-tight truncate">
                       {slide.title}
                     </h2>
-                    {slide.subtitle && (
-                      <p className="text-sm text-white/80 mt-0.5">
-                        {slide.subtitle}
-                      </p>
-                    )}
                   </div>
+                  {slide.subtitle && (
+                    <p className="text-xs text-white/70 truncate">
+                      {slide.subtitle}
+                    </p>
+                  )}
                 </div>
-                {/* EcoHeart branding */}
-                <div className="absolute bottom-3 right-4 flex items-center gap-1.5 opacity-70">
-                  <EcoheartLogo className="w-4 h-4" />
-                  <a href="https://ecoheart.ai" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/80 hover:text-white font-medium">
-                    ecoheart.ai
-                  </a>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-1 opacity-60">
+                    <EcoheartLogo className="w-3.5 h-3.5" />
+                    <a href="https://ecoheart.ai" target="_blank" rel="noopener noreferrer" className="text-[9px] text-white/80 hover:text-white font-medium">
+                      ecoheart.ai
+                    </a>
+                  </div>
+                  <button
+                    onClick={onClose}
+                    className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5 text-white" />
+                  </button>
                 </div>
               </div>
 

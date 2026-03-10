@@ -68,10 +68,10 @@ export function NapkinViewer() {
     setActive((prev) => (prev - 1 + NAPKINS.length) % NAPKINS.length);
   }, []);
 
-  // Auto-advance every 4.5 seconds unless paused
+  // Auto-advance every 5 seconds unless paused
   useEffect(() => {
     if (paused) return;
-    const timer = setInterval(goNext, 4500);
+    const timer = setInterval(goNext, 5000);
     return () => clearInterval(timer);
   }, [paused, goNext]);
 
@@ -80,52 +80,38 @@ export function NapkinViewer() {
 
   return (
     <div
-      className="w-full"
+      className="w-full flex flex-col"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Full image with spotlight overlay */}
-      <div className="relative w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-lg">
-        {/* Full napkin image — show entire 3x2 grid */}
+      {/* Image with spotlight — takes all available space */}
+      <div className="relative w-full rounded-xl overflow-hidden border border-emerald-300/30 dark:border-emerald-700/30 shadow-lg">
         <div className="relative w-full" style={{ aspectRatio: "2816 / 1536" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/aha-images/final-full-six-images.png"
             alt="The Aha! Paradox — Six Steps"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
 
           {/* Dark overlay with radial spotlight cutout */}
           <div
             className="absolute inset-0 transition-all duration-1000 ease-in-out"
             style={{
-              background: `radial-gradient(ellipse 38% 55% at ${spot.x}% ${spot.y}%, transparent 0%, transparent 60%, rgba(0,0,0,0.75) 100%)`,
+              background: `radial-gradient(ellipse 38% 55% at ${spot.x}% ${spot.y}%, transparent 0%, transparent 60%, rgba(0,0,0,0.65) 100%)`,
             }}
           />
 
-          {/* Subtle glow ring around active napkin */}
+          {/* Border around active napkin cell */}
           <div
-            className="absolute w-[33.33%] h-[50%] transition-all duration-1000 ease-in-out pointer-events-none"
+            className="absolute w-[33.33%] h-[50%] transition-all duration-1000 ease-in-out pointer-events-none border-2 border-emerald-400/60"
             style={{
               left: `${napkin.col * 33.33}%`,
               top: `${napkin.row * 50}%`,
-              boxShadow: "inset 0 0 30px 5px rgba(239,68,68,0.15)",
-              borderRadius: "8px",
+              boxShadow: "inset 0 0 30px 6px rgba(16,185,129,0.1)",
+              borderRadius: "6px",
             }}
           />
-
-          {/* Step number badge */}
-          <div
-            className="absolute transition-all duration-700 ease-in-out"
-            style={{
-              left: `${napkin.col * 33.33 + 2}%`,
-              top: `${napkin.row * 50 + 4}%`,
-            }}
-          >
-            <div className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg">
-              {active + 1} / 6
-            </div>
-          </div>
         </div>
 
         {/* Navigation arrows */}
@@ -133,13 +119,13 @@ export function NapkinViewer() {
           onClick={(e) => { e.stopPropagation(); goPrev(); setPaused(true); }}
           className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white/90 hover:bg-black/70 transition-colors backdrop-blur-sm"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-5 h-5" />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); goNext(); setPaused(true); }}
           className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white/90 hover:bg-black/70 transition-colors backdrop-blur-sm"
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-5 h-5" />
         </button>
 
         {/* Dot indicators at bottom */}
@@ -150,7 +136,7 @@ export function NapkinViewer() {
               onClick={() => { setActive(i); setPaused(true); }}
               className={`rounded-full transition-all duration-300 ${
                 i === active
-                  ? "w-5 h-1.5 bg-red-400"
+                  ? "w-5 h-1.5 bg-emerald-400"
                   : "w-1.5 h-1.5 bg-white/50 hover:bg-white/70"
               }`}
             />
@@ -158,15 +144,20 @@ export function NapkinViewer() {
         </div>
       </div>
 
-      {/* Description card below */}
-      <div className="mt-3 p-3 bg-red-50/80 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-        <p className="text-sm font-semibold text-red-800 dark:text-red-200">
-          {napkin.title}{" "}
-          <span className="font-normal text-red-600 dark:text-red-400">
-            — {napkin.subtitle}
+      {/* Active step description — single card, synced with spotlight */}
+      <div className="mt-2 p-2.5 bg-emerald-50/80 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-all duration-500">
+        <div className="flex items-baseline gap-2">
+          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded-full flex-shrink-0">
+            {active + 1}/6
           </span>
-        </p>
-        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+          <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
+            {napkin.title}
+            <span className="font-normal text-emerald-600 dark:text-emerald-400 ml-1">
+              — {napkin.subtitle}
+            </span>
+          </p>
+        </div>
+        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed pl-[38px]">
           {napkin.desc}
         </p>
       </div>
