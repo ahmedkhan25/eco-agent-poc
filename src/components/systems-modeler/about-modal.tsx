@@ -78,34 +78,71 @@ function Slide1Content() {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start w-full">
-      {/* Video with overlays */}
-      <div className="relative w-full">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full rounded-xl shadow-lg"
-        >
-          <source src="/aha-images/ripples-pond-home1.mp4" type="video/mp4" />
-        </video>
-        {/* Title overlay */}
-        <div className="absolute bottom-0 right-0 left-0 rounded-b-xl bg-gradient-to-t from-black/80 via-black/50 to-transparent px-5 pt-10 pb-4 text-right">
-          <p className="text-white font-bold text-lg drop-shadow-lg">Systems Modeler</p>
-          <p className="text-white/80 text-xs drop-shadow-md">Inspired by the work of systems thinker Gene Bellinger</p>
+    <div className="space-y-5 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+        {/* Video with overlays */}
+        <div className="relative w-full">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full rounded-xl shadow-lg"
+          >
+            <source src="/aha-images/ripples-pond-home1.mp4" type="video/mp4" />
+          </video>
+          {/* Title overlay */}
+          <div className="absolute bottom-0 right-0 left-0 rounded-b-xl bg-gradient-to-t from-black/80 via-black/50 to-transparent px-5 pt-10 pb-4 text-right">
+            <p className="text-white font-bold text-lg drop-shadow-lg">Systems Modeler</p>
+            <p className="text-white/80 text-xs drop-shadow-md">Inspired by the work of systems thinker Gene Bellinger</p>
+          </div>
+          {/* Rotating subtitles */}
+          <AboutSubtitleLoop />
         </div>
-        {/* Rotating subtitles */}
-        <AboutSubtitleLoop />
+        {/* Image */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/aha-images/landing-image-sys-model-first-image.png"
+          alt="Welcome to the Universal Interactive System Modeler"
+          className="w-full rounded-xl shadow-lg"
+        />
       </div>
-      {/* Image */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/aha-images/landing-image-sys-model-first-image.png"
-        alt="Welcome to the Universal Interactive System Modeler"
-        className="w-full rounded-xl shadow-lg"
-      />
+      {/* Description */}
+      <div className="space-y-4">
+        <p className="text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+          A dynamic, AI-powered tool that helps you investigate relationships
+          and their implications across <strong>any topic</strong>. Move beyond
+          static lists and &ldquo;incomprehensible spaghetti diagrams&rdquo; into
+          interactive models that promote deep understanding.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-teal-50/80 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800">
+            <span className="text-teal-500 font-bold text-sm mt-0.5">1.</span>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              <strong className="text-slate-800 dark:text-slate-200">Generate</strong> — AI builds a causal loop diagram from your topic, documents, or data
+            </p>
+          </div>
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-emerald-50/80 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+            <span className="text-emerald-500 font-bold text-sm mt-0.5">2.</span>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              <strong className="text-slate-800 dark:text-slate-200">Iterate</strong> — Chat with the diagram to refine it collaboratively
+            </p>
+          </div>
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50/80 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+            <span className="text-red-500 font-bold text-sm mt-0.5">3.</span>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              <strong className="text-slate-800 dark:text-slate-200">Collide</strong> — The Aha! Paradox smashes your model against an unrelated concept to reveal hidden assumptions
+            </p>
+          </div>
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+            <span className="text-amber-500 font-bold text-sm mt-0.5">4.</span>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              <strong className="text-slate-800 dark:text-slate-200">Humanize</strong> — Transform the model into a grounded story with real stakeholder perspectives
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

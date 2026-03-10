@@ -72,11 +72,11 @@ export function SystemsModelerPage() {
         addedNodes: added.map((n) => ({ id: n.id, label: n.label })),
       });
     },
-    render: (props: { status: string; result?: string; args: Record<string, unknown> }) => {
+    render: (props: { status: string; result?: unknown }) => {
       if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Updating model...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
-        const data = JSON.parse(props.result);
+        const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return (
           <ActionResult
             message={data.message}
@@ -84,7 +84,7 @@ export function SystemsModelerPage() {
           />
         );
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
       }
     },
   });
@@ -110,14 +110,14 @@ export function SystemsModelerPage() {
       store.flashHighlight([id]);
       return JSON.stringify({ message: `Added node "${label}" to the model.`, id, label });
     },
-    render: (props: { status: string; result?: string }) => {
+    render: (props: { status: string; result?: unknown }) => {
       if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Adding node...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
-        const data = JSON.parse(props.result);
+        const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={[{ id: data.id, label: data.label }]} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
       }
     },
   });
@@ -134,14 +134,14 @@ export function SystemsModelerPage() {
       store.removeNode(nodeId);
       return JSON.stringify({ message: `Removed node "${label}" and its connected links.`, id: nodeId, label });
     },
-    render: (props: { status: string; result?: string }) => {
+    render: (props: { status: string; result?: unknown }) => {
       if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Removing node...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
-        const data = JSON.parse(props.result);
+        const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={[{ id: data.id, label: data.label, removed: true }]} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
       }
     },
   });
@@ -167,11 +167,11 @@ export function SystemsModelerPage() {
       store.flashHighlight([source, target]);
       return JSON.stringify({ message: `Added ${type} link from ${source} to ${target}.`, source, target, linkType: type });
     },
-    render: (props: { status: string; result?: string }) => {
+    render: (props: { status: string; result?: unknown }) => {
       if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Adding link...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
-        const data = JSON.parse(props.result);
+        const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return (
           <ActionResult
             message={data.message}
@@ -179,7 +179,7 @@ export function SystemsModelerPage() {
           />
         );
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
       }
     },
   });
@@ -196,14 +196,14 @@ export function SystemsModelerPage() {
       store.removeLink(source, target);
       return JSON.stringify({ message: `Removed link from ${source} to ${target}.`, source, target, linkType });
     },
-    render: (props: { status: string; result?: string }) => {
+    render: (props: { status: string; result?: unknown }) => {
       if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Removing link...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
-        const data = JSON.parse(props.result);
+        const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={[{ id: data.source, label: data.source }, { id: data.target, label: data.target }]} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
       }
     },
   });
@@ -229,14 +229,14 @@ export function SystemsModelerPage() {
         nodeRefs,
       });
     },
-    render: (props: { status: string; result?: string }) => {
+    render: (props: { status: string; result?: unknown }) => {
       if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Changing loop type...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
-        const data = JSON.parse(props.result);
+        const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={data.nodeRefs} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
       }
     },
   });
@@ -256,13 +256,13 @@ export function SystemsModelerPage() {
       });
       return JSON.stringify({ message: `Highlighted ${ids.length} node${ids.length > 1 ? "s" : ""} in the diagram.`, nodeRefs });
     },
-    render: (props: { status: string; result?: string }) => {
+    render: (props: { status: string; result?: unknown }) => {
       if (props.status !== "complete" || !props.result) return <></>;
       try {
-        const data = JSON.parse(props.result);
+        const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={data.nodeRefs} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
       }
     },
   });
