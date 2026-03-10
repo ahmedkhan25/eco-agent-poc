@@ -23,6 +23,7 @@ import {
   Menu,
   X,
   Info,
+  Network,
 } from 'lucide-react';
 import { EcoheartLogo } from '@/components/ecoheart-logo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -254,6 +255,15 @@ export function Sidebar({
                   </button>
                 )}
 
+                {/* Systems Modeler */}
+                <button
+                  onClick={() => { window.location.href = '/systems-modeler'; closeMobileMenu(); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                >
+                  <Network className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Systems Modeler</span>
+                </button>
+
                 {/* History */}
                 <button
                   onClick={() => {
@@ -451,6 +461,19 @@ export function Sidebar({
                   </div>
                 </div>
               )}
+
+              {/* Systems Modeler */}
+              <div className="relative group/tooltip">
+                <button
+                  onClick={() => window.location.href = '/systems-modeler'}
+                  className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[20px] transition-all duration-200 group hover:scale-110 active:scale-95"
+                >
+                  <Network className="h-6 w-6 text-indigo-500 dark:text-indigo-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors" />
+                </button>
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                  Systems Modeler
+                </div>
+              </div>
 
                       {/* History */}
               <div className="relative group/tooltip">
