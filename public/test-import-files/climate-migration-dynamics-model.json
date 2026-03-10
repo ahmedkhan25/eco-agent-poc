@@ -1,0 +1,187 @@
+{
+  "name": "Climate Migration Dynamics",
+  "description": "A system dynamics model capturing the interplay between climate change, migration patterns, and their broader socio-economic impact.",
+  "nodes": [
+    {
+      "id": "climate_change",
+      "label": "Climate Change",
+      "desc": "Refers to long-term shifts in temperatures and weather patterns, primarily due to human activities.",
+      "example": "Increased frequency of severe droughts in sub-Saharan Africa over the past decade.",
+      "category": "environment",
+      "key": true
+    },
+    {
+      "id": "extreme_weather_events",
+      "label": "Extreme Weather Events",
+      "desc": "Increased frequency and intensity of events like floods, hurricanes, and droughts caused by climate change.",
+      "example": "Hurricane Dorian's devastation in the Bahamas in 2019.",
+      "category": "environment",
+      "key": false
+    },
+    {
+      "id": "livelihood_disruption",
+      "label": "Livelihood Disruption",
+      "desc": "Loss of income and resources due to environmental changes impacting agriculture, fishing, and other climate-sensitive activities.",
+      "example": "Drought in East Africa leading to crop failures and loss of livestock, affecting millions' livelihoods.",
+      "category": "economic",
+      "key": true
+    },
+    {
+      "id": "migration_rate",
+      "label": "Migration Rate",
+      "desc": "The rate at which people relocate due to environmental pressures, seeking better living conditions.",
+      "example": "In 2019, over 4 million people were displaced in countries like India and the Philippines due to natural disasters.",
+      "category": "population",
+      "key": true
+    },
+    {
+      "id": "receiving_area_stress",
+      "label": "Receiving Area Stress",
+      "desc": "Pressure on infrastructure and services in areas receiving a high number of migrants.",
+      "example": "Increased pressure on public services and housing in cities like Dhaka due to rural influx.",
+      "category": "pressure",
+      "key": false
+    },
+    {
+      "id": "resource_scarcity",
+      "label": "Resource Scarcity",
+      "desc": "A shortage of critical resources such as water, food, and housing in both source and receiving areas.",
+      "example": "Severe water scarcity in Cape Town during the 2018 crisis.",
+      "category": "resource",
+      "key": false
+    },
+    {
+      "id": "social_tension",
+      "label": "Social Tension",
+      "desc": "Rising tensions between migrants and host communities due to competition for limited resources.",
+      "example": "Incidents of conflict between migrants and locals in refugee camps in Lebanon.",
+      "category": "social",
+      "key": false
+    },
+    {
+      "id": "policy_response",
+      "label": "Policy Response",
+      "desc": "Government measures to address climate impacts and manage migration effectively.",
+      "example": "Implementation of adaptive infrastructure projects to counteract flooding in Jakarta.",
+      "category": "policy",
+      "key": false
+    },
+    {
+      "id": "resilience_building",
+      "label": "Resilience Building",
+      "desc": "Efforts to enhance community capacity to withstand and recover from climate impacts.",
+      "example": "Development of drought-resistant crop varieties in parts of Ethiopia.",
+      "category": "solution",
+      "key": false
+    }
+  ],
+  "links": [
+    {
+      "source": "climate_change",
+      "target": "extreme_weather_events",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Decades"
+    },
+    {
+      "source": "extreme_weather_events",
+      "target": "livelihood_disruption",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Immediate"
+    },
+    {
+      "source": "livelihood_disruption",
+      "target": "migration_rate",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "1-3 Years"
+    },
+    {
+      "source": "migration_rate",
+      "target": "receiving_area_stress",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Months"
+    },
+    {
+      "source": "receiving_area_stress",
+      "target": "resource_scarcity",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Months"
+    },
+    {
+      "source": "resource_scarcity",
+      "target": "social_tension",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Immediate"
+    },
+    {
+      "source": "social_tension",
+      "target": "policy_response",
+      "type": "balancing",
+      "label": "+",
+      "lag": "Months"
+    },
+    {
+      "source": "policy_response",
+      "target": "resilience_building",
+      "type": "balancing",
+      "label": "+",
+      "lag": "Years"
+    },
+    {
+      "source": "resilience_building",
+      "target": "livelihood_disruption",
+      "type": "balancing",
+      "label": "-",
+      "lag": "Years"
+    }
+  ],
+  "loops": [
+    {
+      "id": "R1",
+      "type": "R",
+      "name": "Climate Displacement Loop",
+      "desc": "This reinforcing loop captures how increased climate change leads to more extreme weather events, disrupting livelihoods and escalating migration.",
+      "nodes": [
+        "climate_change",
+        "extreme_weather_events",
+        "livelihood_disruption",
+        "migration_rate"
+      ]
+    },
+    {
+      "id": "B1",
+      "type": "B",
+      "name": "Policy and Resilience Loop",
+      "desc": "This balancing loop illustrates how policy responses can enhance resilience and mitigate livelihood disruption.",
+      "nodes": [
+        "policy_response",
+        "resilience_building",
+        "livelihood_disruption",
+        "migration_rate"
+      ]
+    }
+  ],
+  "archetypes": [
+    {
+      "id": "archetype_1",
+      "name": "Tragedy of the Commons",
+      "description": "As migrants increase in receiving areas, the competition for limited resources creates social tension, worsening the overall conditions.",
+      "relatedLoops": [
+        "R1"
+      ]
+    },
+    {
+      "id": "archetype_2",
+      "name": "Fixes that Fail",
+      "description": "Short-term policy responses might alleviate immediate pressures but fail if they do not address the root causes of climate change and migration.",
+      "relatedLoops": [
+        "B1"
+      ]
+    }
+  ]
+}

@@ -48,6 +48,12 @@ interface SystemModelerState {
 
   // Undo
   history: SystemModel[];
+
+  // Chat panel
+  chatPanelWidth: number;
+
+  // Flash highlight (internal)
+  _highlightTimeoutId: ReturnType<typeof setTimeout> | null;
 }
 
 interface SystemModelerActions {
@@ -97,6 +103,12 @@ interface SystemModelerActions {
   pushHistory: () => void;
   undo: () => void;
 
+  // Chat panel
+  setChatPanelWidth: (width: number) => void;
+
+  // Flash highlight (temporary, auto-clears)
+  flashHighlight: (nodeIds: string[], linkIndices?: number[], durationMs?: number) => void;
+
   // Reset
   reset: () => void;
 }
@@ -124,6 +136,8 @@ const initialState: SystemModelerState = {
   illustrationDataUrl: null,
   characterImages: {},
   history: [],
+  chatPanelWidth: 380,
+  _highlightTimeoutId: null,
 };
 
 export const useSystemModelerStore = create<
@@ -285,6 +299,18 @@ export const useSystemModelerStore = create<
     if (history.length === 0) return;
     const previous = history[history.length - 1];
     set({ model: previous, history: history.slice(0, -1) });
+  },
+
+  setChatPanelWidth: (chatPanelWidth) => set({ chatPanelWidth: Math.min(Math.max(chatPanelWidth, 280), 600) }),
+
+  flashHighlight: (nodeIds, linkIndices = [], durationMs = 3000) => {
+    const prev = get()._highlightTimeoutId;
+    if (prev) clearTimeout(prev);
+    set({ highlightedNodeIds: nodeIds, highlightedLinkIndices: linkIndices });
+    const timeoutId = setTimeout(() => {
+      set({ highlightedNodeIds: [], highlightedLinkIndices: [], _highlightTimeoutId: null });
+    }, durationMs);
+    set({ _highlightTimeoutId: timeoutId });
   },
 
   reset: () => set(initialState),

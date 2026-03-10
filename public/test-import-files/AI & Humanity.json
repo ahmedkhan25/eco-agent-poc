@@ -1,0 +1,278 @@
+{
+  "metadata": {
+    "topic": "The Balanced Co-Evolution of AI and Humanity"
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "label": "AI Capabilities [n1]",
+      "shape": "ellipse",
+      "color": {
+        "background": "#DBEAFE",
+        "border": "#3B82F6"
+      },
+      "borderWidth": 2.5,
+      "x": -196,
+      "y": -17,
+      "description": "The technical ceiling of machine intelligence and autonomous processing. This variable represents the external force pushing against traditional human roles. [n1]",
+      "opacity": 1,
+      "font": {
+        "color": "#1F2937"
+      }
+    },
+    {
+      "id": "n2",
+      "label": "Reliance on AI [n2]",
+      "shape": "ellipse",
+      "color": {
+        "background": "#DBEAFE",
+        "border": "#3B82F6"
+      },
+      "borderWidth": 1,
+      "x": -151,
+      "y": -244,
+      "description": "The degree to which individuals delegate decision-making and creative labor. This is the symptomatic solution for modern complexity. [n2]",
+      "opacity": 1,
+      "font": {
+        "color": "#1F2937"
+      }
+    },
+    {
+      "id": "n3",
+      "label": "Human Cognitive Agency [n3]",
+      "shape": "box",
+      "color": {
+        "background": "#CCFBF1",
+        "border": "#14B8A6"
+      },
+      "borderWidth": 1,
+      "x": 103,
+      "y": -138,
+      "description": "The stock of intrinsic expertise and the capacity for independent critical thought. This is the core 'muscle' of the human mind that is subject to atrophy. [n3]",
+      "opacity": 1,
+      "font": {
+        "color": "#1F2937"
+      }
+    },
+    {
+      "id": "n4",
+      "label": "Existential Friction [n4]",
+      "shape": "ellipse",
+      "color": {
+        "background": "#DBEAFE",
+        "border": "#3B82F6"
+      },
+      "borderWidth": 1,
+      "x": 346,
+      "y": -12,
+      "description": "The psychological and social discomfort that arises when humans feel irrelevant or disconnected. This acts as a 'balancing signal' to re-engage with manual or deep work. [n4]",
+      "opacity": 1,
+      "font": {
+        "color": "#1F2937"
+      }
+    },
+    {
+      "id": "n5",
+      "label": "Skill Reclamation Efforts [n5]",
+      "shape": "ellipse",
+      "color": {
+        "background": "#DBEAFE",
+        "border": "#3B82F6"
+      },
+      "borderWidth": 1,
+      "x": 73,
+      "y": 91,
+      "description": "Deliberate activities—like craftsmanship, meditation, or offline study—intended to rebuild agency. This represents the fundamental solution to the dependency trap. [n5]",
+      "opacity": 1,
+      "font": {
+        "color": "#1F2937"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n1",
+      "to": "n2",
+      "width": 5,
+      "color": {
+        "color": "#1E40AF"
+      },
+      "label": "Utility Drive\n+\nLag: Immediate [e1]",
+      "description": "As AI becomes more capable, it offers more utility, naturally drawing humans toward higher reliance for convenience and efficiency. [e1]",
+      "smooth": {
+        "enabled": true,
+        "type": "cubicBezier",
+        "roundness": 0.3
+      },
+      "opacity": 1,
+      "font": {
+        "color": "#4B5563",
+        "background": "rgba(255,255,255,0.75)"
+      }
+    },
+    {
+      "id": "e2",
+      "from": "n2",
+      "to": "n3",
+      "width": 6,
+      "color": {
+        "color": "#991B1B"
+      },
+      "label": "Disuse Atrophy\n-\nLag: Years [e2]",
+      "description": "High reliance on AI triggers a decrease in human cognitive agency because the skills are no longer being exercised or refined. [e2]",
+      "smooth": {
+        "type": "curvedCCW",
+        "roundness": 0.4260123287348958,
+        "enabled": true
+      },
+      "opacity": 1,
+      "font": {
+        "color": "#4B5563",
+        "background": "rgba(255,255,255,0.75)"
+      }
+    },
+    {
+      "id": "e3",
+      "from": "n3",
+      "to": "n4",
+      "width": 4,
+      "color": {
+        "color": "#991B1B"
+      },
+      "label": "Loss of Meaning\n-\nLag: Medium-term [e3]",
+      "description": "When the stock of human agency drops, existential friction increases, as people lose the sense of mastery and purpose derived from their work. [e3]",
+      "smooth": {
+        "enabled": true,
+        "type": "cubicBezier",
+        "roundness": 0.3
+      },
+      "opacity": 1,
+      "font": {
+        "color": "#4B5563",
+        "background": "rgba(255,255,255,0.75)"
+      }
+    },
+    {
+      "id": "e4",
+      "from": "n4",
+      "to": "n5",
+      "width": 5,
+      "color": {
+        "color": "#1E40AF"
+      },
+      "label": "Reclamation Impulse\n+\nLag: Short-term [e4]",
+      "description": "High existential friction motivates people to seek out 'analog' or manual skills to regain a sense of identity and agency. [e4]",
+      "smooth": {
+        "enabled": true,
+        "type": "cubicBezier",
+        "roundness": 0.3
+      },
+      "opacity": 1,
+      "font": {
+        "color": "#4B5563",
+        "background": "rgba(255,255,255,0.75)"
+      }
+    },
+    {
+      "id": "e5",
+      "from": "n5",
+      "to": "n3",
+      "width": 4,
+      "color": {
+        "color": "#1E40AF"
+      },
+      "label": "Competence Building\n+\nLag: Long-term [e5]",
+      "description": "Active reclamation efforts (like intentional learning) increase the stock of human cognitive agency over time. [e5]",
+      "smooth": {
+        "enabled": true,
+        "type": "cubicBezier",
+        "roundness": 0.3
+      },
+      "opacity": 1,
+      "font": {
+        "color": "#4B5563",
+        "background": "rgba(255,255,255,0.75)"
+      }
+    },
+    {
+      "id": "e6",
+      "from": "n3",
+      "to": "n2",
+      "width": 5,
+      "color": {
+        "color": "#991B1B"
+      },
+      "label": "Autonomy\n-\nLag: Immediate [e6]",
+      "description": "Increased human agency reduces the need for AI reliance, as the individual possesses the tools to navigate reality independently. [e6]",
+      "smooth": {
+        "type": "curvedCCW",
+        "roundness": 0.4053008425232796,
+        "enabled": true
+      },
+      "opacity": 1,
+      "font": {
+        "color": "#4B5563",
+        "background": "rgba(255,255,255,0.75)"
+      }
+    }
+  ],
+  "loops": [
+    {
+      "id": "R1",
+      "name": "The Dependency Trap",
+      "type": "R",
+      "description": "This is the reinforcing downward spiral where reliance reduces agency, which in turn necessitates more reliance. Without an external intervention, this leads to total skill loss. [R1]",
+      "nodeIds": [
+        "n2",
+        "n3"
+      ],
+      "edgeIds": [
+        "e2",
+        "e6"
+      ],
+      "internalId": "loop-0",
+      "lx": -29.956244302643572,
+      "ly": -190.42525068368278
+    },
+    {
+      "id": "B2",
+      "name": "The Existential Correction",
+      "type": "B",
+      "description": "This is the balancing 'human' response. As agency drops (n3), the resulting existential friction (n4) triggers reclamation efforts (n5) that eventually rebuild agency (n3). It is the system's way of preserving the nature of humanity. [B2]",
+      "nodeIds": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "edgeIds": [
+        "e3",
+        "e4",
+        "e5"
+      ],
+      "internalId": "loop-1",
+      "lx": 184.72500759647522,
+      "ly": -32.59191735034943
+    }
+  ],
+  "archetypes": [
+    {
+      "id": "arch1",
+      "name": "Shifting the Burden with Internal Correction",
+      "description": "The system initially shifts the burden to AI (R1), but the resulting erosion of agency triggers a balancing loop (B2) that forces a return to fundamental skill-building. The outcome depends on whether the 'atrophy' rate of R1 is faster than the 'reclamation' rate of B2. [arch1]",
+      "nodeIds": [
+        "n2",
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "edgeIds": [
+        "e2",
+        "e3",
+        "e4",
+        "e5",
+        "e6"
+      ]
+    }
+  ]
+}

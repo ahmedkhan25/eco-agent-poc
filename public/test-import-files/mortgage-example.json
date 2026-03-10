@@ -1,0 +1,154 @@
+{
+  "name": "50 Year Mortgage System Dynamics",
+  "description": "This model explores the dynamics introduced by offering 50-year mortgage terms, impacting housing affordability, demand, and pricing.",
+  "nodes": [
+    {
+      "id": "n1",
+      "label": "Availability of 50yr Mortgage",
+      "desc": "Policy or market decision to offer 50-year mortgage terms, influencing borrowing options.",
+      "example": "In 2025, a policy change allowed banks to offer 50-year mortgages, expanding their loan portfolio.",
+      "category": "policy",
+      "key": true
+    },
+    {
+      "id": "n2",
+      "label": "Average Mortgage Term",
+      "desc": "The average length of mortgage terms, which increases with the introduction of 50-year options.",
+      "example": "After 50-year loans became available, the average mortgage term increased from 30 to 35 years.",
+      "category": "economic",
+      "key": false
+    },
+    {
+      "id": "n3",
+      "label": "Monthly Mortgage Payment",
+      "desc": "The typical monthly payment required for new mortgages, reduced by extended terms.",
+      "example": "Switching from a 30-year to a 50-year mortgage reduced monthly payments from $2,000 to $1,500.",
+      "category": "economic",
+      "key": false
+    },
+    {
+      "id": "n4",
+      "label": "Perceived Housing Affordability",
+      "desc": "Potential buyers' perception of affordability, often based on monthly payments.",
+      "example": "With lower monthly payments, more renters felt they could afford a home in 2026.",
+      "category": "social",
+      "key": true
+    },
+    {
+      "id": "n5",
+      "label": "Demand for Housing",
+      "desc": "The number of buyers looking to purchase homes, influenced by affordability perceptions.",
+      "example": "When monthly payments decreased, the number of active home buyers increased by 15%.",
+      "category": "economic",
+      "key": false
+    },
+    {
+      "id": "n6",
+      "label": "Housing Prices",
+      "desc": "Market value of homes, influenced by demand levels and perceived affordability.",
+      "example": "In a competitive market, increased demand pushed housing prices up by 20% over two years.",
+      "category": "economic",
+      "key": true
+    },
+    {
+      "id": "n7",
+      "label": "Interest Rates",
+      "desc": "The cost of borrowing money, which can change independently but affects mortgage terms and payments.",
+      "example": "A reduction in interest rates from 4% to 3% decreased overall mortgage costs.",
+      "category": "economic",
+      "key": false
+    }
+  ],
+  "links": [
+    {
+      "source": "n1",
+      "target": "n2",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Immediate"
+    },
+    {
+      "source": "n2",
+      "target": "n3",
+      "type": "reinforcing",
+      "label": "-",
+      "lag": "Immediate"
+    },
+    {
+      "source": "n3",
+      "target": "n4",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Immediate"
+    },
+    {
+      "source": "n4",
+      "target": "n5",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Immediate"
+    },
+    {
+      "source": "n5",
+      "target": "n6",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "1-2 Years"
+    },
+    {
+      "source": "n6",
+      "target": "n4",
+      "type": "balancing",
+      "label": "-",
+      "lag": "1-2 Years"
+    },
+    {
+      "source": "n7",
+      "target": "n3",
+      "type": "balancing",
+      "label": "-",
+      "lag": "Immediate"
+    },
+    {
+      "source": "n7",
+      "target": "n6",
+      "type": "balancing",
+      "label": "+",
+      "lag": "1-2 Years"
+    }
+  ],
+  "loops": [
+    {
+      "id": "R1",
+      "type": "R",
+      "name": "Affordability-Demand Growth",
+      "desc": "Increased affordability from lower monthly payments encourages more buyers, raising demand and potentially prices.",
+      "nodes": [
+        "n3",
+        "n4",
+        "n5",
+        "n6"
+      ]
+    },
+    {
+      "id": "B1",
+      "type": "B",
+      "name": "Price-Feedback Loop",
+      "desc": "As housing prices rise, perceived affordability decreases, which can temper demand growth.",
+      "nodes": [
+        "n6",
+        "n4"
+      ]
+    }
+  ],
+  "archetypes": [
+    {
+      "id": "archetype_1",
+      "name": "Balancing Process with Delay",
+      "description": "The balancing feedback loop with delayed effect regulates rapid demand spikes due to perceived affordability.",
+      "relatedLoops": [
+        "B1"
+      ]
+    }
+  ]
+}

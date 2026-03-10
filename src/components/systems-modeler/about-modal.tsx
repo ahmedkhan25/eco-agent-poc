@@ -41,13 +41,27 @@ const slides: Slide[] = [
     subtitle: "AI-Powered Systems Thinking by ecoheart.ai",
     accentColor: "from-teal-500 to-emerald-600",
     content: (
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 items-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/aha-images/landing-image-sys-model-first-image.png"
-          alt="Welcome to the Universal Interactive System Modeler"
-          className="w-full rounded-xl shadow-lg"
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 items-start">
+        <div className="space-y-4">
+          {/* Video */}
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full rounded-xl shadow-lg"
+            ref={(el) => { if (el) el.playbackRate = 0.5; }}
+          >
+            <source src="/aha-images/ripples-pond-home1.mp4" type="video/mp4" />
+          </video>
+          {/* Image */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/aha-images/landing-image-sys-model-first-image.png"
+            alt="Welcome to the Universal Interactive System Modeler"
+            className="w-full rounded-xl shadow-lg"
+          />
+        </div>
         <div className="space-y-4">
           <p className="text-base text-slate-700 dark:text-slate-300 leading-relaxed">
             A dynamic, AI-powered tool that helps you investigate relationships

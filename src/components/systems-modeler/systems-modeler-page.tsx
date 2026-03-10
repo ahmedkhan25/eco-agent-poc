@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useCopilotReadable, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
 import { CopilotChat } from "@copilotkit/react-ui";
 import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
@@ -18,6 +18,7 @@ import { NarrativePanel } from "./narrative-panel";
 import { SystemsModelerAboutModal } from "./about-modal";
 import { ProgressOverlay } from "./progress-overlay";
 import { EcoheartLogo } from "@/components/ecoheart-logo";
+import { ActionResult } from "./node-ref-chip";
 
 export function SystemsModelerPage() {
   const store = useSystemModelerStore();
@@ -56,9 +57,35 @@ export function SystemsModelerPage() {
       },
     ],
     handler: async ({ model }: { model: object }) => {
+      const oldModel = store.model;
       store.pushHistory();
       store.setModel(model as SystemModel);
-      return "Model updated successfully. The diagram has been re-rendered.";
+      // Compute diff for refs
+      const newModel = model as SystemModel;
+      const oldIds = new Set(oldModel?.nodes.map((n) => n.id) || []);
+      const added = newModel.nodes.filter((n) => !oldIds.has(n.id));
+      if (added.length > 0) {
+        store.flashHighlight(added.map((n) => n.id));
+      }
+      return JSON.stringify({
+        message: "Model updated. The diagram has been re-rendered.",
+        addedNodes: added.map((n) => ({ id: n.id, label: n.label })),
+      });
+    },
+    render: (props: { status: string; result?: string; args: Record<string, unknown> }) => {
+      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Updating model...</span>;
+      if (props.status !== "complete" || !props.result) return <></>;
+      try {
+        const data = JSON.parse(props.result);
+        return (
+          <ActionResult
+            message={data.message}
+            nodeRefs={data.addedNodes}
+          />
+        );
+      } catch {
+        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+      }
     },
   });
 
@@ -80,7 +107,18 @@ export function SystemsModelerPage() {
         category: category as NodeCategory,
         key: isKey || false,
       });
-      return `Added node "${label}" to the model.`;
+      store.flashHighlight([id]);
+      return JSON.stringify({ message: `Added node "${label}" to the model.`, id, label });
+    },
+    render: (props: { status: string; result?: string }) => {
+      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Adding node...</span>;
+      if (props.status !== "complete" || !props.result) return <></>;
+      try {
+        const data = JSON.parse(props.result);
+        return <ActionResult message={data.message} nodeRefs={[{ id: data.id, label: data.label }]} />;
+      } catch {
+        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+      }
     },
   });
 
@@ -92,8 +130,19 @@ export function SystemsModelerPage() {
     ],
     handler: async ({ nodeId }: { nodeId: string }) => {
       const node = store.model?.nodes.find((n) => n.id === nodeId);
+      const label = node?.label || nodeId;
       store.removeNode(nodeId);
-      return `Removed node "${node?.label || nodeId}" and its connected links.`;
+      return JSON.stringify({ message: `Removed node "${label}" and its connected links.`, id: nodeId, label });
+    },
+    render: (props: { status: string; result?: string }) => {
+      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Removing node...</span>;
+      if (props.status !== "complete" || !props.result) return <></>;
+      try {
+        const data = JSON.parse(props.result);
+        return <ActionResult message={data.message} nodeRefs={[{ id: data.id, label: data.label, removed: true }]} />;
+      } catch {
+        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+      }
     },
   });
 
@@ -115,7 +164,23 @@ export function SystemsModelerPage() {
         label: label as "+" | "-",
         lag,
       });
-      return `Added ${type} link from ${source} to ${target}.`;
+      store.flashHighlight([source, target]);
+      return JSON.stringify({ message: `Added ${type} link from ${source} to ${target}.`, source, target, linkType: type });
+    },
+    render: (props: { status: string; result?: string }) => {
+      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Adding link...</span>;
+      if (props.status !== "complete" || !props.result) return <></>;
+      try {
+        const data = JSON.parse(props.result);
+        return (
+          <ActionResult
+            message={data.message}
+            linkRefs={[{ source: data.source, target: data.target, type: data.linkType }]}
+          />
+        );
+      } catch {
+        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+      }
     },
   });
 
@@ -127,8 +192,19 @@ export function SystemsModelerPage() {
       { name: "target", type: "string", description: "Target node ID", required: true },
     ],
     handler: async ({ source, target }: { source: string; target: string }) => {
+      const linkType = store.model?.links.find((l) => l.source === source && l.target === target)?.type || "reinforcing";
       store.removeLink(source, target);
-      return `Removed link from ${source} to ${target}.`;
+      return JSON.stringify({ message: `Removed link from ${source} to ${target}.`, source, target, linkType });
+    },
+    render: (props: { status: string; result?: string }) => {
+      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Removing link...</span>;
+      if (props.status !== "complete" || !props.result) return <></>;
+      try {
+        const data = JSON.parse(props.result);
+        return <ActionResult message={data.message} nodeRefs={[{ id: data.source, label: data.source }, { id: data.target, label: data.target }]} />;
+      } catch {
+        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+      }
     },
   });
 
@@ -140,8 +216,28 @@ export function SystemsModelerPage() {
       { name: "newType", type: "string", description: "New type: R or B", required: true },
     ],
     handler: async ({ loopId, newType }: { loopId: string; newType: string }) => {
+      const loop = store.model?.loops.find((l) => l.id === loopId);
+      const loopNodes = loop?.nodes || [];
       store.changeLoopType(loopId, newType as "R" | "B");
-      return `Changed loop ${loopId} to ${newType === "R" ? "Reinforcing" : "Balancing"}.`;
+      if (loopNodes.length > 0) store.flashHighlight(loopNodes);
+      const nodeRefs = loopNodes.map((id) => {
+        const n = store.model?.nodes.find((node) => node.id === id);
+        return { id, label: n?.label || id };
+      });
+      return JSON.stringify({
+        message: `Changed loop ${loopId} to ${newType === "R" ? "Reinforcing" : "Balancing"}.`,
+        nodeRefs,
+      });
+    },
+    render: (props: { status: string; result?: string }) => {
+      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Changing loop type...</span>;
+      if (props.status !== "complete" || !props.result) return <></>;
+      try {
+        const data = JSON.parse(props.result);
+        return <ActionResult message={data.message} nodeRefs={data.nodeRefs} />;
+      } catch {
+        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+      }
     },
   });
 
@@ -153,8 +249,21 @@ export function SystemsModelerPage() {
     ],
     handler: async ({ nodeIds }: { nodeIds: object }) => {
       const ids = nodeIds as string[];
-      store.setHighlightedNodes(ids);
-      return `Highlighted nodes: ${ids.join(", ")}`;
+      store.flashHighlight(ids);
+      const nodeRefs = ids.map((id) => {
+        const n = store.model?.nodes.find((node) => node.id === id);
+        return { id, label: n?.label || id };
+      });
+      return JSON.stringify({ message: `Highlighted ${ids.length} node${ids.length > 1 ? "s" : ""} in the diagram.`, nodeRefs });
+    },
+    render: (props: { status: string; result?: string }) => {
+      if (props.status !== "complete" || !props.result) return <></>;
+      try {
+        const data = JSON.parse(props.result);
+        return <ActionResult message={data.message} nodeRefs={data.nodeRefs} />;
+      } catch {
+        return <span className="text-xs text-[#9ab8a2]">{props.result}</span>;
+      }
     },
   });
 
@@ -199,6 +308,54 @@ export function SystemsModelerPage() {
         store.setPhase("iterate");
       } catch (err) {
         store.setError(err instanceof Error ? err.message : "Failed to generate model");
+        store.setPhase("input");
+      } finally {
+        store.setLoading(false);
+      }
+    },
+    [store]
+  );
+
+  const handleImport = useCallback(
+    (model: SystemModel) => {
+      store.setModel(model);
+      store.setInputTopic(model.name || "Imported Model");
+      store.setPhase("iterate");
+    },
+    [store]
+  );
+
+  const handleImportFallback = useCallback(
+    async (topic: string, content: string) => {
+      // Reuse the generate flow with extracted content as context
+      store.setLoading(true);
+      store.setError(null);
+      store.setPhase("generate");
+      store.setProgress("Analyzing imported file", 10);
+
+      try {
+        await new Promise((r) => setTimeout(r, 300));
+        store.setProgress("AI is interpreting the file content", 35);
+
+        const res = await fetch("/api/systems-modeler/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic, content }),
+        });
+
+        store.setProgress("Processing model response", 80);
+        if (!res.ok) throw new Error(await res.text());
+
+        const model: SystemModel = await res.json();
+        store.setProgress("Rendering causal loop diagram", 95);
+
+        store.setModel(model);
+        store.setInputTopic(topic);
+        store.setPhase("iterate");
+      } catch (err) {
+        store.setError(
+          err instanceof Error ? err.message : "Failed to import file"
+        );
         store.setPhase("input");
       } finally {
         store.setLoading(false);
@@ -515,6 +672,38 @@ ${characters}
     return (container as HTMLDivElement & { __zoomControls?: { zoomIn: () => void; zoomOut: () => void; resetView: () => void } })?.__zoomControls;
   }, []);
 
+  // ── Resizable chat panel ──
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeStartX = useRef(0);
+  const resizeStartWidth = useRef(380);
+
+  const handleResizePointerDown = useCallback((e: React.PointerEvent) => {
+    setIsResizing(true);
+    resizeStartX.current = e.clientX;
+    resizeStartWidth.current = store.chatPanelWidth;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }, [store.chatPanelWidth]);
+
+  useEffect(() => {
+    if (!isResizing) return;
+    const handleMove = (e: PointerEvent) => {
+      const delta = resizeStartX.current - e.clientX;
+      store.setChatPanelWidth(resizeStartWidth.current + delta);
+    };
+    const handleUp = () => {
+      setIsResizing(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    document.addEventListener("pointermove", handleMove);
+    document.addEventListener("pointerup", handleUp);
+    return () => {
+      document.removeEventListener("pointermove", handleMove);
+      document.removeEventListener("pointerup", handleUp);
+    };
+  }, [isResizing, store]);
+
   // ── Render ──
   const showDiagram = store.phase !== "input" && store.model;
   const showNarrative = store.phase === "humanize" && store.narrativeResult;
@@ -583,9 +772,11 @@ ${characters}
           />
 
           {store.phase === "input" && (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 overflow-y-auto flex items-start justify-center py-8">
               <ModelInputForm
                 onGenerate={handleGenerate}
+                onImport={handleImport}
+                onImportFallback={handleImportFallback}
                 isLoading={store.isLoading}
               />
             </div>
@@ -733,9 +924,19 @@ ${characters}
           )}
         </div>
 
-        {/* Right: CopilotKit Chat Panel (pinnable) */}
+        {/* Right: CopilotKit Chat Panel (resizable) */}
         {showDiagram && !showNarrative && store.isChatOpen && (
-          <div className="w-[380px] border-l border-[#2a4535] flex-shrink-0 hidden lg:flex flex-col bg-[#1a2f22]">
+          <div
+            className="border-l border-[#2a4535] flex-shrink-0 hidden lg:flex flex-col bg-[#1a2f22] relative"
+            style={{ width: store.chatPanelWidth }}
+          >
+            {/* Resize handle */}
+            <div
+              onPointerDown={handleResizePointerDown}
+              className={`absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 transition-colors ${
+                isResizing ? "bg-[#3ddc84]/30" : "hover:bg-[#3ddc84]/20"
+              }`}
+            />
             <div className="flex items-center justify-between px-3 py-2 border-b border-[#2a4535]">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-[#3ddc84]" />
@@ -765,7 +966,7 @@ ${characters}
 
       {/* Collision dialog */}
       <CollisionDialog
-        isOpen={store.phase === "collide" && !store.collisionResult}
+        isOpen={store.phase === "collide"}
         onClose={() => store.setPhase("iterate")}
         onCollide={handleCollide}
         isLoading={store.isLoading}
