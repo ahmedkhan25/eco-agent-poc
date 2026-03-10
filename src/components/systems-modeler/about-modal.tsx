@@ -37,50 +37,69 @@ const slides: Slide[] = [
   {
     id: 1,
     icon: <Network className="w-6 h-6" />,
-    title: "Welcome to the Universal Interactive System Modeler",
+    title: "Universal Interactive System Modeler",
+    subtitle: "AI-Powered Systems Thinking by ecoheart.ai",
     accentColor: "from-teal-500 to-emerald-600",
-    imagePath: "/eco/systems-modeler/slide-1.png",
-    imageAlt: "System Modeler Overview",
     content: (
-      <div className="space-y-4">
-        <div className="p-3 bg-teal-50/80 dark:bg-teal-900/20 rounded-lg border border-teal-200 dark:border-teal-800">
-          <p className="text-sm font-medium text-teal-800 dark:text-teal-200 mb-1">
-            What it is
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 items-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/aha-images/landing-image-sys-model-first-image.png"
+          alt="Welcome to the Universal Interactive System Modeler"
+          className="w-full rounded-xl shadow-lg"
+        />
+        <div className="space-y-4">
+          <p className="text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+            A dynamic, AI-powered tool that helps you investigate relationships
+            and their implications across <strong>any topic</strong>. Move beyond
+            static lists and &ldquo;incomprehensible spaghetti diagrams&rdquo; into
+            interactive models that promote deep understanding.
           </p>
-          <p className="text-sm text-slate-700 dark:text-slate-300">
-            A dynamic, AI-powered tool designed to help you investigate
-            relationships and their implications across any topic.
-          </p>
-        </div>
-        <div className="p-3 bg-emerald-50/80 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
-          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200 mb-1">
-            The Goal
-          </p>
-          <p className="text-sm text-slate-700 dark:text-slate-300">
-            To move beyond static lists and &ldquo;incomprehensible spaghetti
-            diagrams,&rdquo; creating interactive models that simplify reality
-            and promote deep understanding.
-          </p>
-        </div>
-        <div className="p-3 bg-green-50/80 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-          <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-1">
-            The Output
-          </p>
-          <p className="text-sm text-slate-700 dark:text-slate-300">
-            Instantly generated, collaborative causal loop diagrams built from
-            your data, documents, or conversational prompts.
-          </p>
+          <div className="space-y-2">
+            <div className="flex items-start gap-2">
+              <span className="text-emerald-500 font-bold text-sm mt-0.5">1.</span>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                <strong className="text-slate-800 dark:text-slate-200">Generate</strong> — AI builds a causal loop diagram from your topic, documents, or data
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-emerald-500 font-bold text-sm mt-0.5">2.</span>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                <strong className="text-slate-800 dark:text-slate-200">Iterate</strong> — Chat with the diagram to refine it collaboratively
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-emerald-500 font-bold text-sm mt-0.5">3.</span>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                <strong className="text-slate-800 dark:text-slate-200">Collide</strong> — The Aha! Paradox smashes your model against an unrelated concept to reveal hidden assumptions
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-emerald-500 font-bold text-sm mt-0.5">4.</span>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                <strong className="text-slate-800 dark:text-slate-200">Humanize</strong> — Transform the model into a grounded story with real stakeholder perspectives
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     ),
   },
   {
     id: 2,
+    icon: <Zap className="w-6 h-6" />,
+    title: 'The "Aha! Paradox"',
+    subtitle: "Systems Thinker Gene Bellinger's Breakthrough Methodology",
+    accentColor: "from-emerald-600 to-teal-700",
+    content: (
+      <NapkinViewer />
+    ),
+  },
+  {
+    id: 3,
     icon: <Cpu className="w-6 h-6" />,
     title: "Powered by AG-UI & CopilotKit",
     accentColor: "from-indigo-500 to-violet-600",
-    imagePath: "/eco/systems-modeler/slide-2.png",
-    imageAlt: "AG-UI & CopilotKit Architecture",
     content: (
       <div className="space-y-4">
         <div className="p-3 bg-indigo-50/80 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
@@ -117,13 +136,13 @@ const slides: Slide[] = [
     ),
   },
   {
-    id: 3,
+    id: 4,
     icon: <Brain className="w-6 h-6" />,
     title: "The Modeling Philosophy",
     subtitle: "Gene Bellinger's Approach",
     accentColor: "from-amber-500 to-orange-600",
-    imagePath: "/eco/systems-modeler/slide-3.png",
-    imageAlt: "Gene Bellinger's Systems Modeling Methodology",
+    imagePath: "/aha-images/blind-spot-image-sys-model.png",
+    imageAlt: "Overcoming Blind Spots - The Modeling Philosophy",
     content: (
       <div className="space-y-4">
         <div className="p-3 bg-amber-50/80 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
@@ -161,21 +180,11 @@ const slides: Slide[] = [
     ),
   },
   {
-    id: 4,
-    icon: <Zap className="w-6 h-6" />,
-    title: 'The "Aha! Paradox"',
-    subtitle: "Systems Thinker Gene Bellinger's Breakthrough Methodology",
-    accentColor: "from-emerald-600 to-teal-700",
-    content: (
-      <NapkinViewer />
-    ),
-  },
-  {
     id: 5,
     icon: <BookOpen className="w-6 h-6" />,
     title: "The Model Story",
     accentColor: "from-emerald-500 to-teal-600",
-    imagePath: "/eco/systems-modeler/slide-5.png",
+    imagePath: "/aha-images/landing-image-sys-model.png",
     imageAlt: "The Model Story - Humanizing System Dynamics",
     content: (
       <div className="space-y-4">
@@ -222,12 +231,21 @@ const slides: Slide[] = [
     imageAlt: "Gene Bellinger - Systems Thinker",
     content: (
       <div className="space-y-4">
-        <div className="p-4 bg-slate-50/80 dark:bg-slate-700/30 rounded-lg border border-slate-200 dark:border-slate-600">
+        <div className="flex gap-4 items-start p-4 bg-slate-50/80 dark:bg-slate-700/30 rounded-lg border border-slate-200 dark:border-slate-600">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/aha-images/gene-bellinger-bio.jpg"
+            alt="Gene Bellinger"
+            className="w-24 h-24 rounded-full object-cover border-2 border-slate-300 dark:border-slate-500 flex-shrink-0"
+          />
           <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
             Gene Bellinger has been a passionate Systems Thinker for almost four
             decades. He is a highly respected member of the systems thinking
             community, the author of several hundred articles and over 700 videos
-            on Systems Thinking, and a member of the System Dynamics Society.
+            on Systems Thinking, and a member of the System Dynamics Society.{" "}
+            <a href="https://www.linkedin.com/in/systemswiki/" target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+              LinkedIn
+            </a>
           </p>
         </div>
         <div className="p-4 bg-blue-50/80 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -330,7 +348,7 @@ export function SystemsModelerAboutModal({ isOpen, onClose }: AboutModalProps) {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-[92vw] w-full max-h-[95vh] overflow-hidden pointer-events-auto border border-slate-200 dark:border-slate-700 flex flex-col"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-[95vw] max-w-[95vw] h-[90vh] max-h-[90vh] overflow-hidden pointer-events-auto border border-slate-200 dark:border-slate-700 flex flex-col"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
@@ -375,38 +393,40 @@ export function SystemsModelerAboutModal({ isOpen, onClose }: AboutModalProps) {
               </div>
 
               {/* Content area */}
-              <div className="flex-1 overflow-y-auto">
-                {/* Image area */}
-                {slide.imagePath && (
-                  <div className="relative w-full h-48 bg-slate-100 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
-                    <Image
-                      src={slide.imagePath}
-                      alt={slide.imageAlt || slide.title}
-                      fill
-                      className="object-contain p-4"
-                      onError={(e) => {
-                        // Hide the image container if the image doesn't exist yet
-                        (
-                          e.currentTarget.parentElement as HTMLElement
-                        ).style.display = "none";
-                      }}
-                    />
-                  </div>
-                )}
+              <div className="flex-1 overflow-y-auto min-h-0">
+                <div className={slide.imagePath ? "grid grid-cols-1 lg:grid-cols-2 h-full" : "h-full"}>
+                  {/* Image area */}
+                  {slide.imagePath && (
+                    <div className="relative w-full min-h-[300px] lg:min-h-full bg-slate-100 dark:bg-slate-900/50 lg:border-r border-b lg:border-b-0 border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                      <Image
+                        src={slide.imagePath}
+                        alt={slide.imageAlt || slide.title}
+                        fill
+                        className="object-contain p-4"
+                        onError={(e) => {
+                          // Hide the image container if the image doesn't exist yet
+                          (
+                            e.currentTarget.parentElement as HTMLElement
+                          ).style.display = "none";
+                        }}
+                      />
+                    </div>
+                  )}
 
-                {/* Text content */}
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentSlide}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.2 }}
-                    className="p-5"
-                  >
-                    {slide.content}
-                  </motion.div>
-                </AnimatePresence>
+                  {/* Text content */}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentSlide}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.2 }}
+                      className={slide.imagePath ? "p-5 overflow-y-auto flex items-center" : "p-5 h-full flex flex-col"}
+                    >
+                      {slide.content}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
 
               {/* Footer with navigation */}

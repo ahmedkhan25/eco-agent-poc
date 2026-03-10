@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const NAPKINS = [
@@ -48,17 +48,17 @@ const NAPKINS = [
   },
 ];
 
-// Spotlight center position (% of image) for each napkin in the 3x2 grid
-// Image is 2816x1536, each cell ~938x768
-function getSpotlightCenter(col: number, row: number) {
-  const x = ((col * 938 + 469) / 2816) * 100;
-  const y = ((row * 768 + 384) / 1536) * 100;
-  return { x, y };
-}
+// Image intrinsic aspect ratio: 2816x1536
+const IMG_W = 2816;
+const IMG_H = 1536;
+const CELL_W = IMG_W / 3;
+const CELL_H = IMG_H / 2;
 
 export function NapkinViewer() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [imgBounds, setImgBounds] = useState<{ offsetX: number; offsetY: number; width: number; height: number } | null>(null);
 
   const goNext = useCallback(() => {
     setActive((prev) => (prev + 1) % NAPKINS.length);
@@ -68,30 +68,100 @@ export function NapkinViewer() {
     setActive((prev) => (prev - 1 + NAPKINS.length) % NAPKINS.length);
   }, []);
 
-  // Auto-advance every 5 seconds unless paused
+  // Compute where the image actually renders inside the object-contain container
+  const updateBounds = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const cw = el.clientWidth;
+    const ch = el.clientHeight;
+    if (cw === 0 || ch === 0) return;
+
+    const containerAR = cw / ch;
+    const imageAR = IMG_W / IMG_H;
+
+    let renderW: number, renderH: number, offsetX: number, offsetY: number;
+    if (containerAR > imageAR) {
+      // Container is wider than image — letterboxed on sides
+      renderH = ch;
+      renderW = ch * imageAR;
+      offsetX = (cw - renderW) / 2;
+      offsetY = 0;
+    } else {
+      // Container is taller than image — letterboxed on top/bottom
+      renderW = cw;
+      renderH = cw / imageAR;
+      offsetX = 0;
+      offsetY = (ch - renderH) / 2;
+    }
+    setImgBounds({ offsetX, offsetY, width: renderW, height: renderH });
+  }, []);
+
+  useEffect(() => {
+    updateBounds();
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(updateBounds);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [updateBounds]);
+
+  // Auto-advance every 8 seconds unless paused
   useEffect(() => {
     if (paused) return;
-    const timer = setInterval(goNext, 5000);
+    const timer = setInterval(goNext, 8000);
     return () => clearInterval(timer);
   }, [paused, goNext]);
 
   const napkin = NAPKINS[active];
+
+  // Compute cell position relative to the container (in px), accounting for object-contain offset
+  function getCellRect(col: number, row: number) {
+    if (!imgBounds) return { left: 0, top: 0, width: 0, height: 0 };
+    const cellW = imgBounds.width / 3;
+    const cellH = imgBounds.height / 2;
+    return {
+      left: imgBounds.offsetX + col * cellW,
+      top: imgBounds.offsetY + row * cellH,
+      width: cellW,
+      height: cellH,
+    };
+  }
+
+  // Spotlight center as % of container
+  function getSpotlightCenter(col: number, row: number) {
+    if (!imgBounds || !containerRef.current) {
+      const x = ((col * CELL_W + CELL_W / 2) / IMG_W) * 100;
+      const y = ((row * CELL_H + CELL_H / 2) / IMG_H) * 100;
+      return { x, y };
+    }
+    const rect = getCellRect(col, row);
+    const cw = containerRef.current.clientWidth;
+    const ch = containerRef.current.clientHeight;
+    return {
+      x: ((rect.left + rect.width / 2) / cw) * 100,
+      y: ((rect.top + rect.height / 2) / ch) * 100,
+    };
+  }
+
   const spot = getSpotlightCenter(napkin.col, napkin.row);
+  const cellRect = getCellRect(napkin.col, napkin.row);
 
   return (
     <div
-      className="w-full flex flex-col"
+      className="w-full h-full flex flex-col"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Image with spotlight — takes all available space */}
-      <div className="relative w-full rounded-xl overflow-hidden border border-emerald-300/30 dark:border-emerald-700/30 shadow-lg">
-        <div className="relative w-full" style={{ aspectRatio: "2816 / 1536" }}>
+      {/* Image with spotlight and overlaid description */}
+      <div className="relative w-full flex-1 flex flex-col rounded-xl overflow-hidden border border-emerald-300/30 dark:border-emerald-700/30 shadow-lg">
+        {/* Image + spotlight layer */}
+        <div ref={containerRef} className="relative w-full flex-1 min-h-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/aha-images/final-full-six-images.png"
             alt="The Aha! Paradox — Six Steps"
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain block"
+            onLoad={updateBounds}
           />
 
           {/* Dark overlay with radial spotlight cutout */}
@@ -103,63 +173,65 @@ export function NapkinViewer() {
           />
 
           {/* Border around active napkin cell */}
-          <div
-            className="absolute w-[33.33%] h-[50%] transition-all duration-1000 ease-in-out pointer-events-none border-2 border-emerald-400/60"
-            style={{
-              left: `${napkin.col * 33.33}%`,
-              top: `${napkin.row * 50}%`,
-              boxShadow: "inset 0 0 30px 6px rgba(16,185,129,0.1)",
-              borderRadius: "6px",
-            }}
-          />
-        </div>
-
-        {/* Navigation arrows */}
-        <button
-          onClick={(e) => { e.stopPropagation(); goPrev(); setPaused(true); }}
-          className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white/90 hover:bg-black/70 transition-colors backdrop-blur-sm"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); goNext(); setPaused(true); }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white/90 hover:bg-black/70 transition-colors backdrop-blur-sm"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-
-        {/* Dot indicators at bottom */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1">
-          {NAPKINS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setActive(i); setPaused(true); }}
-              className={`rounded-full transition-all duration-300 ${
-                i === active
-                  ? "w-5 h-1.5 bg-emerald-400"
-                  : "w-1.5 h-1.5 bg-white/50 hover:bg-white/70"
-              }`}
+          {imgBounds && (
+            <div
+              className="absolute transition-all duration-1000 ease-in-out pointer-events-none border-2 border-emerald-400/60"
+              style={{
+                left: `${cellRect.left}px`,
+                top: `${cellRect.top}px`,
+                width: `${cellRect.width}px`,
+                height: `${cellRect.height}px`,
+                boxShadow: "inset 0 0 30px 6px rgba(16,185,129,0.1)",
+                borderRadius: "6px",
+              }}
             />
-          ))}
-        </div>
-      </div>
+          )}
 
-      {/* Active step description — single card, synced with spotlight */}
-      <div className="mt-2 p-2.5 bg-emerald-50/80 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-all duration-500">
-        <div className="flex items-baseline gap-2">
-          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded-full flex-shrink-0">
-            {active + 1}/6
-          </span>
-          <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
-            {napkin.title}
-            <span className="font-normal text-emerald-600 dark:text-emerald-400 ml-1">
-              — {napkin.subtitle}
-            </span>
-          </p>
+          {/* Navigation arrows */}
+          <button
+            onClick={(e) => { e.stopPropagation(); goPrev(); setPaused(true); }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white/90 hover:bg-black/70 transition-colors backdrop-blur-sm z-10"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); goNext(); setPaused(true); }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white/90 hover:bg-black/70 transition-colors backdrop-blur-sm z-10"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
-        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed pl-[38px]">
-          {napkin.desc}
-        </p>
+
+        {/* Description bar — below image, inside the border */}
+        <div className="bg-slate-900 px-8 py-5 flex-shrink-0">
+          <div className="flex items-center gap-5">
+            <div className="flex gap-2 items-center flex-shrink-0">
+              {NAPKINS.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setActive(i); setPaused(true); }}
+                  className={`rounded-full transition-all duration-300 ${
+                    i === active
+                      ? "w-8 h-3 bg-emerald-400"
+                      : "w-3 h-3 bg-white/30 hover:bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+            <div className="h-8 w-px bg-slate-700 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xl font-bold text-white leading-tight">
+                Step {active + 1}: {napkin.title}
+                <span className="font-medium text-emerald-400 ml-2">
+                  — {napkin.subtitle}
+                </span>
+              </p>
+              <p className="text-lg text-white/70 mt-1.5 leading-relaxed">
+                {napkin.desc}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
