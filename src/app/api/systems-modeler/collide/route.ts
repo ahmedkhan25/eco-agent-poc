@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+
+export const maxDuration = 120;
 import {
   AHA_PARADOX_SYSTEM_PROMPT,
   buildAhaParadoxPrompt,
