@@ -39,7 +39,7 @@ export function DiagramSidePanel({
 
   // For a selected loop, get involved node objects
   const loopNodes = selectedLoop
-    ? selectedLoop.nodes
+    ? [...new Set(selectedLoop.nodes)]
         .map((nId) => model.nodes.find((n) => n.id === nId))
         .filter(Boolean)
     : [];

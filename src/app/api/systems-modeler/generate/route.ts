@@ -42,8 +42,35 @@ export async function POST(req: NextRequest) {
       ragContext = ragContext ? `${ragContext}\n\n${content}` : content;
     }
 
+    // Compress very large content to fit within prompt limits
+    if (ragContext && ragContext.length > 30000) {
+      try {
+        const compressRes = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "system",
+              content:
+                "Compress this document into key facts, relationships, dynamics, and stakeholders relevant to systems modeling. Preserve specifics: names, numbers, dates, causal relationships, policies, and organizational structures. Max 6000 tokens.",
+            },
+            {
+              role: "user",
+              content: `Topic: "${topic}"\n\nDocument:\n${ragContext.slice(0, 50000)}`,
+            },
+          ],
+          max_tokens: 6500,
+          temperature: 0.1,
+        });
+        ragContext =
+          compressRes.choices[0]?.message?.content ||
+          ragContext.slice(0, 24000);
+      } catch {
+        ragContext = ragContext.slice(0, 24000);
+      }
+    }
+
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5.4",
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: MC_SYSTEM_PROMPT },

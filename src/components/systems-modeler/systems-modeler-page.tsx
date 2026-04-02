@@ -6,8 +6,12 @@ import { CopilotChat } from "@copilotkit/react-ui";
 import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
 import { MessageSquare, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useSystemModelerStore } from "@/lib/systems-modeler/store";
-import { ITERATE_SYSTEM_PROMPT } from "@/lib/systems-modeler/prompts";
-import type { SystemModel, SystemModelNode, NodeCategory } from "@/lib/systems-modeler/types";
+import {
+  ITERATE_SYSTEM_PROMPT,
+  buildProfessionalIllustrationPrompt,
+  buildProfessionalPortraitPrompt,
+} from "@/lib/systems-modeler/prompts";
+import type { SystemModel, SystemModelNode, NodeCategory, NarrativeMode } from "@/lib/systems-modeler/types";
 import { CausalLoopDiagram } from "./causal-loop-diagram";
 import { PhaseIndicator } from "./phase-indicator";
 import { ModelInputForm } from "./model-input-form";
@@ -287,7 +291,7 @@ export function SystemsModelerPage() {
 
         // Small delay so the user sees the first message
         await new Promise((r) => setTimeout(r, 400));
-        store.setProgress("Generating causal loop model with AI", 45);
+        store.setProgress("GPT-5.4 is reasoning about your system model (this may take a moment)", 45);
 
         const res = await fetch("/api/systems-modeler/generate", {
           method: "POST",
@@ -457,36 +461,52 @@ export function SystemsModelerPage() {
     [store, appendMessage]
   );
 
-  const handleHumanize = useCallback(async () => {
+  const handleHumanize = useCallback(async (mode: NarrativeMode = "story") => {
     if (!store.model) return;
+    store.setNarrativeMode(mode);
     store.setLoading(true);
     store.setError(null);
     store.setIllustration(null);
     store.clearCharacterImages();
-    store.setProgress("Preparing model narrative & illustration", 10);
+
+    const isProfessional = mode === "professional";
+    store.setProgress(
+      isProfessional ? "Preparing professional analysis & diagram" : "Preparing model narrative & illustration",
+      10
+    );
 
     try {
       await new Promise((r) => setTimeout(r, 300));
-      store.setProgress("Crafting the Model Story & generating illustration in parallel", 25);
+      store.setProgress(
+        isProfessional
+          ? "Generating analytical report & visualization in parallel"
+          : "Crafting the Model Story & generating illustration in parallel",
+        25
+      );
 
       // Fire both requests in parallel
       const storyPromise = fetch("/api/systems-modeler/humanize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: store.model }),
+        body: JSON.stringify({ model: store.model, mode }),
       });
 
-      const illustrationPrompt = `Create a dramatic, mythic illustration in a storybook watercolor style for a systems model called "${store.model.name}". The scene should depict interconnected characters and forces in a symbolic, archetypal way with environmental elements like storms, rivers, buildings, and nature. Style: rich colors, atmospheric lighting, epic scale. Do NOT include any text or words in the image.`;
+      const illustrationPrompt = isProfessional
+        ? buildProfessionalIllustrationPrompt(store.model.name)
+        : `Create a dramatic, mythic illustration in a storybook watercolor style for a systems model called "${store.model.name}". The scene should depict interconnected characters and forces in a symbolic, archetypal way with environmental elements like storms, rivers, buildings, and nature. Style: rich colors, atmospheric lighting, epic scale. Do NOT include any text or words in the image.`;
       const imagePromise = fetch("/api/systems-modeler/illustrate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: illustrationPrompt }),
-      }).catch(() => null); // Don't fail the whole operation if image fails
+      }).catch(() => null);
 
-      store.setProgress("AI is writing your story", 45);
+      store.setProgress(
+        isProfessional ? "GPT-5.4 is reasoning through your report (this may take a moment)" : "GPT-5.4 is reasoning through your story (this may take a moment)",
+        45
+      );
 
       const storyRes = await storyPromise;
-      store.setProgress("Processing narrative", 70);
+      store.setProgress("Processing results", 70);
 
       if (!storyRes.ok) throw new Error(await storyRes.text());
       const narrative = await storyRes.json();
@@ -494,27 +514,33 @@ export function SystemsModelerPage() {
 
       store.setProgress("Waiting for illustration", 80);
 
-      // Check illustration result
       const imageRes = await imagePromise;
       if (imageRes && imageRes.ok) {
         const imageData = await imageRes.json();
         store.setIllustration(`data:${imageData.mimeType};base64,${imageData.image}`);
-        store.setProgress("Story & illustration complete", 100);
+        store.setProgress(
+          isProfessional ? "Report & visualization complete" : "Story & illustration complete",
+          100
+        );
       } else {
-        store.setProgress("Story complete (illustration unavailable)", 100);
+        store.setProgress(
+          isProfessional ? "Report complete (visualization unavailable)" : "Story complete (illustration unavailable)",
+          100
+        );
       }
 
       store.setPhase("humanize");
 
-      // Generate character portraits in background (don't block)
+      // Generate portraits in background
       if (narrative.characters?.length) {
         for (const char of narrative.characters) {
+          const portraitPrompt = isProfessional
+            ? buildProfessionalPortraitPrompt(char.name, char.role)
+            : `Portrait of a character named "${char.name}" who represents "${char.representsNode}" in a mythic story. ${char.role}. Style: storybook watercolor portrait, bust/headshot, warm tones, expressive face, no text. Square format.`;
           fetch("/api/systems-modeler/illustrate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              prompt: `Portrait of a character named "${char.name}" who represents "${char.representsNode}" in a mythic story. ${char.role}. Style: storybook watercolor portrait, bust/headshot, warm tones, expressive face, no text. Square format.`,
-            }),
+            body: JSON.stringify({ prompt: portraitPrompt }),
           })
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => {
@@ -522,11 +548,11 @@ export function SystemsModelerPage() {
                 store.setCharacterImage(char.name, `data:${data.mimeType};base64,${data.image}`);
               }
             })
-            .catch(() => {}); // silently skip failed portraits
+            .catch(() => {});
         }
       }
     } catch (err) {
-      store.setError(err instanceof Error ? err.message : "Story generation failed");
+      store.setError(err instanceof Error ? err.message : "Generation failed");
     } finally {
       store.setLoading(false);
     }
@@ -536,6 +562,116 @@ export function SystemsModelerPage() {
     const narrative = store.narrativeResult;
     if (!narrative) return;
 
+    const isPro = store.narrativeMode === "professional" && narrative.professional;
+
+    // Professional report export
+    if (isPro && narrative.professional) {
+      const pro = narrative.professional;
+      const imageSection = store.illustrationDataUrl
+        ? `<div class="illustration"><img src="${store.illustrationDataUrl}" alt="Visualization for ${narrative.title}" /></div>`
+        : "";
+
+      const stakeholderRows = (pro.stakeholderAnalysis || []).map(s => `
+        <tr>
+          <td><strong>${s.stakeholder}</strong></td>
+          <td>${s.role}</td>
+          <td><span class="badge badge-${s.influence}">${s.influence}</span></td>
+          <td>${s.keyLoops.map(l => `<code>${l}</code>`).join(" ")}</td>
+        </tr>
+        <tr><td colspan="4" class="incentives">${s.incentives}</td></tr>`).join("\n");
+
+      const insightCards = (pro.keyInsights || []).map(ins => `
+        <div class="card">
+          <div class="card-header">
+            <span>${ins.insight}</span>
+            <span class="badge badge-${ins.severity}">${ins.severity}</span>
+          </div>
+          <div class="meta"><code>${ins.relatedLoop}</code></div>
+          <p>${ins.evidence}</p>
+        </div>`).join("\n");
+
+      const recCards = (pro.policyRecommendations || []).map(rec => `
+        <div class="card">
+          <div class="card-header"><span>${rec.recommendation}</span></div>
+          <div class="meta">
+            <code>${rec.targetLoop}</code>
+            <span class="badge badge-${rec.difficulty}">${rec.difficulty}</span>
+            <span class="badge badge-time">${rec.timeframe}</span>
+          </div>
+          <p><strong>Expected impact:</strong> ${rec.expectedImpact}</p>
+        </div>`).join("\n");
+
+      const proHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${narrative.title} — EcoHeart Professional Report</title>
+<style>
+  :root { --bg: #f8fafc; --text: #1e293b; --accent: #3b82f6; --border: #e2e8f0; --card-bg: #ffffff; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+  .header { margin-bottom: 32px; }
+  .logo { font-size: 11px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  h1 { font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .accent-bar { width: 64px; height: 4px; background: linear-gradient(to right, #3b82f6, #6366f1); border-radius: 2px; }
+  h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  p { font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+  .illustration { margin: 24px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .illustration img { width: 100%; height: auto; display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+  th { text-align: left; padding: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; border-bottom: 2px solid var(--border); }
+  td { padding: 8px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  td.incentives { font-size: 12px; color: #64748b; padding: 4px 8px 12px; border-bottom: 1px solid var(--border); }
+  code { background: #eff6ff; color: #3b82f6; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+  .badge-high, .badge-critical { background: #fef2f2; color: #dc2626; }
+  .badge-medium, .badge-significant { background: #fffbeb; color: #d97706; }
+  .badge-low, .badge-moderate { background: #f0fdf4; color: #16a34a; }
+  .badge-time { background: #f1f5f9; color: #64748b; }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; font-weight: 600; }
+  .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+  .meta p { margin: 0; }
+  .footer { text-align: center; margin-top: 48px; font-size: 11px; color: #94a3b8; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">EcoHeart Systems Modeler</div>
+    <h1>${narrative.title}</h1>
+    <div class="accent-bar"></div>
+  </div>
+  <h2>Executive Summary</h2>
+  ${pro.executiveSummary.split("\n\n").filter((p: string) => p.trim()).map((p: string) => `<p>${p}</p>`).join("\n")}
+  <h2>System Dynamics Overview</h2>
+  <p>${pro.systemDynamicsOverview}</p>
+  ${imageSection}
+  <h2>Stakeholder Analysis</h2>
+  <table>
+    <thead><tr><th>Stakeholder</th><th>Role</th><th>Influence</th><th>Key Loops</th></tr></thead>
+    <tbody>${stakeholderRows}</tbody>
+  </table>
+  <h2>Key Insights</h2>
+  ${insightCards}
+  <h2>Policy Recommendations</h2>
+  ${recCards}
+  <h2>Archetype Analysis</h2>
+  <p>${pro.archetypeAnalysis}</p>
+  <div class="footer">Generated by EcoHeart Systems Modeler &mdash; Systems Dynamics Analysis</div>
+</body>
+</html>`;
+
+      const blob = new Blob([proHtml], { type: "text/html" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${narrative.title.replace(/\s+/g, "-").toLowerCase()}-report.html`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      return;
+    }
+
+    // Story mode export (unchanged)
     const paragraphs = narrative.narrative
       .split("\n\n")
       .filter((p: string) => p.trim().length > 0)
@@ -652,7 +788,7 @@ ${characters}
     a.download = `${narrative.title.replace(/\s+/g, "-").toLowerCase()}-story.html`;
     a.click();
     URL.revokeObjectURL(a.href);
-  }, [store.narrativeResult, store.illustrationDataUrl, store.characterImages]);
+  }, [store.narrativeResult, store.narrativeMode, store.illustrationDataUrl, store.characterImages]);
 
   const handleExportJSON = useCallback(() => {
     if (!store.model) return;
@@ -886,11 +1022,18 @@ ${characters}
                   Aha! Paradox
                 </button>
                 <button
-                  onClick={handleHumanize}
+                  onClick={() => handleHumanize("story")}
                   disabled={store.isLoading}
                   className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg disabled:opacity-50"
                 >
                   {store.isLoading ? "Generating..." : "Model Story"}
+                </button>
+                <button
+                  onClick={() => handleHumanize("professional")}
+                  disabled={store.isLoading}
+                  className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg disabled:opacity-50"
+                >
+                  {store.isLoading ? "Generating..." : "Professional Report"}
                 </button>
               </div>
             </>
@@ -900,11 +1043,12 @@ ${characters}
             <div className="absolute inset-0 overflow-y-auto">
               <NarrativePanel
                 narrative={store.narrativeResult}
-                onGenerate={handleHumanize}
+                onGenerate={() => handleHumanize(store.narrativeMode)}
                 isLoading={store.isLoading}
                 illustrationDataUrl={store.illustrationDataUrl}
                 onIllustrationGenerated={(dataUrl) => store.setIllustration(dataUrl)}
                 characterImages={store.characterImages}
+                mode={store.narrativeMode}
               />
               <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
                 <button
@@ -915,9 +1059,13 @@ ${characters}
                 </button>
                 <button
                   onClick={handleExportStory}
-                  className="px-4 py-2 text-sm bg-[#213a2b] border border-amber-700/50 text-amber-400 rounded-full hover:text-amber-300 hover:border-amber-500 transition-colors backdrop-blur-sm"
+                  className={`px-4 py-2 text-sm bg-[#213a2b] border rounded-full transition-colors backdrop-blur-sm ${
+                    store.narrativeMode === "professional"
+                      ? "border-blue-700/50 text-blue-400 hover:text-blue-300 hover:border-blue-500"
+                      : "border-amber-700/50 text-amber-400 hover:text-amber-300 hover:border-amber-500"
+                  }`}
                 >
-                  Export Story
+                  {store.narrativeMode === "professional" ? "Export Report" : "Export Story"}
                 </button>
               </div>
             </div>

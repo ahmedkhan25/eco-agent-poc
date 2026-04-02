@@ -3,14 +3,19 @@ import OpenAI from "openai";
 import {
   HUMANIZE_SYSTEM_PROMPT,
   buildHumanizePrompt,
+  PROFESSIONAL_HUMANIZE_SYSTEM_PROMPT,
+  buildProfessionalHumanizePrompt,
 } from "@/lib/systems-modeler/prompts";
-import type { SystemModel, NarrativeResult } from "@/lib/systems-modeler/types";
+import type { SystemModel, NarrativeResult, NarrativeMode } from "@/lib/systems-modeler/types";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: NextRequest) {
   try {
-    const { model } = (await req.json()) as { model: SystemModel };
+    const { model, mode = "story" } = (await req.json()) as {
+      model: SystemModel;
+      mode?: NarrativeMode;
+    };
 
     if (!model) {
       return NextResponse.json(
@@ -21,12 +26,22 @@ export async function POST(req: NextRequest) {
 
     const modelJson = JSON.stringify(model, null, 2);
 
+    const systemPrompt =
+      mode === "professional"
+        ? PROFESSIONAL_HUMANIZE_SYSTEM_PROMPT
+        : HUMANIZE_SYSTEM_PROMPT;
+
+    const userPrompt =
+      mode === "professional"
+        ? buildProfessionalHumanizePrompt(modelJson)
+        : buildHumanizePrompt(modelJson);
+
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5.4",
       response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: HUMANIZE_SYSTEM_PROMPT },
-        { role: "user", content: buildHumanizePrompt(modelJson) },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
       ],
     });
 

@@ -318,3 +318,108 @@ Return a JSON object:
 export function buildHumanizePrompt(modelJson: string): string {
   return `Here is the system model to transform into a story:\n\n${modelJson}\n\nIMPORTANT: Write a GROUNDED story set in a real-world context. Characters must be real professionals (city planners, engineers, analysts, community organizers) — NOT fantasy characters in imaginary lands. Reference specific feedback loops (R1, B2) by name. Show real institutional friction (budget battles, approval queues, inter-departmental politics). The "Aha! moment" must be a concrete insight about a specific system dynamic, not a vague epiphany. Then provide stakeholder modifications showing how the story shifts for each key audience, naming which loop each group cares about most.`;
 }
+
+// =============================================================================
+// PHASE 4b: PROFESSIONAL REPORT MODE
+// =============================================================================
+
+export const PROFESSIONAL_HUMANIZE_SYSTEM_PROMPT = `You are a senior systems dynamics analyst preparing a professional briefing document for organizational leadership, policy makers, or research directors.
+
+Your task is to take a causal loop diagram (represented as JSON with nodes, links, loops, and archetypes) and produce a structured analytical report suitable for a national laboratory, government agency, or professional organization.
+
+OUTPUT REQUIREMENTS:
+
+1. EXECUTIVE SUMMARY (2-3 paragraphs):
+   Summarize the system, its key dynamics, and the most critical insight. Reference specific loops by ID (R1, B2). Use precise, analytical language. No narrative prose or storytelling.
+
+2. SYSTEM DYNAMICS OVERVIEW:
+   Technical description of how the feedback loops interact. Explain reinforcing and balancing dynamics, time delays, and how they create the observed system behavior. Reference specific nodes and links.
+
+3. STAKEHOLDER ANALYSIS:
+   For each key stakeholder group (3-6 groups), identify:
+   - Their institutional role and mandate
+   - Influence level (high/medium/low) based on their position in the causal structure
+   - Primary incentives and constraints
+   - Which feedback loops they are most affected by or can most influence
+
+4. KEY INSIGHTS (3-5):
+   Actionable findings tied to specific loops or archetypes. Each insight must include:
+   - A clear statement of the finding
+   - The related loop or archetype
+   - Evidence from the model structure (which causal links support this)
+   - Severity rating: critical (system-threatening), significant (major impact), or moderate (notable but manageable)
+
+5. POLICY RECOMMENDATIONS (3-5):
+   Concrete, implementable recommendations. Each must include:
+   - The specific action to take
+   - Which loop it targets and how it intervenes
+   - Expected impact on system behavior
+   - Realistic timeframe for implementation and results
+   - Implementation difficulty (high/medium/low)
+
+6. ARCHETYPE ANALYSIS:
+   Identify which system archetypes are present (e.g., Limits to Growth, Fixes that Fail, Shifting the Burden, Tragedy of the Commons). Explain their implications and what they predict about the system's trajectory without intervention.
+
+TONE: Analytical, evidence-based, concise. Suitable for a board meeting, policy brief, or technical report. No narrative storytelling, no character arcs. Use language appropriate for senior decision-makers.
+
+OUTPUT FORMAT — Return ONLY valid JSON:
+{
+  "title": "Professional report title (e.g., 'System Dynamics Analysis: Urban Housing Supply Constraints')",
+  "narrative": "Executive summary as clean prose (2-3 paragraphs, no bullet points)",
+  "mode": "professional",
+  "characters": [
+    {
+      "name": "Stakeholder group or key institutional actor",
+      "representsNode": "node_id they are most associated with",
+      "role": "Their institutional role and why they matter to this system"
+    }
+  ],
+  "professional": {
+    "executiveSummary": "Full executive summary text",
+    "systemDynamicsOverview": "Technical description of loop interactions",
+    "stakeholderAnalysis": [
+      {
+        "stakeholder": "Group name",
+        "role": "Institutional role and mandate",
+        "influence": "high|medium|low",
+        "incentives": "Primary incentives and constraints",
+        "keyLoops": ["R1", "B2"]
+      }
+    ],
+    "keyInsights": [
+      {
+        "insight": "Clear finding statement",
+        "relatedLoop": "R1 or archetype name",
+        "evidence": "Which causal links support this",
+        "severity": "critical|significant|moderate"
+      }
+    ],
+    "policyRecommendations": [
+      {
+        "recommendation": "Specific action",
+        "targetLoop": "Which loop it intervenes on",
+        "expectedImpact": "How system behavior changes",
+        "timeframe": "Implementation and results timeline",
+        "difficulty": "high|medium|low"
+      }
+    ],
+    "archetypeAnalysis": "Analysis of system archetypes and their implications"
+  }
+}`;
+
+export function buildProfessionalHumanizePrompt(modelJson: string): string {
+  return `Here is the system model to analyze:\n\n${modelJson}\n\nProduce a professional analytical report. Focus on actionable insights, stakeholder influence mapping, and evidence-based policy recommendations. Reference specific loops (R1, B2) and archetypes throughout. This report will be presented to senior leadership — be precise, concise, and analytical.`;
+}
+
+export function buildProfessionalIllustrationPrompt(modelName: string): string {
+  // Nano Banana prompting framework: [Subject] + [Action] + [Location/context] + [Composition] + [Style]
+  return `A professional systems dynamics stakeholder ecosystem diagram for a report titled "${modelName}". Interconnected stakeholder groups represented as clean rounded rectangles, connected by directional influence arrows showing reinforcing and balancing feedback loops. Reinforcing loops shown with warm-toned arrows, balancing loops with cool-toned arrows. Displayed on a clean white background with subtle light gray grid lines, as if photographed on a modern glass conference table. Overhead aerial view, full diagram centered in frame, medium shot showing complete system. Clean vector infographic style, flat design with navy blue, teal, and slate gray color palette. Sharp precise lines, modern sans-serif aesthetic. Soft even studio lighting, high-resolution, suitable for a professional board presentation or research publication. 16:9 aspect ratio.`;
+}
+
+export function buildProfessionalPortraitPrompt(
+  name: string,
+  role: string
+): string {
+  // Nano Banana prompting framework: [Subject] + [Action] + [Location/context] + [Composition] + [Style]
+  return `A professional executive representing "${name}", ${role}. Standing confidently with a composed, approachable expression. In a modern, minimalist corporate office with soft natural window light. Bust headshot, center-framed, shallow depth of field. Corporate editorial photography, shot on a Fujifilm medium-format camera, clean color science, sharp focus, neutral tones, professional business attire. Square 1:1 format.`;
+}

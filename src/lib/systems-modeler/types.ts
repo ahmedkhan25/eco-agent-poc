@@ -82,6 +82,40 @@ export interface StakeholderPerspective {
   emotionalCore: string;
 }
 
+export type NarrativeMode = "story" | "professional";
+
+export interface ProfessionalStakeholder {
+  stakeholder: string;
+  role: string;
+  influence: "high" | "medium" | "low";
+  incentives: string;
+  keyLoops: string[];
+}
+
+export interface ProfessionalInsight {
+  insight: string;
+  relatedLoop: string;
+  evidence: string;
+  severity: "critical" | "significant" | "moderate";
+}
+
+export interface PolicyRecommendation {
+  recommendation: string;
+  targetLoop: string;
+  expectedImpact: string;
+  timeframe: string;
+  difficulty: "high" | "medium" | "low";
+}
+
+export interface ProfessionalSection {
+  executiveSummary: string;
+  systemDynamicsOverview: string;
+  stakeholderAnalysis: ProfessionalStakeholder[];
+  keyInsights: ProfessionalInsight[];
+  policyRecommendations: PolicyRecommendation[];
+  archetypeAnalysis: string;
+}
+
 export interface NarrativeResult {
   title: string;
   narrative: string;
@@ -91,6 +125,8 @@ export interface NarrativeResult {
     role: string;
   }[];
   stakeholderPerspectives?: StakeholderPerspective[];
+  mode?: NarrativeMode;
+  professional?: ProfessionalSection;
 }
 
 export interface ModelInputConfig {

@@ -2,9 +2,10 @@
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2, FileText, Database, Upload } from "lucide-react";
+import { Sparkles, Loader2, FileText, Database, Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { parseImportedFile, type ImportResult } from "@/lib/systems-modeler/import-utils";
+import { extractTextFromPDF, extractTextFromMarkdown, truncateContent, topicFromFilename, isContentFile, extractTextFromFiles } from "@/lib/systems-modeler/file-extraction";
 import type { SystemModel } from "@/lib/systems-modeler/types";
 
 interface ModelInputFormProps {
@@ -21,6 +22,9 @@ export function ModelInputForm({ onGenerate, onImport, onImportFallback, isLoadi
   const [showContentArea, setShowContentArea] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [extractionProgress, setExtractionProgress] = useState("");
+  const [stagedFiles, setStagedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const canSubmit = topic.trim().length > 0 && !isLoading;
@@ -33,23 +37,46 @@ export function ModelInputForm({ onGenerate, onImport, onImportFallback, isLoadi
 
   const processFile = useCallback(
     async (file: File) => {
-      if (isLoading) return;
+      if (isLoading || isExtracting) return;
       setImportError(null);
 
-      const validTypes = [
-        "application/json",
-        "text/html",
-        "text/plain",
-      ];
-      const validExtensions = [".json", ".html", ".htm"];
+      const validExtensions = [".json", ".html", ".htm", ".pdf", ".md", ".markdown", ".txt"];
       const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
 
-      if (!validTypes.includes(file.type) && !validExtensions.includes(ext)) {
-        setImportError("Please upload a .json or .html file");
+      if (!validExtensions.includes(ext)) {
+        setImportError("Please upload a .json, .html, .pdf, .md, or .txt file");
         return;
       }
 
       try {
+        // PDF and Markdown files: extract text and generate model from content
+        if (ext === ".pdf") {
+          setIsExtracting(true);
+          setExtractionProgress("Extracting text from PDF...");
+          const rawText = await extractTextFromPDF(file);
+          const content = truncateContent(rawText);
+          const fileTopic = topicFromFilename(file.name);
+          if (!topic.trim()) setTopic(fileTopic);
+          setIsExtracting(false);
+          setExtractionProgress("");
+          onImportFallback(topic.trim() || fileTopic, content);
+          return;
+        }
+
+        if (ext === ".md" || ext === ".markdown" || ext === ".txt") {
+          setIsExtracting(true);
+          setExtractionProgress("Reading document...");
+          const rawText = await extractTextFromMarkdown(file);
+          const content = truncateContent(rawText);
+          const fileTopic = topicFromFilename(file.name);
+          if (!topic.trim()) setTopic(fileTopic);
+          setIsExtracting(false);
+          setExtractionProgress("");
+          onImportFallback(topic.trim() || fileTopic, content);
+          return;
+        }
+
+        // JSON and HTML files: try to import as existing model
         const text = await file.text();
         const result: ImportResult = parseImportedFile(text, file.name);
 
@@ -58,25 +85,94 @@ export function ModelInputForm({ onGenerate, onImport, onImportFallback, isLoadi
         } else {
           onImportFallback(result.fallbackTopic, result.fallbackContent);
         }
-      } catch {
-        setImportError("Failed to read file. Please try again.");
+      } catch (err) {
+        setIsExtracting(false);
+        setExtractionProgress("");
+        setImportError(err instanceof Error ? err.message : "Failed to read file. Please try again.");
       }
     },
-    [isLoading, onImport, onImportFallback]
+    [isLoading, isExtracting, topic, onImport, onImportFallback]
   );
 
+  const handleFiles = useCallback(
+    (files: FileList | File[]) => {
+      if (isLoading || isExtracting) return;
+      const fileArray = Array.from(files);
+      if (fileArray.length === 0) return;
+
+      // Single JSON/HTML file → model import (existing behavior)
+      if (fileArray.length === 1) {
+        const ext = fileArray[0].name.substring(fileArray[0].name.lastIndexOf(".")).toLowerCase();
+        if (ext === ".json" || ext === ".html" || ext === ".htm") {
+          processFile(fileArray[0]);
+          return;
+        }
+        // Single content file → also process immediately
+        if (isContentFile(fileArray[0].name)) {
+          processFile(fileArray[0]);
+          return;
+        }
+      }
+
+      // Multiple files → stage content files for review before processing
+      const contentFiles = fileArray.filter((f) => isContentFile(f.name));
+      if (contentFiles.length === 0) {
+        if (fileArray.length === 1) {
+          processFile(fileArray[0]);
+          return;
+        }
+        setImportError("No supported content files found. Upload .pdf, .md, or .txt files.");
+        return;
+      }
+
+      setImportError(null);
+      setStagedFiles((prev) => {
+        const existingNames = new Set(prev.map((f) => f.name));
+        const newFiles = contentFiles.filter((f) => !existingNames.has(f.name));
+        return [...prev, ...newFiles];
+      });
+    },
+    [isLoading, isExtracting, processFile]
+  );
+
+  const removeStagedFile = useCallback((index: number) => {
+    setStagedFiles((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const processStagedFiles = useCallback(async () => {
+    if (stagedFiles.length === 0 || isLoading || isExtracting) return;
+    setImportError(null);
+    try {
+      setIsExtracting(true);
+      const combined = await extractTextFromFiles(stagedFiles, setExtractionProgress);
+      const fileTopic = stagedFiles.length === 1
+        ? topicFromFilename(stagedFiles[0].name)
+        : `Analysis of ${stagedFiles.length} documents`;
+      if (!topic.trim()) setTopic(fileTopic);
+      setStagedFiles([]);
+      setIsExtracting(false);
+      setExtractionProgress("");
+      onImportFallback(topic.trim() || fileTopic, combined);
+    } catch (err) {
+      setIsExtracting(false);
+      setExtractionProgress("");
+      setImportError(err instanceof Error ? err.message : "Failed to process files.");
+    }
+  }, [stagedFiles, isLoading, isExtracting, topic, onImportFallback]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) processFile(file);
-    // Reset input so the same file can be re-selected
+    if (e.target.files && e.target.files.length > 0) {
+      handleFiles(e.target.files);
+    }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) processFile(file);
+    if (e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -320,20 +416,95 @@ export function ModelInputForm({ onGenerate, onImport, onImportFallback, isLoadi
                 >
                   {isDragging
                     ? "Drop file here"
-                    : "Import existing model"}
+                    : "Import model or upload document"}
                 </p>
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                  Drop a .json or .html file, or click to browse
+                  Drop files (.pdf, .md, .txt) or a .json/.html model — supports multiple files
                 </p>
               </div>
+              {isExtracting && (
+                <div className="flex items-center gap-2 mt-1">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-500" />
+                  <span className="text-xs text-teal-600 dark:text-teal-400">{extractionProgress}</span>
+                </div>
+              )}
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".json,.html,.htm"
+                accept=".json,.html,.htm,.pdf,.md,.markdown,.txt"
+                multiple
                 onChange={handleFileChange}
                 className="hidden"
               />
             </div>
+
+            {/* Staged files list */}
+            {stagedFiles.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                    {stagedFiles.length} file{stagedFiles.length > 1 ? "s" : ""} ready
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setStagedFiles([])}
+                    className="text-[10px] text-slate-400 hover:text-red-400 transition-colors"
+                  >
+                    Clear all
+                  </button>
+                </div>
+                <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                  {stagedFiles.map((file, i) => (
+                    <div
+                      key={`${file.name}-${i}`}
+                      className={cn(
+                        "flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg text-xs",
+                        "bg-slate-50 dark:bg-slate-900/40",
+                        "border border-slate-100 dark:border-slate-700/60"
+                      )}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />
+                        <span className="truncate text-slate-700 dark:text-slate-300">{file.name}</span>
+                        <span className="text-slate-400 dark:text-slate-500 flex-shrink-0">
+                          {(file.size / 1024).toFixed(0)}KB
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeStagedFile(i)}
+                        className="text-slate-400 hover:text-red-400 transition-colors flex-shrink-0"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={processStagedFiles}
+                  disabled={isLoading || isExtracting}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold",
+                    "text-white shadow-md transition-all duration-200",
+                    "bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 hover:shadow-lg active:scale-[0.98]",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
+                >
+                  {isExtracting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>{extractionProgress || "Processing..."}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      <span>Generate Model from {stagedFiles.length} File{stagedFiles.length > 1 ? "s" : ""}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
 
             {/* Import error */}
             {importError && (

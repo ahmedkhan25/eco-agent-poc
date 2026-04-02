@@ -4,6 +4,7 @@ import type {
   ModelPhase,
   CollisionResult,
   NarrativeResult,
+  NarrativeMode,
   SystemModelNode,
   SystemModelLink,
 } from "./types";
@@ -43,6 +44,7 @@ interface SystemModelerState {
   // Phase 3 & 4 results
   collisionResult: CollisionResult | null;
   narrativeResult: NarrativeResult | null;
+  narrativeMode: NarrativeMode;
   illustrationDataUrl: string | null;
   characterImages: Record<string, string>;
 
@@ -95,6 +97,7 @@ interface SystemModelerActions {
   // Phase results
   setCollisionResult: (result: CollisionResult | null) => void;
   setNarrativeResult: (result: NarrativeResult | null) => void;
+  setNarrativeMode: (mode: NarrativeMode) => void;
   setIllustration: (dataUrl: string | null) => void;
   setCharacterImage: (name: string, dataUrl: string) => void;
   clearCharacterImages: () => void;
@@ -133,6 +136,7 @@ const initialState: SystemModelerState = {
   isChatOpen: true,
   collisionResult: null,
   narrativeResult: null,
+  narrativeMode: "story" as NarrativeMode,
   illustrationDataUrl: null,
   characterImages: {},
   history: [],
@@ -172,7 +176,7 @@ export const useSystemModelerStore = create<
       set({
         selectedLoopId: loopId,
         selectedNodeId: null,
-        highlightedNodeIds: loop.nodes,
+        highlightedNodeIds: [...new Set(loop.nodes)],
         highlightedLinkIndices: linkIndices,
         isSidePanelOpen: true,
       });
@@ -283,6 +287,7 @@ export const useSystemModelerStore = create<
 
   setCollisionResult: (collisionResult) => set({ collisionResult }),
   setNarrativeResult: (narrativeResult) => set({ narrativeResult }),
+  setNarrativeMode: (narrativeMode) => set({ narrativeMode }),
   setIllustration: (illustrationDataUrl) => set({ illustrationDataUrl }),
   setCharacterImage: (name, dataUrl) => set((state) => ({ characterImages: { ...state.characterImages, [name]: dataUrl } })),
   clearCharacterImages: () => set({ characterImages: {} }),

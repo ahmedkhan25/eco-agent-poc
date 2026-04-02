@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const modelJson = JSON.stringify(model, null, 2);
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5.4",
       messages: [
         { role: "system", content: AHA_PARADOX_SYSTEM_PROMPT },
         {

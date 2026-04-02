@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import * as d3 from "d3";
 import type { SystemModel, SystemModelNode, SystemModelLink } from "@/lib/systems-modeler/types";
-import { CATEGORY_COLORS, LINK_COLORS, FORCE_DEFAULTS } from "@/lib/systems-modeler/constants";
+import { CATEGORY_COLORS, LINK_COLORS, FORCE_DEFAULTS, getScaledForceParams } from "@/lib/systems-modeler/constants";
 import { linkPath, buildArrowMarkers, circularLayout } from "@/lib/systems-modeler/d3-helpers";
 
 // D3 simulation node type (extends our type with D3's position fields)
@@ -116,8 +116,11 @@ export function CausalLoopDiagram({
       .filter((l) => nodeIds.has(l.source) && nodeIds.has(l.target))
       .map((l) => ({ ...l }));
 
+    // Compute force parameters scaled to node count and viewport
+    const forceParams = getScaledForceParams(nodes.length, W, H);
+
     // Initial layout: place all nodes in a circle first
-    circularLayout(nodes, W, H);
+    circularLayout(nodes, W, H, forceParams.initialRadiusX, forceParams.initialRadiusY);
 
     // Then reposition nodes that have connections to place them near neighbors
     // Build adjacency map from links (using string source/target IDs)
@@ -143,12 +146,12 @@ export function CausalLoopDiagram({
         const cx = positionedNeighbors.reduce((s, nb) => s + nb.x, 0) / positionedNeighbors.length;
         const cy = positionedNeighbors.reduce((s, nb) => s + nb.y, 0) / positionedNeighbors.length;
         // Place near centroid with small random offset to prevent overlap
-        n.x = cx + (Math.random() - 0.5) * 80;
-        n.y = cy + (Math.random() - 0.5) * 80;
+        n.x = cx + (Math.random() - 0.5) * 50;
+        n.y = cy + (Math.random() - 0.5) * 50;
       }
     });
 
-    // Force simulation
+    // Force simulation (using scaled parameters)
     const simulation = d3
       .forceSimulation<SimNode>(nodes)
       .force(
@@ -156,12 +159,19 @@ export function CausalLoopDiagram({
         d3
           .forceLink<SimNode, SimLink>(links as unknown as SimLink[])
           .id((d) => d.id)
-          .distance(FORCE_DEFAULTS.linkDistance)
-          .strength(FORCE_DEFAULTS.linkStrength)
+          .distance(forceParams.linkDistance)
+          .strength(forceParams.linkStrength)
       )
-      .force("charge", d3.forceManyBody().strength(FORCE_DEFAULTS.chargeStrength))
+      .force("charge", d3.forceManyBody().strength(forceParams.chargeStrength))
       .force("center", d3.forceCenter(W / 2, H / 2))
-      .force("collision", d3.forceCollide(FORCE_DEFAULTS.collisionRadius));
+      .force("x", d3.forceX(W / 2).strength(forceParams.centerStrength))
+      .force("y", d3.forceY(H / 2).strength(forceParams.centerStrength))
+      .force("collision", d3.forceCollide<SimNode>((d) => {
+        const base = d.key ? 65 : 55;
+        return nodes.length > 14 ? base + 10 : base;
+      }))
+      .alpha(0.8)
+      .alphaDecay(nodes.length > 14 ? 0.02 : 0.03);
     simulationRef.current = simulation;
 
     // Links
@@ -175,12 +185,13 @@ export function CausalLoopDiagram({
       .attr("class", (d) => `link ${d.type}`)
       .attr("fill", "none")
       .attr("stroke", (d) => LINK_COLORS[d.type])
-      .attr("stroke-width", 1.5)
-      .attr("opacity", 0.7)
+      .attr("stroke-width", nodes.length > 10 ? 2 : 1.5)
+      .attr("opacity", nodes.length > 10 ? 0.5 : 0.7)
       .attr("marker-end", (d) => `url(#arrow-${d.type})`);
     linkSelRef.current = linkSel;
 
-    // Edge labels (lag)
+    // Edge labels (lag) — hidden for complex models to reduce clutter
+    const showLagLabels = nodes.length <= 10;
     const edgeLabels = g
       .append("g")
       .attr("class", "edge-labels")
@@ -188,10 +199,11 @@ export function CausalLoopDiagram({
       .data(links as unknown as SimLink[])
       .enter()
       .append("text")
-      .attr("font-size", "9px")
+      .attr("font-size", "8px")
       .attr("fill", "#5a7a62")
       .attr("text-anchor", "middle")
       .attr("font-family", "system-ui, sans-serif")
+      .attr("opacity", showLagLabels ? 0.8 : 0)
       .text((d) => d.lag);
 
     // Loop badges
@@ -208,17 +220,19 @@ export function CausalLoopDiagram({
 
     loopSel
       .append("circle")
-      .attr("r", 16)
+      .attr("r", 18)
       .attr("fill", (d) => (d.type === "R" ? LINK_COLORS.reinforcing : LINK_COLORS.balancing))
-      .attr("opacity", 0.9);
+      .attr("stroke", "#1a2f22")
+      .attr("stroke-width", 2.5)
+      .attr("opacity", 1);
 
     loopSel
       .append("text")
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "middle")
       .attr("fill", "white")
-      .attr("font-size", "11px")
-      .attr("font-weight", "700")
+      .attr("font-size", "12px")
+      .attr("font-weight", "800")
       .attr("font-family", "system-ui, sans-serif")
       .text((d) => d.id);
 
@@ -279,18 +293,38 @@ export function CausalLoopDiagram({
       .attr("stroke-width", (d) => (d.key ? 2.5 : 1.5))
       .style("transition", "filter 0.2s");
 
-    // Node labels (multiline)
+    // Node labels — word-wrapped, positioned below circle for long labels
     nodeSel.each(function (d) {
       const el = d3.select(this);
-      const lines = d.label.split("\n");
+      const fontSize = d.key ? 11 : 10;
+      const maxCharsPerLine = d.key ? 14 : 12;
+      const r = d.key ? FORCE_DEFAULTS.keyNodeRadius : FORCE_DEFAULTS.nodeRadius;
+
+      // Word-wrap label into lines
+      const words = d.label.replace(/\n/g, " ").split(/\s+/);
+      const lines: string[] = [];
+      let currentLine = "";
+      for (const word of words) {
+        if (currentLine.length + word.length + 1 > maxCharsPerLine && currentLine.length > 0) {
+          lines.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = currentLine ? `${currentLine} ${word}` : word;
+        }
+      }
+      if (currentLine) lines.push(currentLine);
+
+      // Position below the circle
+      const labelY = r + 10;
+      const lineHeight = fontSize + 2;
       lines.forEach((line, i) => {
         el.append("text")
-          .attr("y", lines.length === 2 ? (i === 0 ? -7 : 7) : 0)
-          .attr("font-size", d.key ? "11px" : "10px")
+          .attr("y", labelY + i * lineHeight)
+          .attr("font-size", `${fontSize}px`)
           .attr("fill", d.key ? "white" : "#c8e0cc")
           .attr("font-weight", d.key ? "600" : "400")
           .attr("text-anchor", "middle")
-          .attr("dominant-baseline", "middle")
+          .attr("dominant-baseline", "hanging")
           .attr("font-family", "system-ui, sans-serif")
           .attr("pointer-events", "none")
           .text(line);
@@ -345,13 +379,85 @@ export function CausalLoopDiagram({
 
       nodeSel.attr("transform", (d) => `translate(${d.x},${d.y})`);
 
-      loopSel.attr("transform", (d) => {
-        const involved = nodes.filter((n) => d.nodes.includes(n.id));
-        if (!involved.length) return "translate(0,0)";
-        const cx = involved.reduce((s, n) => s + n.x, 0) / involved.length;
-        const cy = involved.reduce((s, n) => s + n.y, 0) / involved.length;
-        return `translate(${cx},${cy})`;
+      // Compute all loop badge positions, then repel from nodes AND each other
+      const badgePositions: { x: number; y: number }[] = [];
+      const loopData = model.loops;
+      // Pass 1: compute centroids
+      for (const loop of loopData) {
+        const involved = nodes.filter((n) => loop.nodes.includes(n.id));
+        if (!involved.length) {
+          badgePositions.push({ x: 0, y: 0 });
+        } else {
+          badgePositions.push({
+            x: involved.reduce((s, n) => s + n.x, 0) / involved.length,
+            y: involved.reduce((s, n) => s + n.y, 0) / involved.length,
+          });
+        }
+      }
+      // Pass 2: repel from nodes and other badges (8 iterations)
+      const nodeClearance = 60;
+      const badgeClearance = 45;
+      for (let iter = 0; iter < 8; iter++) {
+        for (let bi = 0; bi < badgePositions.length; bi++) {
+          const bp = badgePositions[bi];
+          let pushX = 0, pushY = 0;
+          // Repel from nodes
+          for (const n of nodes) {
+            const ddx = bp.x - n.x;
+            const ddy = bp.y - n.y;
+            const dd = Math.sqrt(ddx * ddx + ddy * ddy) || 0.1;
+            if (dd < nodeClearance) {
+              const f = (nodeClearance - dd) / dd;
+              pushX += ddx * f;
+              pushY += ddy * f;
+            }
+          }
+          // Repel from other badges
+          for (let bj = 0; bj < badgePositions.length; bj++) {
+            if (bi === bj) continue;
+            const other = badgePositions[bj];
+            const ddx = bp.x - other.x;
+            const ddy = bp.y - other.y;
+            const dd = Math.sqrt(ddx * ddx + ddy * ddy) || 0.1;
+            if (dd < badgeClearance) {
+              const f = (badgeClearance - dd) / dd;
+              pushX += ddx * f * 1.5;
+              pushY += ddy * f * 1.5;
+            }
+          }
+          if (pushX !== 0 || pushY !== 0) {
+            bp.x += pushX * 0.5;
+            bp.y += pushY * 0.5;
+          }
+        }
+      }
+      // Apply positions
+      loopSel.attr("transform", (_d, i) => {
+        const bp = badgePositions[i];
+        return bp ? `translate(${bp.x},${bp.y})` : "translate(0,0)";
       });
+    });
+
+    // Auto zoom-to-fit once simulation settles
+    simulation.on("end", () => {
+      if (!nodes.length) return;
+      const pad = 80;
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const n of nodes) {
+        if (n.x < minX) minX = n.x;
+        if (n.y < minY) minY = n.y;
+        if (n.x > maxX) maxX = n.x;
+        if (n.y > maxY) maxY = n.y;
+      }
+      const bw = maxX - minX + pad * 2;
+      const bh = maxY - minY + pad * 2;
+      const scale = Math.min(W / bw, H / bh, 1.2);
+      const tx = W / 2 - (minX + maxX) / 2 * scale;
+      const ty = H / 2 - (minY + maxY) / 2 * scale;
+      svg.transition().duration(600).call(
+        zoom.transform,
+        d3.zoomIdentity.translate(tx, ty).scale(scale)
+      );
     });
 
     return () => {
@@ -362,27 +468,54 @@ export function CausalLoopDiagram({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [model]);
 
-  // Highlighting effect
+  // Highlighting effect — hides non-relevant elements when a loop/node is selected
   useEffect(() => {
     const linkSel = linkSelRef.current;
     const nodeSel = nodeSelRef.current;
+    const loopSel = loopSelRef.current;
     if (!linkSel || !nodeSel) return;
 
+    const hasHighlight = highlightedNodeIds.length > 0;
+
+    // Links: hide non-highlighted, bold highlighted
     linkSel
+      .style("display", (_d, i) =>
+        hasHighlight && !highlightedLinkIndices.includes(i) ? "none" : ""
+      )
       .attr("opacity", (_d, i) =>
-        highlightedLinkIndices.length === 0 || highlightedLinkIndices.includes(i) ? 0.7 : 0.15
+        highlightedLinkIndices.includes(i) ? 0.85 : 0.7
       )
       .attr("stroke-width", (_d, i) =>
         highlightedLinkIndices.includes(i) ? 2.5 : 1.5
       );
 
-    nodeSel.select("circle:not([stroke-width='1'])").attr("filter", (d) =>
-      highlightedNodeIds.length > 0 && highlightedNodeIds.includes(d.id)
-        ? "brightness(1.4) drop-shadow(0 0 12px currentColor)"
-        : highlightedNodeIds.length > 0
-          ? "brightness(0.5)"
-          : "none"
+    // Nodes: hide non-highlighted entirely
+    nodeSel.style("display", (d) =>
+      hasHighlight && !highlightedNodeIds.includes(d.id) ? "none" : ""
     );
+    nodeSel.select("circle:not([stroke-width='1'])").attr("filter", (d) =>
+      hasHighlight && highlightedNodeIds.includes(d.id)
+        ? "brightness(1.3) drop-shadow(0 0 8px currentColor)"
+        : "none"
+    );
+
+    // Loop badges: hide those not related to the highlighted nodes
+    if (loopSel) {
+      loopSel.style("display", (d) => {
+        if (!hasHighlight) return "";
+        // Show badge if any of its nodes are highlighted
+        const loopNodeSet = new Set(d.nodes);
+        return highlightedNodeIds.some((id) => loopNodeSet.has(id)) ? "" : "none";
+      });
+    }
+
+    // Edge labels: hide when filtering
+    const edgeLabelSel = gRef.current?.selectAll(".edge-labels text");
+    if (edgeLabelSel) {
+      edgeLabelSel.style("display", (_d: unknown, i: number) =>
+        hasHighlight && !highlightedLinkIndices.includes(i) ? "none" : ""
+      );
+    }
   }, [highlightedNodeIds, highlightedLinkIndices]);
 
   // Filter effect
@@ -398,6 +531,27 @@ export function CausalLoopDiagram({
     });
 
     nodeSel.style("display", activeFilters.nodes ? "" : "none");
+
+    // Hide loop badges based on their type filter
+    const loopSel = loopSelRef.current;
+    if (loopSel) {
+      loopSel.style("display", (d) => {
+        if (d.type === "R" && !activeFilters.reinforcing) return "none";
+        if (d.type === "B" && !activeFilters.balancing) return "none";
+        return "";
+      });
+    }
+
+    // Hide edge labels when their links are hidden
+    const edgeLabelSel = gRef.current?.selectAll(".edge-labels text");
+    if (edgeLabelSel) {
+      edgeLabelSel.style("display", (_d: unknown) => {
+        const link = _d as SimLink;
+        if (link.type === "reinforcing" && !activeFilters.reinforcing) return "none";
+        if (link.type === "balancing" && !activeFilters.balancing) return "none";
+        return "";
+      });
+    }
   }, [activeFilters]);
 
   // Force toggle
