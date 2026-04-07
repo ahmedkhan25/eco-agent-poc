@@ -28,7 +28,7 @@ export default function MapExplorerPage() {
 
   return (
     <div className="min-h-screen bg-[#fcf9f4] flex">
-      <Sidebar />
+      <Sidebar onNewChat={() => router.push("/")} />
 
       {/* Main content — full-width map */}
       <div className="flex-1 flex flex-col pt-16 md:pl-24 h-screen overflow-hidden">
@@ -51,8 +51,8 @@ export default function MapExplorerPage() {
           </Link>
         </div>
 
-        {/* Map canvas */}
-        <div className="flex-1 relative">
+        {/* Map canvas — z-30 to stay below sidebar overlays (z-40/z-50) */}
+        <div className="flex-1 relative z-30">
           <EcoHeartMap />
 
           {/* Layer controls — bottom right */}
