@@ -12,14 +12,14 @@ import { Sidebar } from "@/components/sidebar";
 
 export default function MapExplorerPage() {
   const router = useRouter();
-  const { setSelectedFeature } = useMapStore();
+  const { setSelectedFeature, reset } = useMapStore();
 
-  // Ensure the map store is in a clean state when visiting this page
+  // Reset map store on unmount — prevents stale map showing on home page
   useEffect(() => {
     return () => {
-      setSelectedFeature(null);
+      reset();
     };
-  }, [setSelectedFeature]);
+  }, [reset]);
 
   const handleAskEcoHeart = (query: string) => {
     // Navigate to chat with the query pre-filled

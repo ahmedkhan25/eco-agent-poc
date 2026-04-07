@@ -111,7 +111,11 @@ const MapContainer = forwardRef<MapHandle, MapContainerProps>(
         ).addTo(map);
 
         // Force a resize after mount (fixes grey tiles in split view)
-        setTimeout(() => map.invalidateSize(), 200);
+        setTimeout(() => {
+          if (mounted && mapRef.current) {
+            mapRef.current.invalidateSize();
+          }
+        }, 200);
       };
 
       init();
@@ -218,7 +222,7 @@ const MapContainer = forwardRef<MapHandle, MapContainerProps>(
       if (!containerRef.current || !mapRef.current) return;
 
       const observer = new ResizeObserver(() => {
-        mapRef.current?.invalidateSize();
+        try { mapRef.current?.invalidateSize(); } catch { /* map already removed */ }
       });
       observer.observe(containerRef.current);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EcoHeartMap from "@/components/map/index";
 import LayerControl from "@/components/map/layer-control";
 import FeaturePopup from "@/components/map/feature-popup";
@@ -37,7 +37,12 @@ export default function SpatialTestPage() {
   const [error, setError] = useState<string | null>(null);
   const [showDebug, setShowDebug] = useState(true);
 
-  const { setSpatialPayload, toggleLayer, showMap } = useMapStore();
+  const { setSpatialPayload, toggleLayer, showMap, reset } = useMapStore();
+
+  // Reset map store on unmount
+  useEffect(() => {
+    return () => { reset(); };
+  }, [reset]);
 
   const runQuery = async (q: string) => {
     const queryText = q || query;

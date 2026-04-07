@@ -21,6 +21,7 @@ import { Sidebar } from '@/components/sidebar';
 import { SignupPrompt } from '@/components/signup-prompt';
 import { EnterpriseBanner } from '@/components/enterprise/enterprise-banner';
 import SplitView from '@/components/map/split-view';
+import { useMapStore } from '@/lib/stores/use-map-store';
 
 function HomeContent() {
   const { user, loading } = useAuthStore();
@@ -42,6 +43,12 @@ function HomeContent() {
   const [messageCount, setMessageCount] = useState(0);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+
+  // Reset map store on mount — clears stale state from map-explorer/spatial-test
+  const resetMap = useMapStore((s) => s.reset);
+  useEffect(() => {
+    resetMap();
+  }, [resetMap]);
 
   // Handle rate limit errors from chat interface
   const handleRateLimitError = useCallback((resetTime: string) => {
