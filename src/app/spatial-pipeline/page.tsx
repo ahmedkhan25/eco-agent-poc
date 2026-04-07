@@ -421,6 +421,21 @@ export default function SpatialQueryPipeline() {
           >
             &larr; Back to Map Explorer
           </Link>
+          <Link
+            href="/spatial-test"
+            style={{
+              color: "#02C39A",
+              fontSize: 13,
+              textDecoration: "none",
+              padding: "6px 14px",
+              borderRadius: 8,
+              border: "1px solid #2D6A4F",
+              background: "rgba(45,106,79,0.15)",
+              transition: "all 0.2s",
+            }}
+          >
+            Test Live Pipeline &rarr;
+          </Link>
         </div>
       </nav>
 
