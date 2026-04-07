@@ -20,6 +20,7 @@ import { useAuthStore } from '@/lib/stores/use-auth-store';
 import { Sidebar } from '@/components/sidebar';
 import { SignupPrompt } from '@/components/signup-prompt';
 import { EnterpriseBanner } from '@/components/enterprise/enterprise-banner';
+import SplitView from '@/components/map/split-view';
 
 function HomeContent() {
   const { user, loading } = useAuthStore();
@@ -281,32 +282,34 @@ function HomeContent() {
           )}
         </AnimatePresence>
         
-        {/* Chat Interface */}
-        <motion.div 
-          className="flex-1 px-0 sm:px-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          <Suspense fallback={<div className="text-center py-8">Loading...</div>}>
-            <ChatInterface 
-              key={chatKey}
-              sessionId={currentSessionId}
-              onMessagesChange={handleMessagesChange} 
-              onRateLimitError={handleRateLimitError}
-              onSessionCreated={handleSessionCreated}
-              onNewChat={handleNewChat}
-              rateLimitProps={{
-                allowed,
-                remaining,
-                resetTime,
-                increment
-              }}
-            />
-          </Suspense>
-        </motion.div>
-        
-        <BottomBar />
+        {/* Chat Interface + Map Split View */}
+        <SplitView>
+          <motion.div
+            className="flex-1 px-0 sm:px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <Suspense fallback={<div className="text-center py-8">Loading...</div>}>
+              <ChatInterface
+                key={chatKey}
+                sessionId={currentSessionId}
+                onMessagesChange={handleMessagesChange}
+                onRateLimitError={handleRateLimitError}
+                onSessionCreated={handleSessionCreated}
+                onNewChat={handleNewChat}
+                rateLimitProps={{
+                  allowed,
+                  remaining,
+                  resetTime,
+                  increment
+                }}
+              />
+            </Suspense>
+          </motion.div>
+
+          <BottomBar />
+        </SplitView>
       </div>
       
       {/* Rate Limit Dialog */}

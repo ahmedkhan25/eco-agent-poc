@@ -24,6 +24,7 @@ import {
   X,
   Info,
   Network,
+  Map,
 } from 'lucide-react';
 import { EcoheartLogo } from '@/components/ecoheart-logo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -264,6 +265,15 @@ export function Sidebar({
                   <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Systems Modeler</span>
                 </button>
 
+                {/* Map Explorer */}
+                <button
+                  onClick={() => { window.location.href = '/map-explorer'; closeMobileMenu(); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                >
+                  <Map className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Map Explorer</span>
+                </button>
+
                 {/* History */}
                 <button
                   onClick={() => {
@@ -472,6 +482,19 @@ export function Sidebar({
                 </button>
                 <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                   Systems Modeler
+                </div>
+              </div>
+
+              {/* Map Explorer */}
+              <div className="relative group/tooltip">
+                <button
+                  onClick={() => window.location.href = '/map-explorer'}
+                  className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[20px] transition-all duration-200 group hover:scale-110 active:scale-95"
+                >
+                  <Map className="h-6 w-6 text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors" />
+                </button>
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                  Map Explorer
                 </div>
               </div>
 
