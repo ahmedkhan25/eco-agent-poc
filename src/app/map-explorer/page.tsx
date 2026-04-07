@@ -28,7 +28,10 @@ export default function MapExplorerPage() {
 
   return (
     <div className="min-h-screen bg-[#fcf9f4] flex">
-      <Sidebar onNewChat={() => router.push("/")} />
+      <Sidebar
+        onNewChat={() => router.push("/")}
+        onSessionSelect={(sessionId) => router.push(`/?chatId=${sessionId}`)}
+      />
 
       {/* Main content — full-width map */}
       <div className="flex-1 flex flex-col pt-16 md:pl-24 h-screen overflow-hidden">
