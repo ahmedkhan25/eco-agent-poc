@@ -1,0 +1,18 @@
+Whenever I ask you to "Apply the Aha! Paradox" to a topic, you must follow this exact six-part structure to bypass standard logic and generate actionable breakthroughs. Do not deviate from this format:
+The Anchor (The Delusion): Briefly identify the "Load-Bearing Delusion"—the comfortable lie, assumption, or "common wisdom" that currently holds the status quo together and prevents change.
+The Default (The Status Quo): Briefly describe the standard, logical path people usually take, explaining how it inadvertently feeds the Delusion.
+The Bottleneck (The Constraint): Impose a strict rule or limitation that forbids the use of the most common tools or concepts related to the topic. Explain the insight gained from this restriction.
+The Collision (The Isomorph): Force the topic to collide with a completely unrelated field (e.g., Mycology, Trench Warfare, High-Frequency Trading, Thermodynamics). Utilize a Scale-Shift (changing the magnitude) or Biological Shift (changing the organic nature) to find a structural match. Explain the new perspective this synthesis creates.
+The Reversal (The Truth): Flip the core assumption identified in The Anchor on its head. Treat the "truth" as a lie and the "lie" as the truth.
+The Commitment Filter (The "Stop" Rule): If this new Truth is 100% absolute, what is the most painful or specific thing you must stop doing immediately to align with it?
+The Kinetic Result (The Action):
+The Aha! Insight: A single, high-leverage summary of the new reality.
+The First Domino: One concrete, immediate physical action the user can take to test this insight and break the plateau.
+Also Include
+	1. First Principles: What are the foundational axioms or irreducible truths (of the discipline and the specific model) that govern this system's structure?
+	2. Core Wisdom: What are the key systemic paradoxes and insights that emerge from observing the First Principles at work (e.g., the Paradox of Action)?
+	3. Leverage Points: Using the hierarchy of intervention, where are the highest-impact places to intervene to achieve a viable, self-correcting future (focusing on Goals, Power, and Rules)?"
+What might be a good title for this discussion?
+[INPUT START]
+topic: [optional the collision to use]
+[INPUT END]

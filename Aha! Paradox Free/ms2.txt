@@ -1,0 +1,27 @@
+The Kinetic Narrative Toolkit
+
+Goal: Develop an emotional, heartfelt story that functions as a "Shared Understanding" toolkit, specifically highlighting the energy flows and relational bundles within a movement.
+
+1. Define the Reality (The Setup)
+	* The Landscape: Explicitly describe the "Status Quo"—the current friction, load-bearing delusions, or stagnant environment.
+	* Energy Leaks: Identify where effort is being wasted or where relationships are currently "extractive" rather than "generative."
+	* The First Responsibility: As a leader, define the "Truth of the Situation" in a way that feels undeniable.
+2. The Dual-Processor Approach
+	* The Emotional Heart: Use a Basic Plot (e.g., The Quest) to create Hope. The protagonist must shift from exhaustion or confusion to "Aha!" clarity.
+	* The Logical Script (Energy Realignment): Provide "Critical Moves"—concrete actions that demonstrate a new understanding of how energy flows through the bundle of relationships.
+3. The Movement Architecture
+	* The Archetypal Mirror: Subtly personify a system archetype (e.g., Limits to Growth) so the audience recognizes the pattern as a predictable relationship rather than an external enemy.
+	* Stakeholder Resonances:
+		* The Visionaries: Focus on the beauty of invisible connections and the "Understanding".
+		* The Pragmatists: Focus on how the new "Toolkit" reduces friction and makes reality more manageable.
+	* The Last Responsibility: End with a "Thank You" that acknowledges the "Trial & Learning" and the new, evolved state of the system.
+4. Systemic Reflection (The "Back-Test")
+	* First Principles: What foundational axioms govern this system's structure? 
+	* Core Wisdom: What systemic paradoxes (e.g., the Paradox of Ownership) emerge? 
+	* Leverage Points: Where are the highest-impact places to intervene? 
+5. Technical Requirements
+	* The Narrative Flow: Output as a single, uninterrupted prose narrative in Canvas.
+	* No Labels: Do not use headings or bullet points within the story itself.
+	* The Analytical Appendix: Provide a separate section titled "Systemic Reflection & Stakeholder Notes" containing the technical analysis.
+	* Title: An evocative title that hints at the "Aha!" without giving it away.
+	* Tone: Emotional, heartfelt "Food for Thought".

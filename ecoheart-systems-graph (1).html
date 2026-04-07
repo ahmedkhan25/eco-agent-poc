@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecoheart — Community Systems Dynamics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0d1a12;
+    --bg2: #111f17;
+    --panel: #162219;
+    --green: #3ddc84;
+    --green-dim: #2a9c5e;
+    --amber: #f5a623;
+    --red: #e05c5c;
+    --blue: #5ca8e0;
+    --teal: #4ecdc4;
+    --text: #d4e8d8;
+    --text-dim: #7a9e82;
+    --border: #1e3528;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.4;
+  }
+
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 60px;
+    background: linear-gradient(180deg, #0d1a12 0%, transparent 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    z-index: 50;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--text-dim); font-weight: 400; font-size: 13px; margin-left: 8px; font-family: 'DM Sans'; letter-spacing: 0; }
+
+  .divider { width: 1px; height: 24px; background: var(--border); }
+
+  .scenario-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .tab {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    background: transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .tab.active, .tab:hover {
+    background: var(--green);
+    color: var(--bg);
+    border-color: var(--green);
+  }
+
+  #save-btn {
+    margin-left: auto;
+    padding: 7px 18px;
+    background: transparent;
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  #save-btn:hover { background: var(--green); color: var(--bg); }
+
+  #graph-container {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Panel */
+  #side-panel {
+    position: fixed;
+    right: 0; top: 0; bottom: 0;
+    width: 280px;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    padding: 80px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 40;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  #side-panel.open { transform: translateX(0); }
+
+  .panel-close {
+    position: absolute;
+    top: 68px; left: -36px;
+    width: 36px; height: 36px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: 6px 0 0 6px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim);
+    font-size: 18px;
+  }
+
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+  }
+
+  .node-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+
+  .node-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .connections-list { margin-top: 12px; }
+  .conn-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .conn-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .conn-label { color: var(--text-dim); flex: 1; }
+  .conn-type { font-size: 10px; opacity: 0.7; }
+
+  /* Loop legend */
+  .loop-legend { margin-top: 8px; }
+  .loop-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .loop-item:hover { border-color: var(--text-dim); }
+  .loop-badge {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .loop-badge.R { background: var(--red); color: white; }
+  .loop-badge.B { background: var(--blue); color: white; }
+  .loop-info { flex: 1; }
+  .loop-name { font-size: 12px; font-weight: 500; }
+  .loop-desc { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+
+  /* Bottom controls */
+  #controls {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 50;
+    background: rgba(13,26,18,0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 8px 12px;
+  }
+  .ctrl-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .ctrl-btn:hover { color: var(--green); border-color: var(--green); }
+
+  .ctrl-divider { width: 1px; background: var(--border); margin: 4px 4px; }
+
+  #filter-bar {
+    position: fixed;
+    left: 24px; top: 70px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 50;
+  }
+  .filter-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 11px;
+    cursor: pointer;
+    background: rgba(13,26,18,0.8);
+    backdrop-filter: blur(8px);
+    transition: all 0.2s;
+    color: var(--text-dim);
+  }
+  .filter-chip.active { border-color: currentColor; }
+  .filter-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 200;
+    max-width: 200px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip .tt-title { font-weight: 600; color: var(--green); margin-bottom: 4px; }
+  #tooltip .tt-body { color: var(--text-dim); line-height: 1.5; }
+
+  /* Node styles via SVG */
+  .node circle {
+    stroke-width: 2;
+    cursor: grab;
+    transition: filter 0.2s;
+  }
+  .node circle:hover { filter: brightness(1.3); }
+  .node.highlighted circle { filter: brightness(1.4) drop-shadow(0 0 12px currentColor); }
+
+  .node text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    fill: var(--text);
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+    font-weight: 500;
+  }
+
+  .link {
+    fill: none;
+    stroke-width: 1.5;
+    opacity: 0.7;
+  }
+  .link.reinforcing { stroke: var(--red); }
+  .link.balancing { stroke: var(--blue); }
+  .link.highlighted { opacity: 1; stroke-width: 2.5; }
+
+  .loop-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Animated pulse for key nodes */
+  @keyframes pulse {
+    0%, 100% { r: 0; opacity: 0.5; }
+    50% { r: 28px; opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Ecoheart <span>Systems Dynamics</span></div>
+  <div class="divider"></div>
+  <div class="scenario-tabs">
+    <button class="tab active" onclick="loadScenario('climate')">Climate Migration</button>
+    <button class="tab" onclick="loadScenario('housing')">Housing Crisis</button>
+    <button class="tab" onclick="loadScenario('health')">Community Health</button>
+  </div>
+  <button id="save-btn">⬇ Save Model</button>
+</header>
+
+<div id="filter-bar">
+  <div class="filter-chip active" style="color: var(--red)" onclick="toggleFilter('reinforcing')" data-filter="reinforcing">
+    <div class="filter-dot" style="background:var(--red)"></div> Reinforcing loops
+  </div>
+  <div class="filter-chip active" style="color: var(--blue)" onclick="toggleFilter('balancing')" data-filter="balancing">
+    <div class="filter-dot" style="background:var(--blue)"></div> Balancing loops
+  </div>
+  <div class="filter-chip active" style="color: var(--green)" onclick="toggleFilter('nodes')" data-filter="nodes">
+    <div class="filter-dot" style="background:var(--green)"></div> Variables
+  </div>
+</div>
+
+<div id="graph-container"></div>
+
+<div id="side-panel">
+  <div class="panel-close" onclick="closePanel()">✕</div>
+  <div class="panel-title" id="panel-title">Feedback Loops</div>
+  <div id="panel-content"></div>
+</div>
+
+<div id="controls">
+  <button class="ctrl-btn" onclick="zoom(1.2)" title="Zoom In">+</button>
+  <button class="ctrl-btn" onclick="zoom(0.8)" title="Zoom Out">−</button>
+  <div class="ctrl-divider"></div>
+  <button class="ctrl-btn" onclick="resetView()" title="Reset">⌂</button>
+  <button class="ctrl-btn" onclick="toggleForce()" title="Toggle Physics" id="force-btn">⟳</button>
+  <div class="ctrl-divider"></div>
+  <button class="ctrl-btn" onclick="openLoopsPanel()" title="Feedback Loops">⟲</button>
+  <button class="ctrl-btn" onclick="openAddNode()" title="Add Node">+</button>
+</div>
+
+<div id="tooltip">
+  <div class="tt-title" id="tt-title"></div>
+  <div class="tt-body" id="tt-body"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+
+const scenarios = {
+  climate: {
+    name: "Mass Climate Migration",
+    nodes: [
+      { id: "mig", label: "Migration\nPressure", desc: "The aggregate force driving people to migrate due to climate-related threats to livelihood and safety.", category: "pressure", key: true },
+      { id: "migpop", label: "Migrant\nPopulation", desc: "Total number of people displaced by climate impacts seeking refuge in other regions.", category: "population" },
+      { id: "strain", label: "Receiving Region\nStrain", desc: "Stress placed on infrastructure, resources and services in host communities.", category: "social" },
+      { id: "anti", label: "Anti-migration\nSentiment", desc: "Societal resistance in receiving regions, influencing political responses and adaptation funding.", category: "social" },
+      { id: "adapt", label: "Adaptation\nMeasures", desc: "Policy, technology and community-level interventions to reduce vulnerability to climate change.", category: "solution" },
+      { id: "climate", label: "Climate Change\nImpacts", desc: "Direct effects: floods, drought, sea level rise, extreme heat, crop failure.", category: "environment" },
+      { id: "ghg", label: "Greenhouse Gas\nConcentration", desc: "Atmospheric CO₂ and methane driving global temperature increase.", category: "environment" },
+      { id: "fossil", label: "Fossil Fuel\nConsumption", desc: "Primary driver of anthropogenic greenhouse gas emissions.", category: "pressure" },
+      { id: "resource", label: "Resource\nAvailability", desc: "Access to food, water, energy in both sending and receiving regions.", category: "resource" },
+      { id: "socio", label: "Socio-political\nInstability", desc: "Political fragmentation and governance failure limiting effective climate response.", category: "social" },
+    ],
+    links: [
+      { source: "mig", target: "migpop", type: "reinforcing", label: "+", lag: "Months–Years" },
+      { source: "migpop", target: "strain", type: "reinforcing", label: "+", lag: "Months–Years" },
+      { source: "strain", target: "anti", type: "reinforcing", label: "+", lag: "1-3 Years" },
+      { source: "anti", target: "adapt", type: "reinforcing", label: "−", lag: "Years" },
+      { source: "adapt", target: "mig", type: "balancing", label: "−", lag: "2-5 Years" },
+      { source: "adapt", target: "climate", type: "balancing", label: "−", lag: "Years to Decades" },
+      { source: "climate", target: "mig", type: "reinforcing", label: "+", lag: "Immediate" },
+      { source: "climate", target: "resource", type: "reinforcing", label: "−", lag: "Years" },
+      { source: "resource", target: "mig", type: "reinforcing", label: "+", lag: "Months" },
+      { source: "ghg", target: "climate", type: "reinforcing", label: "+", lag: "Decades" },
+      { source: "fossil", target: "ghg", type: "reinforcing", label: "+", lag: "Years" },
+      { source: "socio", target: "fossil", type: "reinforcing", label: "+", lag: "Years to Decades" },
+      { source: "socio", target: "adapt", type: "balancing", label: "−", lag: "Years" },
+      { source: "mig", target: "socio", type: "reinforcing", label: "+", lag: "Months" },
+      { source: "migpop", target: "socio", type: "reinforcing", label: "+", lag: "1-5 Years" },
+    ],
+    loops: [
+      { id: "R1", type: "R", name: "Resource Depletion Loop", desc: "Climate impacts deplete resources → more migration pressure → more instability", nodes: ["climate","resource","mig","socio"] },
+      { id: "R2", type: "R", name: "Fossil Fuel Lock-in", desc: "Instability hinders mitigation → fossil fuel consumption → more GHG", nodes: ["socio","fossil","ghg","climate"] },
+      { id: "R3", type: "R", name: "Anti-migration Spiral", desc: "Strain fuels anti-migration sentiment → undermines adaptation → more migration", nodes: ["strain","anti","adapt","mig"] },
+      { id: "B4", type: "B", name: "Adaptation Stabilizer", desc: "Adaptation measures reduce climate impacts and migration pressure", nodes: ["adapt","climate","mig","adapt"] },
+    ]
+  },
+  housing: {
+    name: "Community Housing Crisis",
+    nodes: [
+      { id: "demand", label: "Housing\nDemand", desc: "Population and economic growth driving need for more homes.", category: "pressure", key: true },
+      { id: "supply", label: "Housing\nSupply", desc: "Number of available affordable units in the market.", category: "resource" },
+      { id: "cost", label: "Housing\nCosts", desc: "Rent and purchase prices in the community.", category: "pressure" },
+      { id: "displacement", label: "Resident\nDisplacement", desc: "Forced relocation due to cost increases or demolition.", category: "social" },
+      { id: "invest", label: "Speculative\nInvestment", desc: "Capital flows treating housing as financial asset rather than shelter.", category: "pressure" },
+      { id: "zoning", label: "Zoning\nRestrictions", desc: "Land use regulations limiting housing density and types.", category: "policy" },
+      { id: "community", label: "Community\nCohesion", desc: "Social bonds and networks that support vulnerable residents.", category: "social" },
+      { id: "policy", label: "Affordable\nHousing Policy", desc: "Government interventions: rent control, subsidies, inclusionary zoning.", category: "solution" },
+      { id: "income", label: "Wage\nStagnation", desc: "Failure of incomes to keep pace with housing cost increases.", category: "economic" },
+      { id: "homelessness", label: "Homelessness\nRate", desc: "Number of people without stable housing.", category: "social" },
+    ],
+    links: [
+      { source: "demand", target: "cost", type: "reinforcing", label: "+", lag: "Months" },
+      { source: "cost", target: "supply", type: "balancing", label: "+", lag: "Years" },
+      { source: "supply", target: "cost", type: "balancing", label: "−", lag: "Years" },
+      { source: "cost", target: "displacement", type: "reinforcing", label: "+", lag: "Months" },
+      { source: "displacement", target: "community", type: "reinforcing", label: "−", lag: "Years" },
+      { source: "invest", target: "cost", type: "reinforcing", label: "+", lag: "Months" },
+      { source: "cost", target: "invest", type: "reinforcing", label: "+", lag: "Months" },
+      { source: "zoning", target: "supply", type: "reinforcing", label: "−", lag: "Years" },
+      { source: "policy", target: "cost", type: "balancing", label: "−", lag: "Years" },
+      { source: "policy", target: "supply", type: "balancing", label: "+", lag: "Years" },
+      { source: "community", target: "policy", type: "balancing", label: "+", lag: "1-3 Years" },
+      { source: "income", target: "displacement", type: "reinforcing", label: "+", lag: "Years" },
+      { source: "displacement", target: "homelessness", type: "reinforcing", label: "+", lag: "Months" },
+      { source: "homelessness", target: "community", type: "reinforcing", label: "−", lag: "Years" },
+    ],
+    loops: [
+      { id: "R1", type: "R", name: "Speculation Spiral", desc: "Rising costs attract investment → further cost increases → displacement", nodes: ["cost","invest","demand"] },
+      { id: "R2", type: "R", name: "Community Erosion", desc: "Displacement weakens community → less policy advocacy → more displacement", nodes: ["displacement","community","policy"] },
+      { id: "B1", type: "B", name: "Supply Response", desc: "Higher costs incentivize building → more supply → moderates costs", nodes: ["cost","supply"] },
+      { id: "B2", type: "B", name: "Policy Intervention", desc: "Strong communities advocate for affordable housing policies", nodes: ["community","policy","cost"] },
+    ]
+  },
+  health: {
+    name: "Community Health Dynamics",
+    nodes: [
+      { id: "health", label: "Community\nHealth Outcomes", desc: "Overall wellbeing indicators: life expectancy, chronic disease rates, mental health.", category: "pressure", key: true },
+      { id: "access", label: "Healthcare\nAccess", desc: "Availability and affordability of medical services.", category: "resource" },
+      { id: "envir", label: "Environmental\nQuality", desc: "Air, water, green space quality affecting chronic illness rates.", category: "environment" },
+      { id: "poverty", label: "Poverty &\nInequality", desc: "Income disparity limiting access to healthy food, housing, care.", category: "social" },
+      { id: "stress", label: "Chronic\nStress Burden", desc: "Psychological and physiological stress from socioeconomic precarity.", category: "pressure" },
+      { id: "prevention", label: "Prevention\nPrograms", desc: "Public health initiatives reducing disease burden proactively.", category: "solution" },
+      { id: "workforce", label: "Health\nWorkforce", desc: "Availability of trained health workers in the community.", category: "resource" },
+      { id: "funding", label: "Public Health\nFunding", desc: "Government investment in health infrastructure and programs.", category: "policy" },
+      { id: "industry", label: "Industrial\nPollution", desc: "Toxic emissions and waste from economic activity.", category: "pressure" },
+      { id: "trust", label: "Institutional\nTrust", desc: "Community faith in health systems and public health guidance.", category: "social" },
+    ],
+    links: [
+      { source: "access", target: "health", type: "balancing", label: "+", lag: "Years" },
+      { source: "health", target: "poverty", type: "balancing", label: "−", lag: "Years" },
+      { source: "poverty", target: "health", type: "reinforcing", label: "−", lag: "Years" },
+      { source: "poverty", target: "stress", type: "reinforcing", label: "+", lag: "Months" },
+      { source: "stress", target: "health", type: "reinforcing", label: "−", lag: "Years" },
+      { source: "envir", target: "health", type: "balancing", label: "+", lag: "Years" },
+      { source: "industry", target: "envir", type: "reinforcing", label: "−", lag: "Years" },
+      { source: "prevention", target: "health", type: "balancing", label: "+", lag: "Years" },
+      { source: "prevention", target: "access", type: "balancing", label: "+", lag: "Years" },
+      { source: "funding", target: "prevention", type: "balancing", label: "+", lag: "Years" },
+      { source: "funding", target: "workforce", type: "balancing", label: "+", lag: "Years" },
+      { source: "workforce", target: "access", type: "balancing", label: "+", lag: "Years" },
+      { source: "trust", target: "prevention", type: "balancing", label: "+", lag: "Years" },
+      { source: "health", target: "trust", type: "balancing", label: "+", lag: "Years" },
+    ],
+    loops: [
+      { id: "R1", type: "R", name: "Poverty-Health Trap", desc: "Poor health outcomes worsen poverty, poverty worsens health", nodes: ["health","poverty","stress"] },
+      { id: "R2", type: "R", name: "Environmental Burden", desc: "Industrial pollution degrades environment → chronic illness", nodes: ["industry","envir","health"] },
+      { id: "B1", type: "B", name: "Prevention Investment", desc: "Public funding for prevention improves health outcomes at scale", nodes: ["funding","prevention","health"] },
+      { id: "B2", type: "B", name: "Trust & Engagement", desc: "Better health outcomes build institutional trust → better prevention uptake", nodes: ["health","trust","prevention"] },
+    ]
+  }
+};
+
+// ─────────────────────────────────────────────
+// COLORS
+// ─────────────────────────────────────────────
+const categoryColors = {
+  pressure:    "#e05c5c",
+  population:  "#f5a623",
+  social:      "#9b7de8",
+  solution:    "#3ddc84",
+  environment: "#4ecdc4",
+  resource:    "#5ca8e0",
+  policy:      "#f5a623",
+  economic:    "#e8aa7d",
+  default:     "#7a9e82"
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentScenario = 'climate';
+let simulation, svg, g, linkSel, nodeSel, loopLabelSel;
+let activeFilters = { reinforcing: true, balancing: true, nodes: true };
+let forceActive = true;
+let currentTransform = d3.zoomIdentity;
+let zoomBehavior;
+let selectedNode = null;
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+function init() {
+  const container = document.getElementById('graph-container');
+  const W = container.clientWidth;
+  const H = container.clientHeight;
+
+  svg = d3.select('#graph-container').append('svg')
+    .attr('width', '100%')
+    .attr('height', '100%');
+
+  // Defs: arrowheads
+  const defs = svg.append('defs');
+
+  ['reinforcing','balancing'].forEach(type => {
+    const color = type === 'reinforcing' ? '#e05c5c' : '#5ca8e0';
+    defs.append('marker')
+      .attr('id', `arrow-${type}`)
+      .attr('viewBox', '0 -5 10 10')
+      .attr('refX', 22)
+      .attr('refY', 0)
+      .attr('markerWidth', 6)
+      .attr('markerHeight', 6)
+      .attr('orient', 'auto')
+      .append('path')
+        .attr('d', 'M0,-5L10,0L0,5')
+        .attr('fill', color);
+  });
+
+  // Background radial
+  const grad = defs.append('radialGradient')
+    .attr('id', 'bgGrad')
+    .attr('cx', '50%').attr('cy', '50%');
+  grad.append('stop').attr('offset', '0%').attr('stop-color', '#172b1e');
+  grad.append('stop').attr('offset', '100%').attr('stop-color', '#0d1a12');
+
+  svg.append('rect').attr('width', '100%').attr('height', '100%').attr('fill', 'url(#bgGrad)');
+
+  g = svg.append('g');
+
+  zoomBehavior = d3.zoom()
+    .scaleExtent([0.2, 3])
+    .on('zoom', (e) => {
+      g.attr('transform', e.transform);
+      currentTransform = e.transform;
+    });
+
+  svg.call(zoomBehavior);
+
+  loadScenario('climate');
+}
+
+// ─────────────────────────────────────────────
+// LOAD SCENARIO
+// ─────────────────────────────────────────────
+function loadScenario(name) {
+  currentScenario = name;
+  // Update tabs
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const keys = ['climate','housing','health'];
+    t.classList.toggle('active', keys[i] === name);
+  });
+
+  const data = scenarios[name];
+  const W = document.getElementById('graph-container').clientWidth;
+  const H = document.getElementById('graph-container').clientHeight;
+
+  // Deep copy
+  const nodes = data.nodes.map(n => ({...n}));
+  const links = data.links.map(l => ({...l}));
+
+  // Initial positions in circle
+  nodes.forEach((n, i) => {
+    const angle = (i / nodes.length) * 2 * Math.PI;
+    n.x = W/2 + Math.cos(angle) * 220;
+    n.y = H/2 + Math.sin(angle) * 180;
+  });
+
+  if (simulation) simulation.stop();
+  g.selectAll('*').remove();
+
+  // Create simulation
+  simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(160).strength(0.5))
+    .force('charge', d3.forceManyBody().strength(-400))
+    .force('center', d3.forceCenter(W/2, H/2))
+    .force('collision', d3.forceCollide(55));
+
+  // Draw links
+  linkSel = g.append('g').attr('class','links').selectAll('path')
+    .data(links).enter().append('path')
+      .attr('class', d => `link ${d.type}`)
+      .attr('marker-end', d => `url(#arrow-${d.type})`)
+      .attr('id', (d,i) => `link-${i}`);
+
+  // Edge labels (lag)
+  const edgeLabels = g.append('g').attr('class','edge-labels').selectAll('text')
+    .data(links).enter().append('text')
+      .attr('class','edge-label')
+      .attr('font-size', '9px')
+      .attr('fill', '#5a7a62')
+      .attr('text-anchor','middle')
+      .text(d => d.lag);
+
+  // Loop badges
+  const loopData = data.loops;
+  loopLabelSel = g.append('g').attr('class','loop-labels').selectAll('g')
+    .data(loopData).enter().append('g')
+      .attr('class','loop-group')
+      .style('cursor','pointer')
+      .on('click', (e, d) => highlightLoop(d));
+
+  loopLabelSel.append('circle')
+    .attr('r', 16)
+    .attr('fill', d => d.type === 'R' ? '#e05c5c' : '#5ca8e0')
+    .attr('opacity', 0.9);
+
+  loopLabelSel.append('text')
+    .attr('class','loop-label')
+    .attr('text-anchor','middle')
+    .attr('dominant-baseline','middle')
+    .attr('fill','white')
+    .attr('font-size','11px')
+    .text(d => d.id);
+
+  // Draw nodes
+  nodeSel = g.append('g').attr('class','nodes').selectAll('g')
+    .data(nodes).enter().append('g')
+      .attr('class','node')
+      .call(d3.drag()
+        .on('start', dragStart)
+        .on('drag', dragged)
+        .on('end', dragEnd))
+      .on('click', (e, d) => selectNode(d, data))
+      .on('mouseenter', (e, d) => showTooltip(e, d))
+      .on('mouseleave', hideTooltip);
+
+  // Pulse ring for key nodes
+  nodeSel.filter(d => d.key).append('circle')
+    .attr('r', 0)
+    .attr('fill', 'none')
+    .attr('stroke', d => categoryColors[d.category] || categoryColors.default)
+    .attr('stroke-width', 1)
+    .attr('opacity', 0)
+    .attr('class','pulse-ring')
+    .each(function(d) { animatePulse(this); });
+
+  nodeSel.append('circle')
+    .attr('r', d => d.key ? 38 : 32)
+    .attr('fill', d => {
+      const c = categoryColors[d.category] || categoryColors.default;
+      return c;
+    })
+    .attr('fill-opacity', 0.15)
+    .attr('stroke', d => categoryColors[d.category] || categoryColors.default)
+    .attr('stroke-width', d => d.key ? 2.5 : 1.5);
+
+  // Multiline labels
+  nodeSel.each(function(d) {
+    const el = d3.select(this);
+    const lines = d.label.split('\n');
+    lines.forEach((line, i) => {
+      el.append('text')
+        .attr('y', lines.length === 2 ? (i === 0 ? -7 : 7) : 0)
+        .attr('font-size', d.key ? '11px' : '10px')
+        .attr('fill', d.key ? 'white' : '#c8e0cc')
+        .attr('font-weight', d.key ? '600' : '400')
+        .attr('text-anchor','middle')
+        .attr('dominant-baseline','middle')
+        .text(line);
+    });
+  });
+
+  simulation.on('tick', () => {
+    linkSel.attr('d', linkPath);
+
+    edgeLabels
+      .attr('x', d => (d.source.x + d.target.x) / 2)
+      .attr('y', d => (d.source.y + d.target.y) / 2 - 6);
+
+    nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
+
+    // Loop badge positions (average of involved nodes)
+    loopLabelSel.attr('transform', d => {
+      const involved = nodes.filter(n => d.nodes.includes(n.id));
+      if (!involved.length) return `translate(0,0)`;
+      const cx = involved.reduce((s,n) => s+n.x, 0) / involved.length;
+      const cy = involved.reduce((s,n) => s+n.y, 0) / involved.length;
+      return `translate(${cx},${cy})`;
+    });
+  });
+}
+
+function animatePulse(el) {
+  d3.select(el)
+    .attr('r', 32).attr('opacity', 0.6)
+    .transition().duration(2000).ease(d3.easeCubicOut)
+    .attr('r', 60).attr('opacity', 0)
+    .on('end', () => animatePulse(el));
+}
+
+function linkPath(d) {
+  const dx = d.target.x - d.source.x;
+  const dy = d.target.y - d.source.y;
+  const dr = Math.sqrt(dx*dx + dy*dy) * 0.8;
+  return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+}
+
+// ─────────────────────────────────────────────
+// INTERACTION
+// ─────────────────────────────────────────────
+function selectNode(d, data) {
+  selectedNode = d;
+  const panel = document.getElementById('side-panel');
+  panel.classList.add('open');
+  document.getElementById('panel-title').textContent = 'Variable Detail';
+
+  const connections = data.links.filter(l =>
+    (typeof l.source === 'object' ? l.source.id : l.source) === d.id ||
+    (typeof l.target === 'object' ? l.target.id : l.target) === d.id
+  );
+
+  document.getElementById('panel-content').innerHTML = `
+    <div class="node-name">${d.label.replace('\n',' ')}</div>
+    <div class="node-desc">${d.desc}</div>
+    <div class="connections-list">
+      <div style="font-size:11px;color:var(--text-dim);margin:12px 0 6px;text-transform:uppercase;letter-spacing:0.5px">Connections (${connections.length})</div>
+      ${connections.map(l => {
+        const isSource = (typeof l.source === 'object' ? l.source.id : l.source) === d.id;
+        const otherId = isSource ? (typeof l.target === 'object' ? l.target.id : l.target) : (typeof l.source === 'object' ? l.source.id : l.source);
+        const otherNode = scenarios[currentScenario].nodes.find(n => n.id === otherId);
+        const color = l.type === 'reinforcing' ? '#e05c5c' : '#5ca8e0';
+        return `<div class="conn-item">
+          <div class="conn-dot" style="background:${color}"></div>
+          <div class="conn-label">${isSource ? '→' : '←'} ${otherNode ? otherNode.label.replace('\n',' ') : otherId}</div>
+          <div class="conn-type" style="color:${color}">${l.label} ${l.lag}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+
+  // Highlight connected links
+  linkSel.classed('highlighted', l => {
+    const src = typeof l.source === 'object' ? l.source.id : l.source;
+    const tgt = typeof l.target === 'object' ? l.target.id : l.target;
+    return src === d.id || tgt === d.id;
+  });
+  nodeSel.classed('highlighted', n => n.id === d.id);
+}
+
+function highlightLoop(loopDef) {
+  linkSel.classed('highlighted', l => {
+    const src = typeof l.source === 'object' ? l.source.id : l.source;
+    const tgt = typeof l.target === 'object' ? l.target.id : l.target;
+    return loopDef.nodes.includes(src) && loopDef.nodes.includes(tgt);
+  });
+  nodeSel.classed('highlighted', n => loopDef.nodes.includes(n.id));
+}
+
+function closePanel() {
+  document.getElementById('side-panel').classList.remove('open');
+  linkSel.classed('highlighted', false);
+  nodeSel.classed('highlighted', false);
+}
+
+function openLoopsPanel() {
+  const data = scenarios[currentScenario];
+  const panel = document.getElementById('side-panel');
+  panel.classList.add('open');
+  document.getElementById('panel-title').textContent = 'Feedback Loops';
+  document.getElementById('panel-content').innerHTML = `
+    <div class="loop-legend">
+      ${data.loops.map(l => `
+        <div class="loop-item" onclick="highlightLoop(scenarios['${currentScenario}'].loops.find(x=>x.id==='${l.id}'))">
+          <div class="loop-badge ${l.type}">${l.id}</div>
+          <div class="loop-info">
+            <div class="loop-name">${l.name}</div>
+            <div class="loop-desc">${l.desc}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:16px;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:11px;color:var(--text-dim);line-height:1.6">
+        <span style="color:var(--red)">■</span> <strong>Reinforcing (R)</strong> loops amplify change — can create vicious or virtuous cycles.<br><br>
+        <span style="color:var(--blue)">■</span> <strong>Balancing (B)</strong> loops resist change — they stabilize the system toward a goal.
+      </div>
+    </div>
+  `;
+}
+
+function openAddNode() {
+  const name = prompt('New variable name:');
+  if (!name) return;
+  const data = scenarios[currentScenario];
+  const newNode = {
+    id: 'custom_' + Date.now(),
+    label: name,
+    desc: 'Custom variable added to the model.',
+    category: 'default'
+  };
+  data.nodes.push(newNode);
+  loadScenario(currentScenario);
+}
+
+function showTooltip(e, d) {
+  const tt = document.getElementById('tooltip');
+  document.getElementById('tt-title').textContent = d.label.replace('\n',' ');
+  document.getElementById('tt-body').textContent = d.desc;
+  tt.classList.add('visible');
+  tt.style.left = (e.clientX + 12) + 'px';
+  tt.style.top = (e.clientY - 20) + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('visible');
+}
+
+function toggleFilter(type) {
+  activeFilters[type] = !activeFilters[type];
+  const chip = document.querySelector(`[data-filter="${type}"]`);
+  chip.classList.toggle('active', activeFilters[type]);
+
+  if (type === 'reinforcing' || type === 'balancing') {
+    linkSel.style('display', d => {
+      if (d.type === 'reinforcing' && !activeFilters.reinforcing) return 'none';
+      if (d.type === 'balancing' && !activeFilters.balancing) return 'none';
+      return null;
+    });
+  }
+  if (type === 'nodes') {
+    nodeSel.style('display', activeFilters.nodes ? null : 'none');
+  }
+}
+
+function zoom(factor) {
+  svg.transition().duration(300).call(zoomBehavior.scaleBy, factor);
+}
+
+function resetView() {
+  svg.transition().duration(500).call(zoomBehavior.transform, d3.zoomIdentity);
+}
+
+function toggleForce() {
+  forceActive = !forceActive;
+  if (forceActive) {
+    simulation.alphaTarget(0.1).restart();
+    setTimeout(() => simulation.alphaTarget(0), 2000);
+  } else {
+    simulation.stop();
+  }
+  document.getElementById('force-btn').style.color = forceActive ? 'var(--green)' : 'var(--text-dim)';
+}
+
+// Drag
+function dragStart(e, d) {
+  if (!e.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x; d.fy = d.y;
+}
+function dragged(e, d) { d.fx = e.x; d.fy = e.y; }
+function dragEnd(e, d) {
+  if (!e.active) simulation.alphaTarget(0);
+  d.fx = null; d.fy = null;
+}
+
+// Save
+document.getElementById('save-btn').addEventListener('click', () => {
+  const svgEl = document.querySelector('svg');
+  const blob = new Blob([svgEl.outerHTML], {type:'image/svg+xml'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ecoheart-${currentScenario}-model.svg`;
+  a.click();
+});
+
+// ─────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

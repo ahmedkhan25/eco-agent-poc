@@ -1,0 +1,352 @@
+DEPOSITION SUMMARY: test4
+Date: 3/12/2026
+
+FULL TRANSCRIPT
+----------------------------------------
+[00:00:00] Unknown: because i was in such a rush to do this today but obviously this isn't what you would be doing but recall ai is an infrastructure provider that kind of provides transcription services and meeting bots for all these different platforms for google meet for zoom
+[00:00:19] Unknown: for all of them basically all the different providers the meeting providers i set up a quick recall ai environment where i can get a bot running so that i could have webhooks that i can so that when a bot runs it captures a video call of a meeting it then transcribes the meeting and it gives me webhooks that i can validate that the meeting started that the participants started talking the meeting ended and so forth so i set that up again i set this up on the free trial plan that they have and then in the actual application so right now it should be running
+[00:00:58] Unknown: i got a bunch of these going
+[00:01:00] Unknown: okay okay so here you go so it's actually recording what we're saying
+[00:01:05] Unknown: because it's joined the call
+[00:01:07] Unknown: and you can see it's recording it hasn't listed me ahmed khan because i don't think i have my name on the meeting invite but it did get the recording in and so it is transcribing and what's happening is that every event that it captures it will start transcribing and adding to the meeting transcript and right now obviously i just got this set up literally like ten minutes ago so there's some bugs i have to work through to show the person on the call but it is transcribing and so if i look at the case information right so let me walk through this a little bit so you can set up a case so you can upload your files in this case i have some existing files i created with ai for a hypothetical case so let's ask the docs like what is in this case about
+[00:01:58] Unknown: and you see that it's referencing the docs i've uploaded right so i've got three docs here that i've uploaded it's saying this case is this is just a test case about racial discrimination so the case is johnson versus meridian about a software engineer who's claiming racial discrimination and i can say so what is ahmed related to this case
+[00:02:26] Unknown: so ahmed is the senior software engineer at meridian he's a key witness he's a plaintiff is marcus johnson's closest peer and the infrastructure and this event happened his deposition is scheduled to cover this and then there's some deposition notes
+[00:02:37] Unknown: and based around this i can generate an outline on what i need to do
+[00:02:43] Unknown: as a deposition taker
+[00:02:45] Unknown: and it's going to generate an outline
+[00:02:49] Unknown: what's your initial role what is your performance review like what a document changes you need and related to and now you can look at the case documents to validate this
+[00:02:59] Unknown: if i go to the case documents
+[00:03:03] Unknown: i think i'm just sharing my window about this
+[00:03:08] Unknown: share the documents
+[00:03:10] Unknown: yeah it's like a pdf previewer that will open
+[00:03:13] Unknown: it
+[00:03:15] Unknown: let me do this like that so let's just do the whole screen
+[00:03:22] Unknown: it's
+[00:03:23] Unknown: funny that we actually use recall ai in the past and then we deprecate it because attorney doesn't want to
+[00:03:30] Unknown: well
+[00:03:31] Unknown: i've got thoughts about all this because diving into this when you dive into it yourself then you're like oh okay now i see where that would be a problem okay
+[00:03:38] Unknown: now
+[00:03:38] Unknown: i see
+[00:03:40] Unknown: but this is great
+[00:03:42] Unknown: i only did this since noon this morning give me a little give me a little
+[00:03:49] Unknown: yeah this is amazing i think in the past i have interviewed people who actually show something similar
+[00:03:57] Unknown: but nothing is as in depth as what you have right now
+[00:04:00] Unknown: yeah
+[00:04:01] Unknown: and i'll share this link with you it is live i'll put a password behind it and i'll show you the repo so you can share it let me just send this to you guys right now so you can play with it obviously it's something i just coded today so if there's any bugs i really have to i'm going to have to work through it
+[00:04:17] Unknown: oh good
+[00:04:18] Unknown: probably
+[00:04:18] Unknown: thank you
+[00:04:22] Unknown: i'll link to this
+[00:04:25] Unknown: what else in the chat
+[00:04:36] Unknown: zoom
+[00:04:38] Unknown: oh the chat
+[00:04:39] Unknown: oh there it is i got it
+[00:04:41] Unknown: okay
+[00:04:41] Unknown: yeah
+[00:04:43] Unknown: okay
+[00:04:44] Unknown: so i'll put a password behind this it's not password protected right now and there's no user there's no obviously user authentication or anything it's just a demo and i will send you this behind a password and also the repository i created for this for the code with the two services the application and the two services that are running
+[00:05:06] Unknown: just
+[00:05:07] Unknown: for a reference if you want to share that with your team just to understand
+[00:05:13] Unknown: i'm going to see if i can get it working enough to get the deposition today but that's probably going to be about it okay yeah so i did take the deposition now you see it's live and it's taking everything that i'm saying here you see that
+[00:05:25] Unknown: so
+[00:05:25] Unknown: it is capturing it obviously there's a delay there's issues with the joining delays and things like that but i didn't going into the application the view is giving the notes to the deposition taker as it's going and it's supposedly trying to flag contradictions but i don't think that's working correctly yet it's working enough and i think for two hours not bad
+[00:05:54] Unknown: absolutely this is not definitely something i
+[00:05:57] Unknown: don't know
+[00:05:59] Unknown: for most people i think if they want to vibe code this kind of thing is probably not going to it's probably going to take them more than two hours
+[00:06:07] Unknown: okay so aman maybe we can dive into one of the areas of this this one's amazing so for example for the document processing piece in the real world scenario we would have a lot of different types of files right medical records you can get different kinds of tables forms and scan the handwritten notes how would you architect a system that actually understands these documents and then enable our other ai workflows to quickly retrieve the most relevant information from the knowledge base yeah
+[00:06:43] Unknown: that's a great question and i think that what you're you know so everything i did here was just to get myself under you know kind of situated contextually but it's not what i would build as a production architecture you know and the system is basically a pfc so now the question is what's you know how do we productize this system and make it scalable and one of
+[00:07:05] Unknown: the
+[00:07:05] Unknown: and the question you're asking is one of the core ones which is the document ingestion pipeline and how do we you know how does that document ingestion pipeline support all forms of unstructured data that's going to be passed into the system and then be parsed and validated across the system you know for the for the for the features for both chunking for both relevance and for kind of validation and you know right now in the system the way i built it i've got an s three bucket where there is a retrieval augmented generation ingestion process and i'm using postgres vector database to do chunking on document sets and i'm pulling documents that are either pdf's text or docx word docs as the format but it's not it's not complete unstructured it's not complete it's obviously just a toy version so there are a couple of things here right so one is we need to build a full pipeline and you'd want to build a pipeline
+[00:08:09] Unknown: that's running i don't have it running here
+[00:08:13] Unknown: but
+[00:08:13] Unknown: or you want a google doc or something
+[00:08:16] Unknown: oh i can just see this next scala draw but i've got like
+[00:08:19] Unknown: yeah sounds good
+[00:08:21] Unknown: i've actually got another tool i built myself that i'm using let's
+[00:08:26] Unknown: see if
+[00:08:26] Unknown: i got that
+[00:08:27] Unknown: whatever tool you want to use you just build yourself
+[00:08:30] Unknown: well
+[00:08:31] Unknown: you know what it's weird because so i'm working on this idea it's more of a it's like a system architect idea and the idea is i'm basically using opus i love opus right and i love excalidraw and i kind of combined opus with excalibur with an mcp and i said that you know so like one of the things i was looking to do was like how can i scale and how can i noodle on ideas right
+[00:08:55] Unknown: so you
+[00:08:56] Unknown: know like i will say like i you know i can start with like i want a large scale
+[00:09:04] Unknown: doc ingestion
+[00:09:06] Unknown: pipe line
+[00:09:09] Unknown: or legal teams
+[00:09:32] Unknown: and and the idea here is i don't want to you know because honestly i want to sort of get to my own real thoughts on this but i just want to show you the idea here is i built this so that i can start visualizing you know so when i think ai is so good for right is the ability to rapidly ideate on a concept and then completely kind of explore it from different aspects and and to do that properly you have to have the human in the loop in terms of understanding the problem and understanding what the ai is proposing and then kind of guiding ai where it's right and wrong and where it's hallucinating so from so this is the thing about the organization and how we use ai you know i think this is a challenge that we have with with software engineers is that they're kind of very thinking in one approach and they don't understand that the ai is presenting you a whole option library of possibilities and you can kind of use that for your own ideation and innovation purposes
+[00:10:32] Unknown: so it doesn't mean so when it comes up with an architecture or something like that i don't mean that that we follow that architecture but what we can do is we can use aspects of this to iterate to ideate and kind of you know and then work on and then explore and then maybe launch agents to experiment and create quick pocs and then validate the idea further so i think that i think we're beginning to understand so our skills with how we use these tools is super important
+[00:11:00] Unknown: and i think that's something that as an organization you'd have to build across the board with the whole team and that requires kind of coming up with all these different ideas
+[00:11:09] Unknown: to
+[00:11:10] Unknown: do that now in this case i've got this in generic mode it'll it'll sketch out architectures in different in different modes what i need it to be and also then i can kind of go in and i can take a particular piece and then estimate the cost of building it and research variations and build specs around it so i kind of use this very heavily and i haven't found a tool that does this on the system architecture level so i kind of built this i'm thinking of actually you know open sourcing this or you know making this a tool itself and so selling this or something but anyway i built
+[00:11:44] Unknown: this last
+[00:11:45] Unknown: week and i was like wow this is really useful because i was i've been using it every day now
+[00:11:49] Unknown: and
+[00:11:50] Unknown: i'm like okay this is you know why it's useful it's because i can noodle i can go in and say
+[00:11:54] Unknown: well
+[00:11:54] Unknown: yeah
+[00:11:55] Unknown: you know like
+[00:11:56] Unknown: a
+[00:11:56] Unknown: lot of my a lot of my team members will love this like they they draw these kind of like diagrams every day with ai but like if they control this and easily can tweak it instead of just like draw these you know mark down they will love it yeah
+[00:12:09] Unknown: that's what i was thinking because i'm using an excalidraw plugin an excel excel draw has an mcp so the ai is talking to the ncp to write on excalidraw but it's a plugin so it's just in separate instance in my own server so i'm not i don't have to pay for excalidraw and then the other thing here is that i can change things you know in the definition so i can say hey look i don't want it to be a network scanner i want it to be maybe a wide
+[00:12:34] Unknown: that
+[00:12:34] Unknown: was a bet that was a bad look because actually i do need this over scanner there but let's say i want this to be email and media ingestion
+[00:12:41] Unknown: for example
+[00:12:43] Unknown: email and notification
+[00:12:45] Unknown: so then i can i can noodle on these concepts right and now it knows that i added notifications right so i can explain this or i could research pricing on this and it'll kick off a researcher well we're going off topic so let's go back here but i think this is really scared so the concept here though is that you know we we have multiple sources of unstructured data that we want to build our our platform to ingest and we want it to be you know both we need to look at it from a non functional and functional requirements perspective in the sense that you know what's the scale involved who are the you know who are the users how quickly does it have to you know and i think that what we're saying is we want near real time ingestion on the pipeline when we do all these doc updates because people are going to be sending dogs changing docs updating media so they're going to have this one you know so so the question is is how operationally are they going to use the ingestion pipeline and that kind of is dependent on how the system of doing depositions and uploading case files or integrating with existing folders and data sources works right in the current so some of this the architecture i would recommend depends on understanding how the users is this a deposition attorney or whatever you call them
+[00:14:41] Unknown: i would kind of walk through with you but in the case of speed we just want to assume that there's a lot of documents of different types that they must need to ingest what we'd want to do is have a multi phase ingestion pipeline the one that's sketched by this diagram is somewhat useful but i mean i want to basically explain that
+[00:15:08] Unknown: we want multi phases of that pipeline so that let me just kind of map this out here quickly but basically when a document is brought in into the system that there is an identification of the document a classification so first of all identification that there's an event that happens at the dock is brought to the system
+[00:15:35] Unknown: so ingestion
+[00:15:40] Unknown: and then
+[00:15:46] Unknown: followed by
+[00:15:49] Unknown: classification
+[00:15:51] Unknown: so you need a rapid classifier right so you want to be able to just be able to drop things in which right now there's many we can probably just do that very quickly with the current front end abilities but that may require but it could be that your classification system requires ai here because
+[00:16:13] Unknown: you determine this
+[00:16:15] Unknown: is
+[00:16:15] Unknown: determine the complex types of a document
+[00:16:17] Unknown: yes
+[00:16:18] Unknown: and it's more than just that we can go to the whole flow of classification
+[00:16:23] Unknown: we
+[00:16:24] Unknown: can say first let's classify the doc type
+[00:16:26] Unknown: then let's classify is it a media doc is it form of media is it a text file of some kind like a word doc or a text file or a pdf is
+[00:16:38] Unknown: that
+[00:16:38] Unknown: mixed media is it on the audio clip right so there's classification of the formats which is very easy but then the question is classification of the type which is in order to do classification of the type legal type classification you need to have some semantic understanding of the document right so then it becomes legal classification
+[00:17:00] Unknown: legal type classification
+[00:17:01] Unknown: and then
+[00:17:04] Unknown: and then we kind of go into well okay so then what are all the different legal types depositions case i don't know case i'm not a lawyer but all the different variations on legal documents that they are as well as whether or not it's a recorded and this is where i would kind of work with you and kind of understand what are all your types of case documents that you get
+[00:17:26] Unknown: and
+[00:17:26] Unknown: then you would kind of i would rank them then in terms of the volume of documents you get for each type and kind of focus the system on the ones that have the most volume and the most value for the litigation team
+[00:17:40] Unknown: this whole system would be it would be one set of ai and ai agent right that's the classifier this is a classification system then there's the ingestion system so it's a classification
+[00:17:54] Unknown: i'm kind of sorry i'm going really fast for this let's just do this
+[00:18:12] Unknown: so the ingestance system is the actual taking unstructured data and taking that so unstructured data means it could be tables it could be pdf with images inside them it could be case law with lots and lots of text in certain formats
+[00:18:32] Unknown: so then we need to have an ingestion system
+[00:18:35] Unknown: that identifies now that we've classified it we need to say okay we want the ingestion system to be able to chunk the data
+[00:18:43] Unknown: into classifiable ai embeds that we can use in the rag system and all the rest of processes and
+[00:18:58] Unknown: traditionally in nlp that's called named entity recognition but basically what we're saying is we want to be able to chunk this in different ways and i worked at a number of rag systems and there's a bunch of philosophies and kind of approaches we do in rag some of the more popular ones have been what's called building a knowledge graph which is basically building a chunk building a tree and then followed by chunking aspects of the tree of the knowledge tree of relationships in the document itself and the relations of the document around it and so that's one approach we can do to chunk also the choice of the embedding systems that you use there's multiple embedding systems that are focused on using ai models to do chunking in a more specific way for legal documents so there's a legal embedding model that's used i'm sure i'm kind of repeating things you probably already know i'm just saying these are the so these are things we would do to kind of identify the right embedding vectors for your system you also want to be able to handle the scale we're talking about and so we're talking about advanced scale so i don't know what your production vector database or approach has been there's different and there's different trade offs right now in terms of what you choose so now if you are building this at scale if you need slow vector system s three has this s three vector if you want expensive vector databases and we v eight and pinecone have these very elaborate fast paced dimensional stores and then postgres sql is kind of like the swiss army knife the pg effect is used for lots of startups
+[00:20:47] Unknown: so there's all sorts of variations there that we can go to an engineering decision we can go to depending on what your goal is but it really goes on we can walk through that based on the real scaling the real production use cases and as well the models we're going to be using and the cost and token cost of us to use as well as the privacy and security aspects of it so now because we're legal operation we're going to have to we're going to have to have a strict auditability soc two compliance and pii protection as well as and so there's a whole layer we have to build around security which i'm sure that you've been you know you've worked on as part of this pipeline
+[00:21:32] Unknown: so
+[00:21:33] Unknown: as to keep and i don't know what the legal requirements are around pii for legal but i've done hipaa and i've done it for in our compliance processes for certivo where i work there so we can create guardrails in terms of the ingestion we can create ways for the front end ai to not expose certain things to other people in the team we can have role based controls and access controls on the front end data so that only the authorized legal representative is able to see the data so there's questions around there on the security and the access but i think fundamentally your driver is probably going to be scale and performance to get because obviously you're in a startup mode you want to have customers look at this system and have it perform in near real time purposes so i think the fundamental driver is going to be performance and accuracy and accuracy on the results every chunk has to be pointing to the right document and that is driven by the chunk size
+[00:22:34] Unknown: semantic mapping that the knowledge graph and there's ways we can do that as the models themselves as their context windows increase that becomes easier to handle modern frontier models have better needle in a haystack capabilities so
+[00:22:49] Unknown: there's
+[00:22:49] Unknown: a lot more
+[00:22:51] Unknown: we're
+[00:22:51] Unknown: kind of seeing we're kind of seeing the models overlap on the old the rag pipeline in the sense that the model itself is getting better at finding data finding key data inside of large document sets because of the better ability for needle in a haystack inside of the context window so there's a whole bunch of trade offs we have to do in engineering and it's changing literally every three months so what i would recommend what i did for certivo is not what we would do here i'm sure that once you built three months ago is updating so this is a challenge for the engineering team
+[00:23:23] Unknown: here
+[00:23:24] Unknown: how do you keep up
+[00:23:25] Unknown: because
+[00:23:25] Unknown: there's new technologies new capabilities coming out literally every other day
+[00:23:31] Unknown: that's simply a challenge that we have to make sure that our engineering team is able to handle so that we are in front of that wave of change while also maintaining a stable product
+[00:23:46] Unknown: yeah what is her recommendation to deal with that
+[00:23:49] Unknown: you mean the change question with the change question yeah
+[00:23:54] Unknown: yeah
+[00:23:54] Unknown: yeah especially like so many things are changing like how do you make the trade offs like okay what are the technology and framework that we will select today
+[00:24:03] Unknown: i would not be too opinionated about the framework i choose and not build too heavily in any framework so that i'm so dependent on it that i can't switch it up having said that modern coding tools like code like claude and opex and these now idea of fleets of coding means you can kind of switch out quickly because you can kind of it's easier for llms to take one thing and just switch it with another it's very good in mapping which is something that humans are bad at doing so
+[00:24:30] Unknown: there's
+[00:24:30] Unknown: that question
+[00:24:33] Unknown: whenever i look at my assumptions i like oh that's going to be a two week project well when i do it with the lm i'm like oh i can do this in one day in one hour and so that's the question right so it's it's a very hard question to answer i would do it through my intuition and knowing the team so the first question i would have is like just kind of getting to understand what the team is what their scope for that team is uh and then what your goals are for your future as you expand the organization
+[00:25:00] Unknown: um and to make sure that you're hiring a team that has some core that there's a core members in the team who can support the product as is and keep that in a very you know sre kind of format like you know ability
+[00:25:12] Unknown: but then there's also the folks who are pocing and examining the new you need somebody who's out there on the waves who's trying all the new things right you need that person or that team depending on how big the company
+[00:25:24] Unknown: yeah that's that's exactly like what i need for the architect as well you
+[00:25:29] Unknown: need something there and then you but you need somebody also who's the who is the guard who's the security guard who's kind of
+[00:25:35] Unknown: looking at
+[00:25:35] Unknown: it and saying well no this is not going to fly because this is not hipaa compliant this is not um you know legal you're not getting audibility oh you're going to get you need so you need a review and you know the way i've structured innovation teams before in larger companies where we you know the innovation team concept is very powerful so you want an innovation team inside of your organization that's always pushing the boundaries and you want the rest of the folks you want the other folks around you pushing back and you want that kind of you want that kind of
+[00:26:06] Unknown: if you're not
+[00:26:06] Unknown: having friction there there's a problem if somebody's not saying hey we need to be doing this and somebody's not saying no you can't
+[00:26:13] Unknown: then
+[00:26:13] Unknown: there's something wrong it's too nice in some levels because you're going to get because the technology moves so fast that you're going to get outpaced very quickly like literally i can build a lot of what deposley is in an afternoon right so you know and it's not because i'm any good it's just because you know the technology has gotten so fast that we can build things quickly and scope out and plan things in an idea very quickly it doesn't mean that that's a success factor in itself but it means that it means that as a team we have to put it on our you know put in our cells on guard um to handle this and strategically as an organization you have to make sure that you have people on board
+[00:26:54] Unknown: that are going to be pushing for that uh and it needs to be innovators um so that's a that's a
+[00:26:59] Unknown: personal question
+[00:27:01] Unknown: that's
+[00:27:02] Unknown: a person question um from but from the technical perspective there's other things so we want to make sure that the engineering team the dev teams and the product teams closely aligned we all have to understand the product very carefully like you have to in this ai world it's your understanding of the product and the product space and where you're going that brings you your moat or under your capability um you know it's where i don't understand diposley that i can't add a feature right like it's it's it's what i don't know that is my limitation not the ai ai has all this information but we don't our minds are our limitations here now and this is really interesting it's a totally different way than it was like two three years ago right uh working it means that we have to be as an organization ready to use these tools day and night uh for our operational approach uh we have to be we have to be willing to see where these tools are limited and somebody has to show that to the organ you know so you have to have educational
+[00:28:01] Unknown: you know you have to kind of organically and i can't i can't say you can't prescribe it top down it has to come bottom up really um among the team because the team member has to say oh look i've been using this tool and it's saving us time by doing this action you know five times faster here's how you do it
+[00:28:18] Unknown: and you have to have a trustworthy environment where everybody trusts each other enough to say oh that's a cool idea let me try oh okay that didn't work fine throw it away let's do something else but you want to have that in that in your whole team even among the teams that is not doing the innovation and to do that you kind of have to foster an environment that does that so that's an environment and you do that in different ways you want to make sure that your organization is positive to change in that sense in the startup i think by some nature you do have that most startups are pretty good at you know pivoting and figuring out if most surviving startups are pretty good at doing that stuff so i'm not too concerned about that at the early startup stage but it is something you want to think about when you build your you know as you expand your team and you get into your larger stages
+[00:29:08] Unknown: i'm confident i'm completely aligned there because you know even today all of my engineers are kind of like experimenting different tools like they one of them actually built our own developer experience technology
+[00:29:23] Unknown: so
+[00:29:23] Unknown: he's like you all of these like lunch allure sessions about like hey you can use this toy like i have all the skills you can use it's connected to super bit and everything right and then some other engineers they were like experimenting like a graphite and then we're using graph five for code review and all of that
+[00:29:40] Unknown: now
+[00:29:40] Unknown: so yeah i completely agree with you on that so that really resonate
+[00:29:46] Unknown: so here's the other challenge now so when you have a bunch of people like me and people like you talked about who are you know coming now the problem you have is that you get lots and lots of content and what i call semantic drift which is everyone has a creates tons and tons of code content you know diagrams processes and now everybody thinks their system is cool because they built it themselves with ai or whatever and they're like oh this is let's so how do you keep yourself aligned right how do you keep yourself aligned and what happens is there's an alignment problem this happened in certivo where the pm and myself and the ceo we were all using ai tools and we were all coming up with
+[00:30:28] Unknown: strategies
+[00:30:29] Unknown: and now you had fifty different
+[00:30:32] Unknown: documents
+[00:30:33] Unknown: or you had fifty and so the challenge there is how do you align semantically and i think that's also a people question and we can have a process in which we say okay you know let's vote this up the chain or let's let's anybody
+[00:30:46] Unknown: can
+[00:30:47] Unknown: come up with an idea we bring in the tool we try it
+[00:30:50] Unknown: it didn't work you know it works for one person but it doesn't look across the organization because of xyz okay vote it down let's go to the next one and then we'll you know and let's kind of keep us going and in the meantime let's follow the steady state but the challenge is is that you know with code especially we're producing intense amounts of code uh and this whole idea of orchestrating agents is kind of where we're heading toward uh with these tools right now it's not there yet but we are kind of going there and as a developer as a software developer it's a very scary thing because code is our only you know we're very we're very detail oriented when it comes to code and what this does is it kind of forces you one level up to be less detail oriented because you just can't manage that level of code humanly uh in your in your memory and it's just not possible as you get
+[00:31:36] Unknown: and
+[00:31:37] Unknown: so you end up having so you have to have guardrails and approaches and devops approaches for like you don't want a developer to dump a five thousand line pr on your pipeline you know or one hundred file and so you got to have a but at the same time you want that an innovation guy to let him go and do that stuff independently so you can you know figure out the path for the company she's kind of like the explorer he's kind of going out and doing all these things
+[00:32:02] Unknown: coming back and saying okay these things work but that but at the same time you want to have you know a mature and stable development pipeline on your features so that this feature is vetted especially in an illegal organization where you're going to have audits and all that kind of stuff so if you have a double challenge but it's also you know that's also your moat because you're spending all that time doing that together
+[00:32:25] Unknown: i feel like that's if you're doing it well then that's your moat because it's going to be hard for somebody to catch up with that even
+[00:32:31] Unknown: if they get
+[00:32:31] Unknown: the technology right yeah
+[00:32:33] Unknown: yeah exactly exactly and we're definitely building with some really complex workflow um
+[00:32:41] Unknown: the integration stuff as well but like i get what you're saying on the on the process level of like how do we determine the tools that everybody can use to improve their productivity i think currently we were just having really open conversations to talk about when i do see when things get too complex everybody in the room will call her hey can we make this simplified first and see if
+[00:33:04] Unknown: everybody
+[00:33:05] Unknown: can use it at least through a very basic example like okay i have a jewish test i used the tool to actually work on it create a work tree and branch and then publish a pr if everybody thinks that this is a really cool float let's do it and then we can expand onto the like scales how do i use that how do i do that
+[00:33:21] Unknown: absolutely
+[00:33:22] Unknown: something simple
+[00:33:22] Unknown: yeah yeah i think that you're absolutely right i think going with a simple use case is a great way to map out whether a new workflow is going to work remember humans are really hard at adopting new workflows this is the challenge i've been looking about this very deeply it's not that the ai is great ai is great the tools are going to be great but but having humans change as i'm sure you've had your doctors of your your customers right this is the problem you have with your customers
+[00:33:46] Unknown: is
+[00:33:47] Unknown: that they're used to doing things they get and as you get older you get used to doing things a certain way um and that challenge is something that is not going to be easily you know surmounted unless the tool does everything for you um so so that one way to look at that is you know is when we do these kinds of mappings there's the human journey um and i think this is where the product owner or the you know there's some human factors used to be human factors we used to have you know ux researchers in our old way of working and people who were very focused on how the customer interacts and how you know how that developer experience might be for the developers who's building this to kind of understand the pain points but now because things are changing so quickly we're kind of blowing these things out of the water before we even have a chance to kind of understand whether or not this works but it just works because it creates so much code or does you know
+[00:34:41] Unknown: and
+[00:34:42] Unknown: so in that wild west i think that you have to you know you have to have an environment that is both accepting of this change but also is gated enough that you you can you know we can vet each new idea successfully uh
+[00:35:01] Unknown: yeah
+[00:35:02] Unknown: we're very openly
+[00:35:03] Unknown: so let me ask let me ask you a couple of questions in terms of your current work like so how many devs do you have and you don't have to tell me that you know exact details but just like you know like what is your current scope and what is your like next immediate let's say trash of a capability that what kind of dev team are you looking to have for that
+[00:35:23] Unknown: yeah
+[00:35:23] Unknown: yeah so let's get so currently i have four engineers three senior engineer one junior engineer who she's amazing it was kind of boring to coding so all of them are very respectful resourceful and i'm looking to hire so towards the end of the year we're looking to grow to around a
+[00:35:48] Unknown: twenty twenty person organization under product development so we'll get we'll have engineers we'll have ai you know the principal arctic maharim and then some ai ops engineers and then at least two security engineers at the security guard and we also want to have maybe a couple qa engineers because we're dealing with a very complex workflow software space
+[00:36:14] Unknown: so we
+[00:36:15] Unknown: want to make sure and especially our model of working with all these core reporting agency they have different features to be enabled and disable we want to ask rigorously of all of these scenarios right
+[00:36:43] Unknown: the organization is growing by a factor of two or three let's say in the next couple of months or year over the next year or so yeah
+[00:36:52] Unknown: i would say probably like so right now it's like four or five and then growing to twenty twenty five so probably a four to five times four
+[00:36:59] Unknown: to five okay four to five okay so four to five four x five x in growth so that means that you're gonna you're gonna lose the so the trust and the you know that you have the core small team everybody knows each other they're all working as soon as you get over the pizza team size now you're going to have to now you're getting into the you know engineering management becomes important right before engineering management it's good to have but you know after that now you're above the peace and team size now you want to go to an em role right and you want your em or you want your self organizing team to be kind of you know be able to go cross functionally across these different domains enough
+[00:37:33] Unknown: yeah exactly
+[00:37:33] Unknown: and so how do you do that right how do you handle that so there's aspects there that we can look at um and also how does the tooling work when you have all these cooling changes you're going to have to keep these teams in sync you know api first but not even api versus doc first spec first as we're talking about with these tools um and the tools and the models are going to change in the next year who knows like you know it's going i expect
+[00:37:55] Unknown: great
+[00:37:55] Unknown: great changes on these as well so i think for your ai engineer this is a role that's very exciting because you can you know you kind of have to be at a fast pace with with with the tool changes um i think that the person who's good for that role is not going to be the good guardrail guide the security guy that's why it's a good idea to have a separate person to do that
+[00:38:15] Unknown: and
+[00:38:15] Unknown: develop and to be the buffer on anything that
+[00:38:18] Unknown: you
+[00:38:18] Unknown: know they so they come up with the idea the other guy says no this is not you know doable because this is you know break her as well as
+[00:38:25] Unknown: i'm actually just hiring i'm actually just interviewing with a security engineer as well
+[00:38:30] Unknown: right and do you have other folks in the legal space or at least in the deposition who know enough to
+[00:38:38] Unknown: garner your
+[00:38:38] Unknown: your system to understand hey look this is not how an attorney would would take this deposition or this
+[00:38:45] Unknown: is not
+[00:38:45] Unknown: how the organization really works or maybe
+[00:38:47] Unknown: do you have
+[00:38:48] Unknown: programs
+[00:38:49] Unknown: yeah
+[00:38:50] Unknown: we have a couple ways to absorb feedback right now uh we just hired our long term advisor as our chief legal officer she worked at amla two hundred firm and it was associate general counsel from a fortune five hundred company as well so and then because of the big corporate agency partner that we work with they shirt extensive amount of feedback on how attorney works so those are two major sources of feedback that we're getting that
+[00:39:21] Unknown: was my problem with certivo because i didn't have we didn't have inroads with our early clients we had relationships we gave them the tool but we didn't once they started using it then we got all the problems because we didn't we didn't get enough good feedback from the actual people using the tool until it started getting used can
+[00:39:37] Unknown: i tell you a story of that
+[00:39:39] Unknown: yeah oh
+[00:39:40] Unknown: let you finish first on my sorry
+[00:39:41] Unknown: no no no no okay go ahead i'm sorry oh
+[00:39:44] Unknown: okay good so the story was like because the ecosystem that's established our platform working with the core boarding agencies uh we first worked with our biggest corporate agency partner like the top three in the in the united states they're really a great team they share so many extensive feedback and we i totally see your point because of that and now when we're demoing our product for the current agency to other four point agencies they were all like oh my god this solves all of my problems i w this yesterday
+[00:40:21] Unknown: what i liked about your product was that because i was looking at supio i remember i talked to suvio a while ago and they seemed like all over the place and you guys seemed focused that's what i liked about your like it's a very specific thing right you've got a specific thing and now you can expand on that you targeted
+[00:40:38] Unknown: you put
+[00:40:38] Unknown: your footprint down and you can expand because now you'll have inroads with the people who actually use it and now you can see okay that's where it should go you know it's it's so so that to me is is powerful for where you are i do think that you know anthropic and these big ones the big providers
+[00:40:54] Unknown: they are going to increase their capabilities and they are going to take some of the market where people are just going to use straight up claw enterprise whatever you know versus going to a startup
+[00:41:07] Unknown: for our use cases actually a little bit different because of the because like right now the product that you're seeing on our website is basically like whatever the end user the attorney is using it doesn't really include any demos of our product that's integrated with the core reporting agencies and that piece is actually the meditative process so like that central piece for the preceding integration like people need to use that
+[00:41:33] Unknown: no matter what so like if they use quad okay you're going to use two different platforms what if we
+[00:41:38] Unknown: have the same
+[00:41:39] Unknown: same or better capabilities that just embed into the same platform where you are getting your records right your testimony transcript and recordings that's where we're going we're going to establish that system of record and then expand like the entire litigation workflow
+[00:41:57] Unknown: have you seen and then i want to talk about a little bit like like five years out and you know like perplexity just came out yesterday with this thing called perplexity computer um what is it called here yeah this is just it's just a flyer it's just like a teaser for what they're planning to do right um i'll just share it here with you but the idea is it's kind of like the movie her
+[00:42:23] Unknown: and if you saw that movie but it's like it's
+[00:42:25] Unknown: like
+[00:42:25] Unknown: the ai is the os the ai is kind of operating the whole system
+[00:42:30] Unknown: um i feel like that eventually that's where we're going right
+[00:42:35] Unknown: and what i mean by that is more and more of these connectors and integrations are automating
+[00:42:44] Unknown: workflows
+[00:42:46] Unknown: by allowing ai discovery at the agent level um and you know obviously the whole open claw cloudbot thing that whole thing was about that right it was that
+[00:42:55] Unknown: if
+[00:42:56] Unknown: once you give the ai now that we the agents are smart enough
+[00:42:59] Unknown: uh agents are smart enough because the models are better models are better um agents are are better now now if you keep agents running out of loop and use enough tokens they're smart enough to do things before they work or you have to really guide them now they're smart enough to do some things now well what's the natural progression of this right so look let's see how it's going right so it's going to the point where it's self agentix is kind of working intentionality is working enough
+[00:43:24] Unknown: so that you know fully sustained loops that are happening where you where the human isn't watching things every every minute of the time now you have the idea of aios potentially happening where you could have
+[00:43:34] Unknown: ai operate the os and what that means is people like perplexity or open ai whatever are going to start releasing or microsoft or whatever are going to start releasing products that are running self sustaining uh ai operations on the on the hardware um enough to maintain and they're like your personal existent now as a user your user experience is going to be more personal assistant and you're getting and so if you're a startup and you have a saas tool you're going to need to you're going to be sure to have those expose those endpoints and hooks and capabilities so that these agents can easily run your system on this new environment right um and i think that's where it's going to eventually go where we're going to end up having specialized aios that are enterprise focused that have lockdowns and are expensive you know it's kind of like the next evolution of like how oss are working in browsers or working
+[00:44:27] Unknown: so i think that's
+[00:44:28] Unknown: where so i think that there's a long arm like in the next five years that we need to look at
+[00:44:33] Unknown: for any ai startup or any saas tool where don't forget that right now we're building for the web or we're building for a desktop app that's you know an electron app or something but remember that ai is going to be owning agents are going to own that and the way it operates and humans are going to be one level above kind of watching the results and saying okay no ai don't do this not know the postal you see what i'm saying so there's like one layer in between
+[00:44:59] Unknown: i see so so basically the user is asking the agent to do whatever they were doing deposit is doing good but
+[00:45:06] Unknown: then the agent is just calling the posley agent is if the posley is ready
+[00:45:39] Unknown: how do you think we could evolve our system to be more agentic
+[00:45:43] Unknown: so one of the things where you know so obviously making sure that we're on top of all these frameworks so there's a bunch of frameworks that are out there that have been you know google has created them anthropic has created them open ai has created them um you know a to a ag ui mcp obviously mcp everyone is using uh also the more what we're finding is that a lot of these frameworks they're in the evolutionary battle so they're going to go up and down
+[00:46:10] Unknown: we're finding that as the tools get better at calling they may end up being straight up clis instead of just full frameworks but either way you need to have that we need to have just like you just like in the in a web uh just like in the cloud world a few years ago everybody was api first amazon and api first you know same way we have to be agent first in the future like as we move forward so we need to have those exposed endpoints that allow agents to interact with our system and operate the system and that we have to make them secure we have to make them perform it and we have to make them scalable so that's its own separate layer now right in addition to ai api
+[00:46:46] Unknown: you want the api because eventually ai will be able to talk to apis but you also want this agentic canvas that can be accessed by agents so that the agents can kind of talk to each other and figure out when something needs to be scaled or something needs to be controlled
+[00:47:02] Unknown: because you want some
+[00:47:03] Unknown: intelligence in that now
+[00:47:06] Unknown: go ahead
+[00:47:07] Unknown: i'm just saying that the challenge with that is that it adds more non deterministic
+[00:47:11] Unknown: points
+[00:47:12] Unknown: of failure and basically right now the only way to do that is kind of just you know observe more observability and just kind of you know restarting things when they fail and just kind of handling that through you know kind of other monitoring agent and things like that but it's not really very easy to control failure points in those systems because they are non deterministic to a high degree um but you know people very smart people are working on those problems that open ai and anthropic so i'm pretty sure we're going to you know one way is just like the brute for you know the leroy jenkins kind of brute force open claw moldbot which was like i don't care about security let's just see what these things can do
+[00:47:50] Unknown: and
+[00:48:10] Unknown: and we're going
+[00:48:10] Unknown: to get something more secure but we are going to get there that's to me is like a no brainer that's where it's going gotcha
+[00:48:17] Unknown: yeah so basically like the with the with the with the agent eventually or what are users like instead of like just use these actions to click generating my drafting my entire ally is just like hey
+[00:48:28] Unknown: just chat with an agent hey help me drive the alley about this deposition like it's going to be a very seamless user experience set of the user needs to go through the workflow anymore
+[00:48:38] Unknown: or are you just going to log in your computer and the agent's going to know well okay
+[00:48:41] Unknown: it's fourteenth here's your five outline cases ready and here's the deposition here's your deposition
+[00:48:47] Unknown: outline ready for that one case coming up in the next five minutes you know the way google kind of does that
+[00:49:04] Unknown: and
+[00:49:05] Unknown: nobody cares
+[00:49:05] Unknown: about it
+[00:49:06] Unknown: but but because the agents are now better we can now now we can appreciate that technology and revisit it and build it correctly i think i think apple is very smart with that in that they you know apple is like well we're not jumping head first into ai because it's going to suck let's do this carefully but you're going to see they're going to come out with a much more robust and aware system than what they did originally with siri and so forth but but yeah like i know the trends are going there it's no doubt about that like to me in my head um the question is how fast and like how you know so for the immediate future your roadmap is fine but you definitely need to be aware so this is this is a job for the person who's kind of doing your ai innovation work is to validate and be ready for that as well as to be involved in the community to make sure that there's ai engineering meetups going on there's events there's lots of things going on in seattle and san francisco where you want to be in the tinker's groups you want to be in that space um community social wise you want your you want uh you know your dev relation i know that you're not a dev company so you won't necessarily have
+[00:50:14] Unknown: but
+[00:50:14] Unknown: you know those things are important uh this thing scales up um the right conferences and so forth just to keep up with those and you know we can build our own agents to kind of track these deep research is amazing right now like i i use deep research daily i set up a deep research agent every morning and i get hundreds of and it's more than i can handle so it's it's like you know so there's enough you know there's enough ways that we can figure out an injection pipeline and all the trends right to see where things are going
+[00:51:13] Unknown: we do we do we do want to have those advanced document understanding and the age intake more agentic workflow relatively sooner in q two q three so like you know i think i think this row is going to be amazing this we're going to have a lot of innovation and researching like those autonomy and also like very hands on experience actually experiment and ship those
+[00:51:33] Unknown: high impact
+[00:51:34] Unknown: stuff
+[00:51:35] Unknown: one of the things i would do is like have an internship program with the latest ml guys like bring in some of those young ml guys working in the university because they're often working on the more innovative thing they're working on the more innovative thing and they're not worried about business stuff so they're kind of working on cool technology research and nlp in transformers in multimodal and the you know diffusion models that are coming out so trying to get but those guys are expensive right so if you try to get those guys in if you try to get an expensive ai engineer with a phd in right now he's not going to be that useful to you i think because
+[00:52:07] Unknown: you
+[00:52:07] Unknown: know but but if you get like a couple of interns maybe and they you know and you say hey you want to work on a you give them a really interesting problem to work on that's an idea right that's where you can bring in
+[00:52:18] Unknown: right you know like i don't we we currently don't really see like super super high roi to fine tune our model per se or like do a lot of like the ml stuff but maybe there's a
+[00:52:29] Unknown: pattern
+[00:52:29] Unknown: that i don't understand
+[00:52:30] Unknown: i don't mean fine tuning a model and fine
+[00:52:32] Unknown: tuning
+[00:52:32] Unknown: model is not what you want to do because there's so much money in the being
+[00:52:35] Unknown: invested in the big
+[00:52:35] Unknown: models right so that doesn't make sense but embeddings right like let's say so embeddings is a model right it's an lm that you that you do for embeddings only right uh maybe there is something to be you know maybe there's a more optimization uh you can do on the current and those are open source embeddings you can take a look at all the ones that are coming and that's something i can do obviously i can get into
+[00:52:59] Unknown: but
+[00:53:00] Unknown: what i'm saying is is that maybe we can make it more accurate and we can make that part of our ip right um but
+[00:53:05] Unknown: that's something
+[00:53:06] Unknown: you want you
+[00:53:06] Unknown: mean the you mean you mean like a specific like tailor like legal embedding model that will help us to better find the most relevant information within our document
+[00:53:15] Unknown: exactly exactly that's your pipeline and there's different ways you can tweak that pipeline but one of the laborers in that is the embedding there's other things too i also think the speed can be you know the whole diffusion model thing is about speed i just tried a new model uh by inception labs which is like ten times faster um i was going to hook it up to this thing but i didn't but it's ten times faster than openai's endpoints um you know token wise token speed wise um and it's just like so when you have ten times faster it means you can quickly iterate much faster right now in case review i don't know if that's so great but maybe that's going to apply to rag or that maybe that could apply to like and i have to kind of think about this but i think that that could the speed can have other benefits right that that you don't necessarily get you know obviously openai's got the cerebras endpoint for coding that's fast and they built those giant wafer chips that they bought that company for but i'm also looking at where the technology is going and i know like i've got a friend in nvidia who's like they're working on stuff that they haven't released like there's things going on right like that technology wise there's lots of places where we can keep an eye on to see and i don't think that's obviously your immediate thing but but there's frameworks that are being built baml baml
+[00:54:33] Unknown: is one that
+[00:54:34] Unknown: i'm
+[00:54:34] Unknown: looking at
+[00:54:35] Unknown: i've used baml in the senior site that i'm using for doc parsing because i have all sorts of docs
+[00:54:57] Unknown: a
+[00:55:17] Unknown: give
+[00:55:18] Unknown: an advice on that
+[00:55:19] Unknown: but
+[00:55:19] Unknown: i think yeah but there might be places where it could be useful i also think that you know for enterprise i don't know if you do but like you know environments where you have to keep everything entirely private and guardrailed i don't know if you have that um use case or not
+[00:55:34] Unknown: you know maybe in the future because i know some of am law firms they require that but not all of
+[00:55:40] Unknown: them
+[00:55:40] Unknown: where we're currently not doing it because you know we just want to get as much as we can and then we
+[00:55:45] Unknown: can
+[00:55:45] Unknown: look into these taylor yeah
+[00:55:46] Unknown: that may not be a better yeah that might be something to do later on in your in your target uh but i think what you're doing makes sense you know from a strategy perspective so that makes sense
+[00:55:55] Unknown: awesome
+[00:55:56] Unknown: i mean dude like i've already learned so much for me just from one meeting and i personally really i think i think i'm really excited about like you as a candidate and i think i think if you're interested like we we we could i can definitely see us building a lot of great stuff together with a fantastic team but we do want to so if you're still interested i think we can schedule like outside so you can meet my co founder mitchell and our you know product executive as well uh and also my team in bellevue ca if you like this environment i'm just going to say like it's a very very good environment from my perspective because every day people are just like chilling and then very happy you work in a very happy birded
+[00:56:48] Unknown: no i mean that sounds good i really like to work in a place where people are friendly and there's not a lot of you know
+[00:56:56] Unknown: i don't
+[00:56:56] Unknown: know politics or whatever you call it um
+[00:56:59] Unknown: i've
+[00:57:00] Unknown: worked in all sorts of companies and last i didn't have a great i didn't have a great experience with certivo because of me and my
+[00:57:06] Unknown: ceo
+[00:57:06] Unknown: we had some issues so i am looking for something that you know it's a fun place to work where everybody's kind of like you know trusting each other trust is important to me trust and empathy right trust and empathy
+[00:57:18] Unknown: at all levels is important um so that's what i'm looking for from an work environment and a place where i can innovate like i want to i'm a curious person i'm i kind of get bored with like very strict so
+[00:57:33] Unknown: that's
+[00:57:33] Unknown: not my skills if you're looking for somebody who's very you know anal retentive or very detailed on one specific well that's not me i'm more of the idea guy if you ask me like that's but i've been very successful on that in many organizations all the way from nasa all the way to oil and gas to the startup world um i'm i am trying to get my own startup off the ground there's one that i'm working on and then just a couple ideas i'm working on but i would not if i'm working with you i'm just going to be full time or if it's going to be you know it's going to be focused on your company it wouldn't be my own um yeah
+[00:58:06] Unknown: and i and i and i and i totally get it like if you if you're in your spare time do you want to work on some other stuff i don't i don't i would not ask you to drop it
+[00:58:13] Unknown: but i would not i
+[00:58:14] Unknown: would
+[00:58:14] Unknown: not work on my stuff in your time is what i want to say is like
+[00:58:17] Unknown: i know i don't
+[00:58:18] Unknown: think it's fair to say that because i think do people do that it's not fair but yeah no if the idea and you know if the idea of the people and i'd like to meet your team and everyone and see for sure to kind of
+[00:58:29] Unknown: yeah sounds good and we're also in some in lay discussions with with a couple of vc's on our series a so that would also bring more stability and we're also targeting to move to a new office space but just the status for our current voting
+[00:58:46] Unknown: buddies have you brought in are you the cto or have you brought are you a ceo right like have you brought in a cto or is there no
+[00:58:53] Unknown: i'm the cto so my son
+[00:58:54] Unknown: my ctr okay
+[00:58:56] Unknown: my co founder mitchell who is the ceo yeah okay
+[00:58:59] Unknown: got it okay i just want to make sure you had a cto
+[00:59:03] Unknown: you know no i'm not i've you know i've never been a cto before and i was just an engineering manager at amazon and there's a ton of things i have to learn and i feel like you kept teaching me a lot like you know
+[00:59:19] Unknown: i don't want to be cto i was cto um of a bigger company of a forty person company and it's a lot bureaucratic responsibility more than
+[00:59:28] Unknown: like
+[00:59:29] Unknown: like i like the tech i like the ai engineer but you know obviously you have your ego you do like to have the name you know title but i like
+[00:59:37] Unknown: i
+[00:59:37] Unknown: like senior ai engineer that works for me well you know these are just at the start of these are just these are just what do
+[00:59:43] Unknown: you call
+[00:59:44] Unknown: yeah
+[00:59:44] Unknown: yeah
+[00:59:44] Unknown: you know they help your ego but they're not you know when you get bigger then you can say okay man i started this company that's way more i think prestigious to me than to say oh i was cto of ex startup you know but no i'm very interested i like you know i like what you guys are doing you know and based on what i've seen it looks very cool and i think there's a lot of opportunity there so yeah sure let's stop
+[01:00:09] Unknown: sounds good all right perfect i will just follow up with feel and probably i'll just directly email you to schedule like a time for the outside yeah i'll fill up in the next couple of days
+[01:00:23] Unknown: i'll send you a link to what i to the code base as well so you can share with the team and you know get some feedback of what i did and i'll put a password on it so that it's not completely public all right i
+[01:00:34] Unknown: appreciate it appreciate
+[01:00:35] Unknown: it
+[01:00:36] Unknown: talk to you later
+[01:00:37] Unknown: talk
+[01:00:38] Unknown: there bye

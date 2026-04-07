@@ -1,0 +1,235 @@
+{
+  "name": "Climate Migration Effects on Olympia Redesigned via War Lens",
+  "description": "A collision-based reinterpretation of how climate migration impacts Olympia, now viewed through the lens of war-like dynamics.",
+  "nodes": [
+    {
+      "id": "pop_influx",
+      "label": "Population Influx",
+      "desc": "A flood-like arrival of climate refugees creating acute stress.",
+      "category": "population",
+      "key": true
+    },
+    {
+      "id": "housing_demand",
+      "label": "Housing Demand",
+      "desc": "A frenzied pursuit for territory-like acquisition.",
+      "category": "pressure",
+      "key": false
+    },
+    {
+      "id": "housing_supply",
+      "label": "Housing Supply",
+      "desc": "Control over territory rather than simple availability.",
+      "category": "resource",
+      "key": false
+    },
+    {
+      "id": "housing_price",
+      "label": "Housing Prices",
+      "desc": "A barometer of social control and dominance.",
+      "category": "economic",
+      "key": false
+    },
+    {
+      "id": "income_diversity",
+      "label": "Income Diversity",
+      "desc": "Economic stratification leading to socio-political battlegrounds.",
+      "category": "economic",
+      "key": false
+    },
+    {
+      "id": "social_tensions",
+      "label": "Social Tensions",
+      "desc": "Ideological and resource-conflicts resembling frontline battles.",
+      "category": "social",
+      "key": true
+    },
+    {
+      "id": "local_infrastructure",
+      "label": "Local Infrastructure",
+      "desc": "The logistics of societal endurance amidst chaos.",
+      "category": "resource",
+      "key": false
+    },
+    {
+      "id": "employment_opportunities",
+      "label": "Employment Opportunities",
+      "desc": "A war economy absorbing idled refugees.",
+      "category": "economic",
+      "key": false
+    },
+    {
+      "id": "public_services",
+      "label": "Public Services",
+      "desc": "Critical supply lines for civilian like sustenance.",
+      "category": "policy",
+      "key": false
+    },
+    {
+      "id": "environmental_capacity",
+      "label": "Environmental Capacity",
+      "desc": "The contested field where sustainability is constantly under siege.",
+      "category": "environment",
+      "key": false
+    },
+    {
+      "id": "system_exhaustion",
+      "label": "System Exhaustion",
+      "desc": "Manifestation of war-like exhaustion patterns, leading to structural collapse.",
+      "category": "dynamic",
+      "key": true
+    }
+  ],
+  "links": [
+    {
+      "source": "pop_influx",
+      "target": "housing_demand",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Immediate"
+    },
+    {
+      "source": "housing_demand",
+      "target": "housing_price",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Months"
+    },
+    {
+      "source": "housing_price",
+      "target": "income_diversity",
+      "type": "reinforcing",
+      "label": "-",
+      "lag": "1-3 Years"
+    },
+    {
+      "source": "income_diversity",
+      "target": "social_tensions",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Immediate"
+    },
+    {
+      "source": "social_tensions",
+      "target": "local_infrastructure",
+      "type": "balancing",
+      "label": "-",
+      "lag": "1-3 Years"
+    },
+    {
+      "source": "pop_influx",
+      "target": "employment_opportunities",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "1-3 Years"
+    },
+    {
+      "source": "local_infrastructure",
+      "target": "public_services",
+      "type": "balancing",
+      "label": "+",
+      "lag": "Years"
+    },
+    {
+      "source": "pop_influx",
+      "target": "environmental_capacity",
+      "type": "balancing",
+      "label": "-",
+      "lag": "1-3 Years"
+    },
+    {
+      "source": "housing_supply",
+      "target": "housing_price",
+      "type": "balancing",
+      "label": "-",
+      "lag": "Months"
+    },
+    {
+      "source": "public_services",
+      "target": "social_tensions",
+      "type": "balancing",
+      "label": "-",
+      "lag": "1-3 Years"
+    },
+    {
+      "source": "social_tensions",
+      "target": "system_exhaustion",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Years"
+    },
+    {
+      "source": "system_exhaustion",
+      "target": "housing_supply",
+      "type": "reinforcing",
+      "label": "-",
+      "lag": "Immediate"
+    }
+  ],
+  "loops": [
+    {
+      "id": "R1",
+      "type": "R",
+      "name": "Housing Price Escalation",
+      "desc": "Population influx increases housing demand, causing prices to rise, reducing income diversity, leading to higher social tensions, which could further strain local infrastructure.",
+      "nodes": [
+        "pop_influx",
+        "housing_demand",
+        "housing_price",
+        "income_diversity",
+        "social_tensions"
+      ]
+    },
+    {
+      "id": "B1",
+      "type": "B",
+      "name": "Infrastructure Balancing",
+      "desc": "As social tensions increase, pressure for improved local infrastructure and public services rises, providing some balance to increasing tensions.",
+      "nodes": [
+        "social_tensions",
+        "local_infrastructure",
+        "public_services"
+      ]
+    },
+    {
+      "id": "B2",
+      "type": "B",
+      "name": "Environmental Limits",
+      "desc": "Increased population impacts environmental capacity negatively, causing the system to self-limit due to decreased livability.",
+      "nodes": [
+        "pop_influx",
+        "environmental_capacity"
+      ]
+    },
+    {
+      "id": "R2",
+      "type": "R",
+      "name": "System Fatigue and Collapse",
+      "desc": "Escalating social tensions increase system exhaustion leading to supply breakdowns and further exacerbation of resource contests.",
+      "nodes": [
+        "social_tensions",
+        "system_exhaustion",
+        "housing_supply"
+      ]
+    }
+  ],
+  "archetypes": [
+    {
+      "id": "1",
+      "name": "Limits to Growth",
+      "description": "Demonstrates how continued population growth pressures on housing, social systems, and infrastructure are eventually checked by environmental and resource limits.",
+      "relatedLoops": [
+        "R1",
+        "B2"
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Collapse Dynamics",
+      "description": "Unveils the war-like escalation that leads to systemic collapse through fatigue and breakdown in critical infrastructure.",
+      "relatedLoops": [
+        "R2"
+      ]
+    }
+  ]
+}

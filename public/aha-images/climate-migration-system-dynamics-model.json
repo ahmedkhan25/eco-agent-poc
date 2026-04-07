@@ -1,0 +1,241 @@
+{
+  "name": "Climate Migration System Dynamics",
+  "description": "This model captures the dynamics driving climate-induced migration, its impacts on host regions, and subsequent social, economic, and environmental feedback.",
+  "nodes": [
+    {
+      "id": "climate_change",
+      "label": "Climate Change",
+      "desc": "Long-term shifts in temperatures and weather patterns, often exacerbated by human activities.",
+      "example": "Increase in global average temperatures by 1.2°C since pre-industrial times.",
+      "category": "environment",
+      "key": true
+    },
+    {
+      "id": "extreme_weather_events",
+      "label": "Extreme Weather Events",
+      "desc": "Occurrence of unusually severe weather conditions, like hurricanes or droughts.",
+      "example": "2017 Hurricane Maria caused widespread devastation in Puerto Rico.",
+      "category": "pressure",
+      "key": false
+    },
+    {
+      "id": "livelihood_disruptions",
+      "label": "Livelihood Disruptions",
+      "desc": "Impact on local economies and employment due to climate effects, forcing people to move.",
+      "example": "Farmers in Bangladesh losing crops to recurrent flooding, leading to loss of income.",
+      "category": "economic",
+      "key": false
+    },
+    {
+      "id": "migration_flow",
+      "label": "Migration Flow",
+      "desc": "Movement of people from affected regions to more stable areas, often international.",
+      "example": "In 2020, approximately 30 million climate migrants were displaced worldwide.",
+      "category": "population",
+      "key": true
+    },
+    {
+      "id": "host_region_population",
+      "label": "Host Region Population",
+      "desc": "Population size in the areas receiving climate migrants.",
+      "example": "The European Union received over 200,000 asylum applications from climate-affected regions in 2019.",
+      "category": "population",
+      "key": false
+    },
+    {
+      "id": "resource_stress",
+      "label": "Resource Stress",
+      "desc": "Increased pressure on local resources like water, housing, and jobs in host regions.",
+      "example": "Cities like Dhaka experiencing resource shortages due to an influx of rural climate migrants.",
+      "category": "pressure",
+      "key": false
+    },
+    {
+      "id": "social_tension",
+      "label": "Social Tension",
+      "desc": "Strained relationships between new migrants and existing population in host regions.",
+      "example": "Rising xenophobia in areas with high migrant populations.",
+      "category": "social",
+      "key": false
+    },
+    {
+      "id": "adaptive_policies",
+      "label": "Adaptive Policies",
+      "desc": "Government and organizational responses to manage climate migration and integrate migrants.",
+      "example": "Development of resettlement schemes for displaced people in Australia.",
+      "category": "policy",
+      "key": true
+    },
+    {
+      "id": "economic_growth",
+      "label": "Economic Growth",
+      "desc": "Overall economic development in host regions, influenced by workforce changes.",
+      "example": "Migration contributing to labor market expansion in Germany.",
+      "category": "economic",
+      "key": false
+    },
+    {
+      "id": "environmental_degradation",
+      "label": "Environmental Degradation",
+      "desc": "Deterioration of the natural environment due to overuse of resources in host regions.",
+      "example": "Increased deforestation in the Amazon due to land-clearance for settlement.",
+      "category": "environment",
+      "key": false
+    }
+  ],
+  "links": [
+    {
+      "source": "climate_change",
+      "target": "extreme_weather_events",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Years"
+    },
+    {
+      "source": "climate_change",
+      "target": "livelihood_disruptions",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Years"
+    },
+    {
+      "source": "extreme_weather_events",
+      "target": "migration_flow",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Immediate"
+    },
+    {
+      "source": "livelihood_disruptions",
+      "target": "migration_flow",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Months"
+    },
+    {
+      "source": "migration_flow",
+      "target": "host_region_population",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Months"
+    },
+    {
+      "source": "host_region_population",
+      "target": "resource_stress",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Immediate"
+    },
+    {
+      "source": "resource_stress",
+      "target": "social_tension",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Months"
+    },
+    {
+      "source": "social_tension",
+      "target": "adaptive_policies",
+      "type": "balancing",
+      "label": "+",
+      "lag": "Months"
+    },
+    {
+      "source": "adaptive_policies",
+      "target": "economic_growth",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Years"
+    },
+    {
+      "source": "economic_growth",
+      "target": "host_region_population",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Years"
+    },
+    {
+      "source": "host_region_population",
+      "target": "environmental_degradation",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Years"
+    },
+    {
+      "source": "environmental_degradation",
+      "target": "climate_change",
+      "type": "reinforcing",
+      "label": "+",
+      "lag": "Decades"
+    }
+  ],
+  "loops": [
+    {
+      "id": "R1",
+      "type": "R",
+      "name": "Climate Migration Pressure",
+      "desc": "Climate change causes extreme weather events and livelihood disruptions, increasing migration flow, and thus population pressure in host regions.",
+      "nodes": [
+        "climate_change",
+        "extreme_weather_events",
+        "livelihood_disruptions",
+        "migration_flow",
+        "host_region_population"
+      ]
+    },
+    {
+      "id": "R2",
+      "type": "R",
+      "name": "Resource and Social Stress",
+      "desc": "As migration flows increase, host region population grows, leading to resource stress and social tension, which can further destabilize conditions.",
+      "nodes": [
+        "migration_flow",
+        "host_region_population",
+        "resource_stress",
+        "social_tension"
+      ]
+    },
+    {
+      "id": "B1",
+      "type": "B",
+      "name": "Adaptive Policy Intervention",
+      "desc": "Increasing social tension prompts adaptive policies, aimed at stabilizing the economic and social impacts of migration.",
+      "nodes": [
+        "social_tension",
+        "adaptive_policies",
+        "economic_growth",
+        "host_region_population"
+      ]
+    },
+    {
+      "id": "R3",
+      "type": "R",
+      "name": "Environmental Feedback",
+      "desc": "Rising population in host regions leads to environmental degradation, which can contribute back to global climate change.",
+      "nodes": [
+        "host_region_population",
+        "environmental_degradation",
+        "climate_change"
+      ]
+    }
+  ],
+  "archetypes": [
+    {
+      "id": "tragedy_of_commons",
+      "name": "Tragedy of the Commons",
+      "description": "Environmental degradation in host regions due to overuse of resources by increased population, feeding back into climate change.",
+      "relatedLoops": [
+        "R3"
+      ]
+    },
+    {
+      "id": "limits_to_growth",
+      "name": "Limits to Growth",
+      "description": "Resource stress and social tension escalate as population grows, potentially limiting the sustainable capacity of host regions.",
+      "relatedLoops": [
+        "R2",
+        "B1"
+      ]
+    }
+  ]
+}
