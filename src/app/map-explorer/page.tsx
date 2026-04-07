@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Info } from "lucide-react";
 import EcoHeartMap from "@/components/map/index";
 import LayerControl from "@/components/map/layer-control";
 import FeaturePopup from "@/components/map/feature-popup";
@@ -40,6 +42,13 @@ export default function MapExplorerPage() {
               Browse environmental layers for the Olympia region
             </p>
           </div>
+          <Link
+            href="/spatial-pipeline"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#012d1d] hover:bg-[#1b4332] text-white text-xs font-semibold transition-colors shadow-sm"
+          >
+            <Info className="w-3.5 h-3.5" />
+            How It Works
+          </Link>
         </div>
 
         {/* Map canvas */}
