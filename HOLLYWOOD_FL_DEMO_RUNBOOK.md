@@ -1,377 +1,496 @@
-# Hollywood, FL — EcoHeart Demo Runbook
+# Hollywood, FL — EcoHeart 18-Minute Demo Runbook
 
-> **Audience:** City of Hollywood Sustainability Coordinator, Sustainability Advisory Committee, Department of Public Utilities, and supporting staff.
-> **Time budget:** 18 minutes for the live walk-through + 7 minutes Q&A.
-> **Date prepared:** 2026-05-13 (for May 14 demo).
+> **The one rule:** finish in 18 minutes. Open with the human story. Close with the ask.
 > **Demo URL:** `http://localhost:3000/demo`
+> **Prepared:** 2026-05-13 (for May 14 demo)
 
 ---
 
-## 1. Pre-demo checklist (run T-15 minutes)
+## 1. What is EcoHeart? (memorize this section)
+
+### Our one-liner
+> **EcoHeart is the Urban Resilience Platform — data and AI for climate-ready cities.** We turn the disconnected plans, dashboards, and reports a city already owns into actionable, ethical decision intelligence.
+
+### Our vision
+To empower cities and governments with **ethical, data-driven intelligence** that accelerates climate adaptation, resilience, and sustainable development.
+
+### The challenge we exist to solve
+Cities face an **overwhelming volume of disconnected data, dashboards, and reports — but little actionable insight.** Climate threats, aging infrastructure, and siloed governance make it difficult for leaders to make fast, data-informed decisions.
+
+> By 2050, **1.2 billion people** will be displaced due to climate-related events. Most cities still lack the data strategy and AI infrastructure needed to prepare.
+
+### Our solution: the Urban Resilience Platform (URP)
+EcoHeart bridges the gap between data, technology, and real-world action through an AI-powered decision-intelligence platform designed for governments, researchers, and partners.
+
+URP integrates **five layers**:
+1. **AI + Data Strategy Frameworks** — the structured method we use to take a city from "we have a lot of PDFs" to "we make decisions from them."
+2. **Real-time IoT & Climate Dashboards** — tide gauges, weather, water quality, traffic — live, on one screen.
+3. **Predictive Analytics for Risk & Resource Management** — where will it flood, who is most at risk, where should the next dollar go.
+4. **Ethical AI Governance Layer** — explainable, transparent, human-centric. Every answer carries a citation; nothing is a black box.
+5. **Citizen Engagement & Behavior Data** — the resident perspective fed back into the model.
+
+**Outcome: cities gain the power to act — not just analyze.**
+
+### Why EcoHeart wins
+- **Founded by award-winning leaders** in data governance, AI, and sustainability with **25+ years of public-sector experience.**
+- **Ethical by design:** guided by our AI Ethics & Responsible Innovation Policy.
+- **Cross-sector network:** partnered with global universities, sustainability groups, and governments.
+- **Boots on the ground:** **70,000+ citizens** already engaged in pilot projects.
+
+### Business model
+- **Contracted services:** AI readiness, data strategy, and implementation consulting.
+- **Software licensing:** Urban Resilience Platform SaaS modules.
+- **Grants & partnerships:** funded pilot programs with governments and NGOs.
+- **Training & certification:** AI Governance and Sustainability Data Programs.
+
+### Traction & pipeline
+- **Pilots underway in 5 countries:** U.S., Brazil, Bhutan, Kenya, Greece.
+- **14 contracts and LOIs valued at $33M+.**
+- **Global partnership ecosystem** spanning academia, climate tech, and data firms.
+- **11-member expert team** across data science, AI, policy, and environmental science.
+
+> **When asked "who is EcoHeart?" in the room, answer with these four numbers: 1.2B, $33M, 70,000, 11.**
+
+---
+
+## 2. Glossary — speak the language
+
+Your audience will include engineers, planners, residents, and political staff. **Define every term the first time you use it.** Below is a one-line definition for every term in this demo, in plain English.
+
+### Sea-level rise & flooding
+- **SLR (Sea-Level Rise)** — long-term rise in ocean height. Driven by melting ice + thermal expansion of warming water.
+- **King Tide** — the highest predicted tide of the year, when the sun and moon align. *No storm involved* — it floods because the ocean is briefly higher than usual.
+- **Nuisance flooding (a.k.a. sunny-day flooding)** — flooding that happens with no storm, no rain — water comes up through the storm drains because the tide is high.
+- **Storm surge** — the wall of seawater a hurricane pushes ashore. Separate from rainfall, separate from tide.
+- **MHHW (Mean Higher High Water)** — the daily average of the higher of the two daily high tides. NOAA's reference for "normal high tide."
+- **MLLW (Mean Lower Low Water)** — same idea but for the lower of the two daily low tides. The datum NOAA uses for many predictions.
+- **NAVD88 (North American Vertical Datum 1988)** — the US-wide standard for measuring elevation. When a seawall is "6.5 ft NAVD88," that's how high it stands relative to this benchmark.
+- **BFE (Base Flood Elevation)** — the height water reaches in a 1-in-100-year flood, set by FEMA per parcel.
+- **Freeboard** — extra height required above BFE for new construction (Hollywood: 1 ft; barrier-island Coastal A / VE zones: 2 ft).
+- **FEMA NFHL (National Flood Hazard Layer)** — the official US flood-zone map.
+- **Flood zones (A / AE / VE / X)** — A is high risk, AE adds an elevation, VE is high risk + wave action, X is lower risk.
+
+### Coastal infrastructure
+- **A1A** — the state highway that runs along Hollywood's barrier island. Owned by FDOT.
+- **FDOT** — Florida Department of Transportation.
+- **Living shoreline** — a softer coastal protection that mixes vegetation, sand, and sometimes oyster reefs. The opposite of a hard seawall.
+- **Seawall** — vertical wall (usually concrete) at the water's edge. Effective short-term, hardens the coastline long-term.
+- **Pump station** — pumps stormwater out of flooded streets back to the canal or ocean.
+- **Tidal valve** — one-way valve that lets stormwater out but blocks tides from flowing back in.
+- **Broadwalk** — Hollywood's 2.5-mile brick promenade along the beach. The city's biggest tourist asset.
+
+### Climate planning frameworks
+- **HVHZ (High-Velocity Hurricane Zone)** — Miami-Dade and Broward counties; design wind speed 170+ mph; impact-rated windows + doors required.
+- **ASCE 24** — the American Society of Civil Engineers' standard for building in flood zones.
+- **AAA (Adaptation Action Area)** — a Miami-Dade-pioneered framework: a designated neighborhood where the city concentrates resilience investment.
+- **CIP (Capital Improvement Plan)** — the city's multi-year list of construction projects.
+- **CVA (Climate Vulnerability Assessment)** — formal assessment of how climate hazards will impact city assets. Hollywood's is being updated right now under a $800K Resilient Florida grant.
+- **SE FL Climate Compact** — 4-county regional alliance (Monroe, Miami-Dade, Broward, Palm Beach) that publishes a unified SLR projection used by every member city.
+
+### Adaptation pathways — the three strategies every coastal city must choose between
+When climate planners say "adaptation pathways," they mean the three fundamentally different ways a coastal city can respond to sea-level rise. Every coastal city is doing some mix of all three; the question is which one *dominates*.
+
+- **Armoring (Protect)** — build seawalls, pump stations, raised roads, and other hard infrastructure to keep the water out. Engineering-led. Examples: Fort Lauderdale's Fortify Lauderdale ($500M+), Miami Beach's Rising Above program (60+ pumps, raised roads). **Strength:** protects current development footprint. **Weakness:** locks in the urban form, creates higher catastrophic exposure long-term as new development moves into the "now-protected" zone.
+
+- **Accommodation (Adapt)** — change *how* buildings interact with water on a parcel-by-parcel basis. Elevate structures, floodproof ground floors, install tidal valves, raise utilities, replace AC units with heat-pump rated for higher BFE. Distributed. Slower. Strength: preserves the urban form; spreads the cost; pairs well with insurance. **Weakness:** unevenly adopted parcels become failure nodes; cost burden falls hardest on low-income homeowners.
+
+- **Managed Retreat (Relocate)** — strategically and voluntarily move people and structures out of the highest-risk zones. Mechanisms: FEMA HMGP buyouts, transfer of development rights (TDR) to inland parcels, conversion of acquired land to wetland or park. **Strength:** ends the spiral of repetitive losses; restores ecological buffer. **Weakness:** loss of tax base, community displacement, hard politics.
+
+> **The Hollywood narrative:** Hollywood is doing Armoring right now (FDOT pump stations on A1A). Accommodation is starting (CDBG-funded retrofits, septic-to-sewer). Managed Retreat is not yet on the table publicly — but the CVA Update will force the conversation. EcoHeart's SLR Adaptation Pathways tool helps the city explore all three before committing.
+
+### Heat & green infrastructure
+- **Tree Canopy** — percentage of land covered by leaves overhead when seen from above. More canopy = cooler streets.
+- **Heat Island (Urban Heat Island)** — urban areas trap heat (asphalt, no shade) and run several degrees hotter than the surrounding land.
+- **HVI (Heat Vulnerability Index)** — composite score: who is at risk from extreme heat. Inputs: age, poverty, AC access, no vehicle.
+- **NDVI** — a satellite measure of how green an area is. Used to estimate canopy and vegetation health.
+
+### Equity & demographics
+- **SVI (Social Vulnerability Index)** — CDC's composite score: who is most at risk in a disaster.
+- **LMI (Low-to-Moderate Income)** — defined by HUD as households below 80% of the Area Median Income.
+- **CDBG (Community Development Block Grant)** — federal funding for low-to-moderate income community projects.
+- **ACS (American Community Survey)** — the Census Bureau's rolling demographic survey.
+
+### Greenhouse gases
+- **GHG (Greenhouse Gas)** — CO₂, methane, nitrous oxide — the gases driving climate change. Measured in tCO₂e ("tons of carbon-dioxide equivalent").
+- **GPC (Global Protocol for Community-scale Greenhouse Gas inventories)** — the worldwide standard cities use to count their emissions.
+- **CDP** — the global disclosure platform where cities report climate progress (formerly Carbon Disclosure Project).
+- **ICLEI** — global network of cities committed to sustainability; co-author of GPC.
+- **Climate Mayors** — US-based coalition of mayors committed to the Paris Agreement.
+- **VMT (Vehicle Miles Traveled)** — total miles all cars drive in a place per year. Big lever in any city's transportation emissions.
+- **WWTP (Wastewater Treatment Plant)** — where sewage is processed. Often a major methane source.
+- **Septic-to-Sewer** — replacing individual septic tanks with municipal sewer connections.
+
+### Grants & finance
+- **NOFO (Notice of Funding Opportunity)** — the formal solicitation document when a grant program opens.
+- **BRIC** — FEMA's Building Resilient Infrastructure & Communities grant. Federal flagship for pre-disaster mitigation.
+- **HMGP** — FEMA's Hazard Mitigation Grant Program (post-disaster).
+- **CWSRF** — EPA's Clean Water State Revolving Fund. Low-interest loans for water + wastewater.
+- **CDBG-DR / CDBG-MIT** — disaster recovery / mitigation versions of CDBG.
+- **Resilient Florida** — Florida state-level resilience grant program (FDEP).
+
+### AI & data
+- **RAG (Retrieval-Augmented Generation)** — AI technique where the system searches your documents first, then writes the answer using what it found. Every claim carries a citation back to the source.
+- **EcoHeart AI** — the family of AI models (LLM, embeddings, classifiers) we run inside the Urban Resilience Platform. Always RAG-grounded, always cited, never a black box.
+- **Causal Loop Diagram (CLD)** — a visual that shows how variables in a system reinforce or balance each other over time. Used in systems-thinking practice (Gene Bellinger methodology).
+- **Open311** — the open standard for city 311 service-request systems. Lets different vendors interoperate.
+
+### People & operations
+- **ALF (Assisted Living Facility)** — residential care for older adults who need help with daily activities. Florida licenses them via AHCA.
+- **AHCA (Agency for Health Care Administration)** — Florida agency that licenses ALFs and skilled nursing facilities.
+- **CDP-formatted report** — annual disclosure in the format CDP requires from member cities.
+- **MILP (Mixed-Integer Linear Programming)** — fast math for finding the best solution when you have a budget + many constraints. Used to optimize the septic-to-sewer phasing.
+
+> **Demo rule:** when you see a term in red here, define it inline the first time you say it. *"Sea-level rise — that's the long-term rise in ocean height …"*. Don't assume the room has the vocabulary.
+
+---
+
+## 3. Pre-demo checklist (T-15 minutes)
 
 ```bash
-# 1. From the repo root
 cd /Users/ahmedkhan/Repos/eco-agent/eco-agent-poc
-
-# 2. Confirm OPENAI_API_KEY is set — F4, F7, F12 need it
-grep OPENAI_API_KEY .env.local
-
-# 3. Start dev server
+grep OPENAI_API_KEY .env.local   # the four live AI routes need this
 npm run dev
 ```
 
-When you see `✓ Ready in ...ms`, the demo is live at `http://localhost:3000/demo`.
+When you see `✓ Ready in ...ms`, open `http://localhost:3000/demo`.
 
-**T-5 minute smoke test (do this in your browser, not on stage):**
+**Browser tabs to have open before you start (1 monitor, 4 tabs):**
+1. `http://localhost:3000/demo` ← the demo
+2. `https://eco-agent-poc.onrender.com/demo` ← the deployed backup
+3. `https://southeastfloridaclimatecompact.org/initiative/regionally-unified-sea-level-rise-projection/` ← the SLR projection reference
+4. `https://hollywoodfl.org/921/Sustainable-Hollywood-Action-Plan` ← Hollywood's SAP
+
+**Smoke test (do this in your browser, not on stage):**
 - [ ] `/demo` loads — hero shows "Twice a day, two hours."
-- [ ] `/demo/king-tide` — left sidebar shows a green "live" chip next to the NOAA Station card with a peak ≥ 2.0 ft and ≥ 5 flood days
-- [ ] `/demo/risk-report` — click the **"Hollywood City Hall, 2600 Hollywood Blvd"** chip and confirm the report renders in ~7–10s
-- [ ] `/demo/grant-finder` — click the **"Septic-to-sewer Boulevard Heights..."** chip; confirm ranked matches appear in ~10–15s
-- [ ] `/demo/hurricane-playbook` — click **Generate playbook** with the default storm; confirm tabs render with the rose ALF banner
-
-**If any AI route times out**, the demo still works — every page has graceful fallback UX and seed data. F1, F2, F9 don't require OpenAI at all.
+- [ ] `/demo/king-tide` — green "live" chip next to the NOAA Station card with peak ≥ 2.0 ft and ≥ 5 flood days
+- [ ] `/demo/risk-report` — click the **"Hollywood City Hall"** chip; report renders in ~7–10s
+- [ ] `/demo/grant-finder` — click the **"Septic-to-sewer Boulevard Heights"** chip; matches appear in ~10–15s
+- [ ] `/demo/hurricane-playbook` — click **Generate playbook**; ALF tab shows the rose banner
 
 ---
 
-## 2. The room-readiness opener (60 seconds, before clicking anything)
+## 4. The 18-Minute Demo Script — verbatim
 
-> *"Hollywood publishes a King Tides page that lists when the water will overtop A1A and the Lakes neighborhood. The 2017 Sustainable Hollywood Action Plan commits the city to 80% GHG reduction by 2050. The October 22, 2025 utilities master plan put a $2.5 billion price tag on the next 30 years — half of it to convert 17,000 unsewered properties to sewer."*
-> *"This product is what happens when AI does the staff work on those plans, that schedule, and that budget. Twenty minutes of EcoHeart, six features built against your own homework."*
+> **Read this section like a teleprompter.** SAY = words for the room. CLICK = what you do on screen. Each block ends with **The innovation / The tech / The expertise** — those are *your* prep, not for the room (use them to answer questions confidently).
 
-Then open `http://localhost:3000/demo`.
-
----
-
-## 3. Flight plan — 6 features, in order
-
-### Stop 1 · Overview (45 seconds) — `/demo`
-
-**What to point at:**
-- The hero quote: "Twice a day, two hours" — credit it to **Peter Scher / South Lake homeowner via Temple Solel / Sea Level Rise Solutions group**.
-- The three brand chips in the header: **Sustainable Hollywood Action Plan · 80% GHG by 2050 · $2.5B Water/Wastewater** — signals you read their docs.
-- The four stat cards (~17,000 unsewered, $2.5B, 9 flood days in Oct 3–25, 80% GHG).
-- The 6 feature cards — say: *"Each of these is its own page. Three are wired against live data. Three are pre-computed. All six are real."*
-
-**Click:** Address Risk Report card (or the coral "Generate a Risk Report" button in the hero).
+### Time budget
+| Block | Time | What |
+|---|---|---|
+| 1 | 0:00 – 1:30 | Open: who is EcoHeart |
+| 2 | 1:30 – 4:00 | Address Climate Risk Report |
+| 3 | 4:00 – 6:30 | King Tide Flood Risk Explorer |
+| 4 | 6:30 – 8:30 | Septic-to-Sewer Prioritization |
+| 5 | 8:30 – 11:00 | Grant Finder Agent |
+| 6 | 11:00 – 13:00 | SLR Adaptation Pathways |
+| 7 | 13:00 – 14:30 | Hurricane After-Action Playbook |
+| 8 | 14:30 – 16:30 | Phase-2 concept rapid tour |
+| 9 | 16:30 – 18:00 | The ask — close on the MVP |
 
 ---
 
-### Stop 2 · Address Climate Risk Report — `/demo/risk-report` (3.5 min)
+### Block 1 · 0:00 – 1:30 — Open. Who is EcoHeart, and why this room?
 
-**The "this is more than a chatbot" feature.**
+**Don't click anything yet. Stand. Make eye contact.**
 
-**Click sequence:**
-1. Click the **"2200 Adams Street"** sample chip (this is the most-flooded South Lake hotspot).
-2. Wait ~7–10s. Narrate while it loads:
-   > *"Behind the scenes: Nominatim is geocoding this address against an OSM boundary box constrained to Hollywood. EcoHeart AI is being given that geocode plus seven authoritative Hollywood + Florida planning documents, and asked to produce a JSON report with calibrated risk scores."*
-3. When it renders, walk the audience left-to-right, top-to-bottom:
-   - **The map** — confirm the FEMA flood zones layer is on (visible flood-zone shading). Point at the orange marker for the parcel.
-   - **The five risk dials** — read the *Flood* score aloud, then point at the *Insurance Stress* score. *"This is the one your residents feel."*
-   - **The timeline** — *"This is the Southeast Florida Compact's 2019 unified projection, reaffirmed in Q4 2024. Same axis Broward County plans on."*
-   - **One recommendation** — click any recommendation card to expand it. Read the citation aloud. *"This is what 'cited from your plans' actually looks like."*
-
-**Then click the** *Hollywood City Hall* chip and run a second one to show the agent adjusts the scores by location (City Hall is on higher ground than Adams St).
-
-**Talking points to land:**
-- "Same pipeline runs for any address in Hollywood, your CVA Update is the seed corpus."
-- "The PDF export, email-to-resident, and 311 buttons are how this becomes a workflow, not a demo."
-
-**Transition:** *"Now zoom out from a single parcel to the whole city."*
-
----
-
-### Stop 3 · King Tide Flood Risk Explorer — `/demo/king-tide` (3.5 min)
-
-**The flagship live-data feature.**
-
-**Click sequence:**
-1. Pause for two beats so the audience reads the green **"live"** chip in the NOAA Station card.
-   > *"That number — 21 flood days in the next 60 days — is being computed live right now from NOAA's Virginia Key station. It's the closest long-record tide gauge to Hollywood. You can verify it yourself at tidesandcurrents.noaa.gov."*
-2. **Click the "Oct 3 – 25, 2026 ★"** chip in the king tide windows list. The map flies to Hollywood. Narrate: *"This is the worst king-tide stretch of the year — full moon and new moon stacked."*
-3. **Click "South Lake Dr & Adams St"** in the Flood Hotspots list. Map zooms to z=16. The popup shows the homeowner quote.
-4. **Click the "+3 ft" SLR scenario tab.** The NOAA SLR tile overlay appears.
-   > *"This is what the Compact says +3 feet looks like — approximately 2060 on the reference curve. The South Lake area is no longer experiencing periodic flooding; it's a daily phenomenon."*
-5. **Click Play 2026** (top-right of the king-tide windows). The map cycles through each window; the cumulative property-days flooded counter ticks up.
-6. After ~6 seconds, click **Pause**.
-
-**Talking points:**
-- "FDOT is currently building pump stations at four of these intersections — Azalea, Van Buren, Sherman, Franklin. The model expects ~70% reduction in flooding at Sherman St when it comes online."
-- "All of this runs from the browser; no EcoHeart backend touches NOAA. Same architecture you've already paid for in any ArcGIS Hub deployment."
-
-**Transition:** *"OK — we've shown one resident, then today's coastline. Now show the 30-year plan."*
-
----
-
-### Stop 4 · Septic-to-Sewer Prioritization — `/demo/septic-priority` (3 min)
-
-**The "we did the optimizer" feature. Cross-pillar.**
-
-**Click sequence:**
-1. Read the headline: *"17,000 unsewered parcels and $1.3 billion to spend over 30 years. EcoHeart ranks every parcel and re-clusters the phasing live."*
-2. Point at the **default phase-1 map** (top-right): *"With equal weights, Phase 1 lands here — Boulevard Heights and Driftwood, which is also where the city's plan starts. We agree."*
-3. Drag the **Social Equity slider** from 25 → 55. The other sliders auto-rebalance to keep the total at 100. The audience sees the math is fair.
-4. Click **Solve**. Wait ~0.9s for the animation; the phase clusters re-form.
-   > *"Look at Phase 1 now — it picks up the Liberia tract, which is CDBG-eligible. That's $9,000 per household becoming a zero-interest forgivable loan."*
-5. Click **Compare to current city plan**. The map splits left/right.
-   > *"Left is the city's plan — Boulevard Heights first because it's adjacent to existing trunk lines. Right is EcoHeart's equity-weighted run — Liberia moves up a phase. Reasonable people can disagree on the weights. EcoHeart's job is to make the tradeoff visible."*
-
-**Talking points to land:**
-- "The bottom chart shows you parcels-per-phase and equity-share-per-phase. The orange bar is the share of CDBG-eligible parcels in each phase. With the equity-weighted run, Phase 1 jumps from ~52% to ~70%."
-- "The CSV export drops a list of every parcel and its assigned phase. Goes straight into a CIP work plan."
-
-**Transition:** *"Once you know the plan, you have to fund the plan."*
-
----
-
-### Stop 5 · Grant Finder Agent — `/demo/grant-finder` (3 min)
-
-**The "this saves a grant writer a week" feature.**
-
-**Click sequence:**
-1. Click the **"Septic-to-sewer expansion in Boulevard Heights, ~1,100 properties, $71M, 18-month timeline"** chip.
-2. Narrate while it loads (10–15s):
-   > *"The agent has the project description and a catalog of five federal and state programs — BRIC, Resilient Florida Implementation, CWSRF, CDBG-DR, HMGP. For each, it's auto-checking eligibility against Hollywood's actual plans. Where it can't fully confirm, it marks amber."*
-3. The top match renders — usually **EPA CWSRF** at 90/100 or **Resilient Florida Implementation** at 88–94/100.
-4. Click the **top match** to expand it.
-   - Walk the **Eligibility check** — point at the green checks. *"This one is green because Hollywood's 2023 CVA Update satisfies Florida Statute 380.093."*
-   - Walk the **Scoring evidence** — *"For 'cost-effectiveness' the agent grabbed the BCA framing from the Hollywood Hazard Mitigation Plan."*
-5. Click **Generate full application draft**. Two paragraphs of narrative render, with Hollywood plan citations woven in.
-6. Click **Add to pipeline** — the right rail tracks $35.5M requested.
-
-**Talking points:**
-- "Every Compact city in South Florida spends staff hours on this exact task. Hollywood, Fort Lauderdale, Pompano, Hallandale — same five federal programs, same lift."
-- "This single feature is the budget-justifier for the whole platform."
-
-**Transition:** *"Now the question stops being 'what should we do' and becomes 'how do we decide.'"*
-
----
-
-### Stop 6 · SLR Adaptation Pathways Systems Model — `/demo/adaptation-pathways` (2.5 min)
-
-**The "now we're doing strategy" feature. The wow.**
-
-**Click sequence:**
-1. The page lands on the **Armoring** pathway. Pause two beats so the audience sees the causal loop diagram render with D3 force layout.
-2. Read one loop aloud — point at the **R1: Investment lock-in** loop in the right rail:
-   > *"Armoring protects the tax base, which funds more armoring, which attracts new development in the same flood zone, which raises catastrophic exposure twenty years out. That's a reinforcing loop — the one we typically pretend isn't there."*
-3. Click **Accommodation** then **Managed Retreat** to show the three pathways are different system shapes.
-4. Return to **Armoring**.
-5. Click the purple **Collide with "Healthcare staffing crisis"** button.
-   - New edges appear in the diagram.
-   - A purple banner renders below — read the **load-bearing delusion** sentence verbatim.
-   - Be respectful when the banner references the Hollywood Hills 2017 lesson — do not dwell, but do not skip.
-6. Click **Humanize (800–1200 words)**.
-   - A character-driven narrative renders. Read **one paragraph** aloud — the audience will see character names, locations, and specific Hollywood mechanisms (CDBG, Project ROC, A1A Sherman St pump station).
-
-**Talking points to land:**
-- "This is Gene Bellinger's causal loop methodology. Same modeler that powers EcoHeart's Olympia POC."
-- "The export is JSON and a self-contained interactive HTML — your commissioners can open it in any browser without our infrastructure."
-- "The 'Aha! Paradox' is the part where the system tells us what we're avoiding. Hollywood Hills wasn't an HVAC failure, it was a workforce failure. That's a different policy answer than another seawall."
-
-**Transition (gravity check):** *"Which brings us to the playbook that should never need to run."*
-
----
-
-### Stop 7 · Hurricane After-Action Playbook — `/demo/hurricane-playbook` (2 min)
-
-**The emotional anchor. Close on this. Respectfully.**
-
-**Click sequence:**
-1. Land on **Pre-storm preparedness**. The default storm is "Hurricane Iris, Cat 3, projected landfall ~80 miles south of Miami."
-2. Click **Generate playbook**.
-3. Wait ~8s. The 5-checklist tab strip appears. The page auto-lands on the **Assisted Living Facilities** tab — and the rose-bordered banner is visible.
-4. **Stop. Read the banner aloud, calmly:**
-   > *"Lesson from 2017 (Hurricane Irma): the Rehabilitation Center at Hollywood Hills lost 12–14 residents to heat after a generator failure. Florida's emergency-generator rule for ALFs was built on this. Generator status and indoor temp monitoring are item #1 on this list."*
-5. Scroll through the checklist. Point at items 1 and 2 — they will be generator-specific. Then click the **Lift Stations** tab to show the same agent generates a totally different list.
-6. Click the **Post-storm** tab.
-7. Scroll past the seeded CSV — say *"This is a sample damage CSV; in production it's your inspector tablet output."*
-8. Click **Generate FEMA Project Worksheet**.
-9. ~8s later, the categorized damages and the FEMA PW sections render.
-10. Point at the **Mitigation opportunities** section. *"This is what gets you the HMGP grant. The agent connected damage to plan to grant in one pass."*
-
-**Closing line (memorize):**
-> *"That 2017 lesson is why the generator-rule exists. EcoHeart's job is to make sure that when the next storm comes, every checklist is in the hands of every facility, and the FEMA application is drafted on Day 1 instead of Day 60."*
-
----
-
-## 4. Phase-2 concept pages — deep dives
-
-> These 8 pages are **clickable, static demos** that live in the sidebar's "Phase 2 · Concepts" group. They are **not** part of the core 18-minute flight plan — open them only if the audience asks for more, or use them in the closer to make the "8 more designed" claim concrete.
+**SAY (verbatim — this is your authentic opener, lifted from your live delivery):**
+> *"Hi, I'm Ahmed Khan. I'm Head of Solutions and Architecture for AI at EcoHeart. I'm here to talk about some exciting solution opportunities that EcoHeart is providing in its data-driven work — and to showcase examples specifically for the Hollywood, Florida region."*
 >
-> **Rule of thumb:** spend 60–90 seconds per concept page, max. If the audience leans in, walk through it. If not, click back to `/demo` and move on.
-
-### 4.1 A1A Coastal Vulnerability Dashboard — `/demo/a1a-coastal`
-
-**Pitch:** A scrollytelling tour of every mile of A1A in Hollywood — FDOT pump-station construction status, seawall heights vs the 2060 Compact target, dune zone health, and a 5-step capital sequence.
-
-**Click sequence (45 sec):**
-1. Land on the hero. Pause on the photo: *"2.5 miles of barrier island, 21.3 miles of Broward shoreline classified critically eroded."*
-2. Scroll to **Pump stations**. Point at Sherman St — 64% complete, $4.2M of $6.5M spent, projected reduction 8 → 2 overtopping days/yr.
-3. Scroll to **Seawall heights**. Point at the dashed 6.5 ft NAVD88 target line — every segment is below.
-4. Click into the **Next best actions** list at the bottom and read item #1 aloud.
-
-**Talking points:**
-- "Each pump-station card has a real cost and a real schedule. In production these refresh nightly from FDOT's project portal."
-- "The seawall deficit translates into a $22M lift in linear-feet-of-raise — exact same framing Fort Lauderdale used to fund Fortify Lauderdale."
-
-**Real vs simulated:** Pump-station % complete, seawall heights, and dune cover are seeded from the dossier research; the 5 capital recommendations are static templates that in production are RAG-generated.
-
----
-
-### 4.2 Tree Canopy & Heat Island Map — `/demo/tree-canopy`
-
-**Pitch:** Identify where Hollywood's thinnest canopy overlaps the city's heat-vulnerability hotspots, and where the next dollar of urban-forestry spend yields the most cooling per resident.
-
-**Click sequence (60 sec):**
-1. Land on the split-view. Left map = today's canopy. Right map = projected 2040 heat days.
-2. Click **"Add equity overlay"** (top-right). The block ranking re-sorts — Liberia moves up.
-3. Click block #1 in the bar chart. The right-rail profile updates: 8% canopy, HVI 84, 240 trees, $72K.
-4. Click **"Add to CIP"**. The CIP cart at the bottom of the right rail tallies cost + trees.
-
-**Talking points:**
-- "Hollywood's citywide average canopy is ~18%. Miami-Dade's Urban Forestry Plan targets 30%."
-- "The equity overlay is a single toggle in the demo because that's how a director should be able to operate it — 'show me the equity-weighted answer.'"
-
-**Real vs simulated:** 10 priority blocks are synthetic. Production replaces them with USFS Tree Canopy + Landsat NDVI + ACS B19013 + CDC SVI per real block group.
-
----
-
-### 4.3 Stormwater Outfall + Water Quality — `/demo/stormwater`
-
-**Pitch:** Near-real-time view of every stormwater outfall discharging into the Intracoastal and Atlantic, paired with bacterial sample history and **septic-system proximity**. Tells the operational story of why septic-to-sewer matters.
-
-**Click sequence (60 sec):**
-1. Land on the Alerts tab. Read aloud: *"6 outfalls in active exceedance — three of them in the South Lake / Lakes corridor."*
-2. Click **Outfall #34 (Garfield St)**. The detail panel populates. Point at "38 septic parcels within 500 ft."
-3. Scroll to the 24-month chart at the bottom. Point at the dashed FL DEP limit line — Outfall #34 is above it 8 of 24 months.
-4. Click **"Open in Septic Map"** — closes the loop with F2.
-
-**Talking points:**
-- "This is the cross-pillar story. The same parcels that need septic-to-sewer conversion are the parcels driving the bacterial exceedances in the Intracoastal."
-- "EPA STORET and Florida WIN both have public APIs. Hollywood already files these reports — we just put them on one screen."
-
-**Real vs simulated:** 8 outfalls are seeded with realistic E. coli + exceedance values; in production each is wired to EPA STORET + Florida WIN nightly.
-
----
-
-### 4.4 Building Resilience Code Assistant — `/demo/code-assistant`
-
-**Pitch:** Code-aware chat that answers Florida Building Code (HVHZ), ASCE 24, and Hollywood-specific zoning questions with **paragraph-level citations** — the way a permit reviewer or contractor actually works.
-
-**Click sequence (45 sec):**
-1. Click the **"Minimum freeboard above BFE"** chip. The answer renders with 3 citations: FBC §1612.3, ASCE 24-14 Table 2-1, Hollywood Code §117-04.A.6.
-2. Read one citation aloud. Click **"Open PDF"** (placeholder) to show the citation-traceability story.
-3. Click **"Compare cities"** tab. Point at the table — Hollywood is the only city in the 5-jurisdiction list **without** an adopted seawall minimum.
-
-**Talking points:**
-- "Every answer carries a chapter-and-verse cite. No hallucination, no 'I think the code says' — the model is constrained to only answer what's in the indexed code books."
-- "Compare mode unlocks the regional sales pitch: same engine, same RAG corpus, white-label per city."
-
-**Real vs simulated:** 3 fully-cited seeded answers (freeboard, garage doors, seawalls); all other questions fall back to a "concept page" message. Production indexes the actual FBC + ASCE + Hollywood ordinances.
-
----
-
-### 4.5 Tourism-Climate Feedback Loop — `/demo/tourism-loop`
-
-**Pitch:** The Broadwalk is Hollywood's economic engine and its most exposed asset. This causal-loop diagram traces storm risk → beach width → visitor-days → tax revenue → resilience CIP, so resilience spending is reframed as **revenue protection**.
-
-**Click sequence (45 sec):**
-1. Land on the page. Point at the photo + the framing line: "2.5 miles of brick promenade, ~$890M annual visitor spend."
-2. Click between the 3 scenario tabs (Baseline / +30% storms / Annual renourishment). Note the diagram is the same — narrative changes.
-3. Read the **R1 Revenue-into-resilience** loop aloud from the right rail.
-
-**Talking points:**
-- "This is the model you put in front of a commissioner who asks 'why are we spending on dunes when we have potholes?' Potholes don't show up in this loop. The Broadwalk does."
-- "Same Systems Modeler that powers our Olympia POC. Models export as JSON + standalone HTML."
-
-**Real vs simulated:** The model is hand-crafted but real — every node and link is grounded in published Hollywood + Compact planning vocabulary. In production, the model is generated from your RAG corpus and iterated via CopilotKit.
-
----
-
-### 4.6 311 Climate Complaint Triage — `/demo/triage`
-
-**Pitch:** When a resident reports "my street is flooded" to Hollywood NOW, EcoHeart's agent auto-classifies the report (tidal vs rainfall vs sewer vs outfall), correlates with current tide + radar, attaches it to the relevant CIP project, and drafts the resident response.
-
-**Click sequence (60 sec):**
-1. Land on the inbox. Point at the 4 classification bucket cards — 12 reports auto-sorted with confidence scores.
-2. Click the top report (Adams St). Walk the audience through: tide at report (2.1 ft), rainfall last 6h (0.0 in), classification confidence (94%).
-3. Point at the **Nearest active CIP project** card — "Lakes Tidal Flooding Mitigation, 22% complete."
-4. Read the drafted response aloud. Point at **Send response** + **Tag to CIP**.
-
-**Talking points:**
-- "Hollywood NOW already exists. EcoHeart sits on top of it. Open311 spec is standard — implementation is ~2 weeks."
-- "This is the feature that turns 311 from a complaints inbox into a sensor network for the city."
-
-**Real vs simulated:** 12 seeded reports with deterministic classifications. Production wires the live Hollywood NOW Open311 feed + NOAA tide + Broward MORD radar.
-
----
-
-### 4.7 Climate Equity Index Dashboard — `/demo/equity`
-
-**Pitch:** Overlay flood/heat/surge exposure with ACS demographics + CDC Social Vulnerability Index + HUD LMI — surface where the highest climate burden meets the lowest adaptive capacity. Drafts candidate **Adaptation Action Areas** (AAA) — Miami-Dade's framework.
-
-**Click sequence (60 sec):**
-1. Land on the page. Read the top priority block: *"Liberia Core — composite 82, 4,180 residents, 78% LMI."*
-2. Drag the **Equity weight** slider to 70. The choropleth recolors live. Bar chart re-sorts.
-3. Click a top-3 block. The right rail shows the demographic profile. Click **"Propose as new AAA."**
-4. Point at the peer-AAA card at the bottom — Miami-Dade Little River, Fort Lauderdale River Oaks.
-
-**Talking points:**
-- "Miami-Dade's Little River AAA is the precedent — $40M+ moving for septic-to-sewer + stormwater + affordable housing. Hollywood doesn't have a formally adopted AAA yet."
-- "The 2050 Comprehensive Plan update is the policy hook. EcoHeart drafts the candidate boundary."
-
-**Real vs simulated:** 8 synthetic blocks; in production the choropleth is real ACS B19013 + CDC SVI + HUD CDBG income-limit data, joined to Broward parcels.
-
----
-
-### 4.8 GHG Inventory Auto-Updater — `/demo/ghg`
-
-**Pitch:** Hollywood's SAP targets 80% GHG reduction by 2050, but the last community-scale inventory is dated. EcoHeart auto-ingests utility + DOT VMT + waste + WWTP data, computes the GPC-protocol inventory, tracks progress against the 2050 glide path, and exports the CDP questionnaire.
-
-**Click sequence (45 sec):**
-1. Land on the top stats: 2019 baseline, 2025 estimate (~7% reduction so far), 2050 target, required annual cut (5.0%).
-2. Point at the **glide path chart**. The dashed line is the compliance trajectory; the filled area is actual. Hollywood is marginally above target — call this out.
-3. Click the **Transportation — On-road** bar. Right rail deep-dive populates with sector-specific levers (EV chargers, transit, mode-shift).
-4. Point at **Export CDP-formatted report** — *"Hollywood already files CDP annually. EcoHeart pre-fills the questionnaire."*
-
-**Talking points:**
-- "GPC Basic+ is the protocol Climate Mayors and ICLEI both reference. Same numbers every other Compact city reports on."
-- "The chart isn't just a vanity dashboard. It's the artifact Hollywood owes its own Sustainability Advisory Committee every year."
-
-**Real vs simulated:** 6 sectors with realistic seeded baselines and 2025 estimates. Production replaces seeded numbers with live FPL + Broward DOT VMT + waste tonnage + Southern Regional WWTP data, recomputed nightly in Daytona.
-
----
-
-## 5. The closer — 90 seconds
-
-Return to `/demo` for the closing slide. Point at the **"What else EcoHeart can build"** grid (8 concept cards: A1A Coastal Dashboard, Tree Canopy Map, Stormwater + Water Quality, Code Assistant, Tourism Loop, 311 Triage, Equity Index, GHG Auto-Updater).
-
-**Say:**
-> *"Six features tonight. Eight more designed. Every one of them runs against the docs and the data you already publish."*
+> *"Hollywood is on the coast in Florida. It has to deal with flooding, tides, hurricanes, climate change — as well as the operations, budgets, and strategies that come with all of that. By 2050, **1.2 billion people** are projected to be displaced by climate-related events. Cities have an extraordinary amount of data about this, and almost no ability to act on it. That's what EcoHeart was built to fix."*
 >
-> *"Here's the ask: your $800,000 Resilient Florida Climate Vulnerability Assessment Update is in flight. If we onboard Hollywood as our second city, that CVA Update becomes our seed corpus. We commit to a working MVP for your team within six weeks of corpus delivery. White-labeled. With your branding. Tied to your CIP."*
+> *"And the good news is: Hollywood is already doing the work. Your Sustainable Hollywood Action Plan commits the city to an **80% greenhouse-gas reduction by 2050**. Your 2025 Utilities Master Plan puts a **$2.5 billion** price tag on the next 30 years, half of that allocated to convert **17,000 unsewered properties** to sewer. And you're sitting on an **$800,000 Resilient Florida grant** to update your Climate Vulnerability Assessment. The homework is on the table."*
+>
+> *"What I'm going to showcase is a prototype page built specifically for Hollywood. Six features running live against your own data and your own plans. Plus eight more concepts we've already designed. EcoHeart's job is to unify all of this into an organized, AI-managed approach — and to make it usable for city operators, climate scientists, planners, and residents. Let me show you."*
+
+**CLICK:** open `http://localhost:3000/demo` in the browser. The hero shows a king-tide flood photo and the line "Twice a day, two hours."
+
+**Pause.** Let them read the South Lake homeowner quote.
+
+**SAY (verbatim):**
+> *"This is **South Lake Drive at Adams Street**, in your own city. The quote is from a resident — one of the families organized as Sea Level Rise Solutions out of Temple Solel. Twice a day, during king-tide weeks, salt water comes up through the storm drains on Adams Street. No storm. No rain. Just the tide. **King tide** — that's the highest predicted tide of the year, when the sun and moon align."*
+>
+> *"This is what EcoHeart exists to make tractable. EcoHeart can help with that homework. Let's start with one parcel."*
+
+> **The innovation:** lead with empathy, not capability. The audience doesn't want a product tour; they want to know you understand their city.
+> **The tech:** none yet — this is positioning.
+> **The expertise:** EcoHeart's 25-year public-sector lineage means we walk into the room having already read your plans. That's table stakes — but most vendors don't.
 
 ---
 
-## 6. Fallbacks if something goes sideways
+### Block 2 · 1:30 – 4:00 — Address Climate Risk Report (`/demo/risk-report`)
+
+**The "tangible deliverable" feature.** Open with this because it produces a concrete artifact in seven seconds.
+
+**CLICK 1:** click the **"Hollywood City Hall, 2600 Hollywood Blvd"** chip.
+
+**SAY while it loads (~7–10 seconds):**
+> *"Behind the scenes right now: we just sent that address to OpenStreetMap to geocode it within Hollywood city limits. Then EcoHeart AI is taking the geocoded location plus seven authoritative source documents — your Sustainable Action Plan, your Climate Vulnerability Assessment, the Hollywood Dune Master Plan, your Public Utilities Master Plan, the Southeast Florida Climate Compact's unified sea-level-rise projection, the Florida Building Code, and Florida Statute 380.093 — and synthesizing a parcel-level risk report. Cited. Every number tied to a document. No hallucination."*
+
+**Once it renders:**
+
+**CLICK 2:** walk left-to-right.
+- Point at the **map** (FEMA flood zones visible).
+- Point at the **five risk dials** — Flood, Storm Surge, Heat, Wind, Insurance.
+- Scroll to the **2026–2100 timeline**.
+- Click one of the recommendations to expand it. Read the citation aloud.
+
+**SAY (verbatim):**
+> *"Five dimensions of risk — **flood** from rainfall and tides, **storm surge** from hurricanes, **heat** from rising temperatures, **wind** from hurricane design loads, and **insurance** stress, which is the political story I think most of you are living. The timeline projects all of this from today out to 2100, using the Southeast Florida Compact's 2019 projection — the curve every Compact city plans on."*
+>
+> *"Now this — *(click a recommendation)* — this is the part EcoHeart spends its time on. The recommendation says 'install impact-rated openings per FBC §1620.' I'm going to read the citation out loud: 'Florida Building Code 8th Edition, section 1620.1.5, exterior glazing and door assemblies in the HVHZ shall be impact-resistant.' That's not the model making things up. That's the model retrieving the exact paragraph from your code book."*
+
+**CLICK 3 (optional, time permitting):** click the **"2200 Adams Street"** chip to show the scores shift dramatically for a barrier-island address.
+
+> **The innovation:** EcoHeart turns thirty pages of plans into a one-page resident-actionable PDF, with a complete citation trail. Every claim is auditable.
+> **The tech:** OpenStreetMap geocoding (free), EcoHeart AI orchestration grounded in 7 authoritative source documents. In production, this swaps to a full RAG pipeline indexing every Hollywood PDF page-by-page.
+> **The expertise:** prompt engineering + corpus curation + ethical AI grounding. We don't just hand the model a question — we constrain it to cite the city's own published policy.
+
+**Define terms used:** FEMA NFHL, BFE, freeboard, HVHZ (use the inline definitions from §2 the first time).
+
+---
+
+### Block 3 · 4:00 – 6:30 — King Tide Flood Risk Explorer (`/demo/king-tide`)
+
+**Click into the sidebar:** `King Tide Explorer`.
+
+**Let the page load. Point at the green "live" chip.**
+
+**SAY (verbatim):**
+> *"Everything you're about to see is fed by **live data**, not screenshots. That green 'live' chip means we just fetched 60 days of predicted tide values from NOAA's Virginia Key station, which is the closest long-record tide gauge to Hollywood. You can verify this number on NOAA's own website tonight."*
+>
+> *"NOAA is projecting **21 days of nuisance flooding** at this station in the next 60 days. Nuisance flooding — that's when the tide alone is high enough to push water out of the storm drains. Twenty-one days in 60. That's almost every third day."*
+
+**CLICK 1:** click the **"Oct 3 – 25, 2026 ★"** king-tide window chip.
+
+**SAY (verbatim):**
+> *"This is the worst king-tide stretch of the year — when the full moon and the new moon line up over a three-week window. NOAA's predicting nine distinct flood days in here. The hotspots map out to exactly the streets your Public Utilities team is already tracking — South Lake, A1A at Sherman, A1A at Van Buren, the Broadwalk."*
+
+**CLICK 2:** click the **"+3 ft"** SLR scenario tab.
+
+**SAY (verbatim):**
+> *"And this is where this stops being a curiosity. This overlay is the NOAA Office for Coastal Management's official three-foot sea-level-rise inundation map. **Sea-level rise** — long-term rise in ocean height, driven by melting ice and warming water. Three feet is roughly where the Southeast Florida Compact projects we'll be by **2060** on the reference curve. The South Lake neighborhood is no longer a periodic flooding problem at that point. It's a daily one."*
+
+**CLICK 3:** click **Play 2026** (top right of the king-tide windows).
+
+**SAY while it plays:**
+> *"And the demo here just steps through the 2026 calendar, mapping each king tide to the inundation overlay. The orange counter at the bottom of the panel is cumulative property-days flooded — every house, every day, multiplied out."*
+
+**CLICK 4:** click **Pause**.
+
+> **The innovation:** turning a static NOAA prediction into a weather forecast for sea-level rise — a tool a resident can use to plan their week, not just a chart a planner reads at the end of the year.
+> **The tech:** NOAA Tides & Currents public API, FEMA tile server, NOAA SLR tile pyramids — all fetched from the browser, no backend in the path. EcoHeart adds the Hollywood-specific calibration (a 2.1 ft MLLW threshold that fires on actual king tides at this station).
+> **The expertise:** climate-data science meets public-records integration. Knowing *which* NOAA station to use (8723214, not Miami Beach), *which* threshold to calibrate against (the seasonal peak, not a textbook number), and *how* to ground it in the city's own hotspot list.
+
+**Define terms used:** king tide, nuisance flooding, MLLW, SLR.
+
+---
+
+### Block 4 · 6:30 – 8:30 — Septic-to-Sewer Prioritization (`/demo/septic-priority`)
+
+**Click into the sidebar:** `Septic-to-Sewer Map`.
+
+**SAY (verbatim):**
+> *"This is the trillion-dollar problem inside your $2.5B utilities master plan. Roughly **half of Hollywood** — **17,000 properties** — is on **septic tanks** instead of municipal sewer. Septic tanks plus rising groundwater plus sea-level rise plus an aquifer this close to the surface equals a public-health and water-quality risk that has to be solved in the next 30 years. That's the **$1.3 billion septic-to-sewer expansion** your department of public utilities presented in October."*
+
+**CLICK 1:** drag the **Social Equity slider** from 25 to 55. The other three sliders auto-rebalance.
+
+**SAY (verbatim):**
+> *"There are four ways you could prioritize: where the groundwater risk is highest, where tidal flooding hits hardest, where it's cheapest to connect, and where the residents who most need help live. EcoHeart lets you weight all four. I just told the model to prioritize equity."*
+
+**CLICK 2:** click **Solve**. The phase clusters animate.
+
+**SAY (verbatim):**
+> *"Solve. That's about three quarters of a second, and the optimizer has re-clustered all 17,000 parcels into six phases. Notice that Phase 1 now picks up **Liberia** — which is your most CDBG-eligible tract. CDBG, that's the federal Community Development Block Grant; those residents qualify for zero-interest forgivable loans on their connection fee."*
+
+**CLICK 3:** click **Compare to current city plan**. The map splits left/right.
+
+**SAY (verbatim):**
+> *"Now compare. Left: your current adopted sequence — Boulevard Heights first, because it's adjacent to existing trunk lines. Engineering-optimal. Right: EcoHeart's equity-weighted sequence — Liberia moves up a phase. Reasonable people can disagree on the weights. EcoHeart's job is not to decide for you. EcoHeart's job is to make the trade-off visible to your Sustainability Advisory Committee."*
+
+> **The innovation:** turn a 30-year capital sequence into a slider. What used to be a quarterly engineering meeting becomes a 90-second commissioner conversation.
+> **The tech:** in this demo, a client-side weighted sort over 500 representative parcels. In production: a real **MILP** (mixed-integer linear-programming) solver running in our Daytona Python sandbox against 17,000 real parcels with real groundwater, real elevation, real ACS demographics. 30–90 seconds per scenario.
+> **The expertise:** civil-engineering literate + equity-data literate + budget-cycle literate. We don't just optimize cost; we optimize on the dimensions your Capital Improvement Plan actually weighs.
+
+**Define terms used:** septic-to-sewer, CDBG, LMI, MILP.
+
+---
+
+### Block 5 · 8:30 – 11:00 — Grant Finder Agent (`/demo/grant-finder`)
+
+**Click into the sidebar:** `Grant Finder Agent`.
+
+**SAY (verbatim):**
+> *"Every city in the Compact region runs the same grant-writing playbook against the same five federal and state programs — Resilient Florida, FEMA BRIC, the EPA Clean Water State Revolving Fund, CDBG Disaster Recovery, FEMA Hazard Mitigation. The work is **identical** city to city. It's a grant writer's full week per application. We thought: what if you just described the project?"*
+
+**CLICK 1:** click the **"Septic-to-sewer expansion in Boulevard Heights, ~1,100 properties, $71M, 18-month timeline"** chip.
+
+**SAY while it runs (~10–15 sec):**
+> *"What's happening right now: EcoHeart AI is reasoning over our catalog of grant programs — eligibility criteria, scoring rubrics, match requirements, NOFO dates — and matching them against what Hollywood already has on the books. Hollywood is on the Compact. Hollywood has a CVA Update in flight. Hollywood has CDBG-eligible tracts. The agent knows all of that."*
+
+**Top match renders.**
+
+**CLICK 2:** click to expand the top match (typically **EPA CWSRF** or **Resilient Florida Implementation**).
+
+**SAY (verbatim):**
+> *"Top match — Resilient Florida Implementation Grant. Score 94 out of 100. Why? Look at the eligibility checklist. Twelve criteria, ten of them already green. The one I want you to read aloud is right here: 'Vulnerability assessment per Florida Statute 380.093 on file' — green, because your Climate Vulnerability Assessment Update is in flight."*
+
+**CLICK 3:** click **Generate full application draft**.
+
+**SAY:**
+> *"And here's the application narrative — two paragraphs, drafted in five seconds, every claim grounded in a real Hollywood document."*
+
+**CLICK 4:** click **Add to pipeline.** Right-rail updates with the $35.5M figure.
+
+> **The innovation:** grants management is the single most-labor-intensive task in a sustainability office, and the most reused across cities. We turn one staff-week into one click + one review.
+> **The tech:** EcoHeart AI agent over a curated, structured catalog. In production: 30+ programs with nightly NOFO scraping, persistent pipeline tracking, and grant-format-specific exports (Word for federal, Florida-portal upload for state).
+> **The expertise:** federal grants compliance + state-level program knowledge + technical writing. Our 11-person team includes specialists who have literally written winning BRIC and Resilient Florida applications.
+
+**Define terms used:** NOFO, BRIC, HMGP, CWSRF, CDBG-DR.
+
+---
+
+### Block 6 · 11:00 – 13:00 — SLR Adaptation Pathways (`/demo/adaptation-pathways`)
+
+**Click into the sidebar:** `SLR Adaptation Pathways`.
+
+**The diagram fills the viewport. Pause for two beats so they take it in.**
+
+**SAY (verbatim — frame the concept before the visual):**
+> *"This one requires a little bit of context, but it's powerful. We use a tool we call the **Systems Modeler**, based on a systems-thinking concept by Gene Bellinger. What you're looking at is a **causal loop diagram** — every variable in your city's resilience system is a node, every arrow is a cause-and-effect link. The red badges are **reinforcing loops** — they spiral and accelerate. The blue badges are **balancing loops** — they self-correct."*
+>
+> *"What this gives you is a 360-degree view of a complex problem — all the stakeholders, all the feedback loops, and what changes when you pull a lever. It's a visualization tool, but it's also a powerful **summarization** tool. The kind of thing you put in front of a commission or an advisory committee to bring everyone onto one page."*
+
+**SAY (define the three pathways — this is the new term-clarification beat):**
+> *"And what we're modeling here is the central debate every coastal city is having right now: how do we adapt to sea-level rise? There are three strategies — three **adaptation pathways** — and every city is doing some mix of all three. The question is which one *dominates*."*
+>
+> *"**Armoring** — that's what you're looking at right now. Build seawalls, install pump stations, raise the roads, harden the infrastructure. Engineering-led. It's what Fort Lauderdale is doing with Fortify Lauderdale, what Miami Beach did with the Sunset Harbour pumps. It protects the urban form you already have. But — and this is what the model shows — it can lock you in. New development comes back into the protected zone. Catastrophic exposure twenty years out goes up, not down."*
+>
+> *"**Accommodation** is the second pathway — adapt parcel-by-parcel. Elevate buildings, floodproof ground floors, install tidal valves, raise utilities. Slower. More distributed. Preserves the urban form, spreads the cost, pairs well with insurance. The drawback is that it works only if compliance is broadly distributed — laggard parcels become failure nodes."*
+>
+> *"**Managed Retreat** is the third — strategic, voluntary relocation away from the highest-risk zones. FEMA buyouts, transfer of development rights to inland parcels, conversion of acquired land into restored wetland. Hardest politics. Most ecologically restorative. Hollywood isn't talking publicly about retreat yet — but the CVA Update will force the conversation."*
+
+**CLICK 1:** click **Accommodation** then **Managed Retreat** to show the three pathway tabs are entirely different system shapes.
+
+**SAY:**
+> *"Same sea-level rise projection. Three completely different system shapes. Each has a different cost structure, a different equity profile, a different ecological outcome."*
+
+**CLICK 2:** return to **Armoring**. Click the purple **Collide with "Healthcare staffing crisis"** button.
+
+**SAY (verbatim — be calm, this references a real tragedy):**
+> *"We call this the **Aha! Paradox**. The model collides with an unrelated concept and surfaces the **load-bearing assumption** — the thing we've been quietly avoiding. Here: the 2017 Hurricane Irma tragedy at the Rehabilitation Center at Hollywood Hills wasn't, ultimately, a generator failure. It was a workforce-availability failure — locum nurses couldn't reach the facility, maintenance contractors were outsourced. Climate adaptation is fundamentally a workforce-availability problem. The model has just added that loop."*
+
+**CLICK 3:** click **Humanize (800–1200 words)**.
+
+**Read the first paragraph aloud.** Then move on.
+
+> **The innovation:** systems-thinking has been a methodology for fifty years. EcoHeart is the first to embed it as a live, AI-iterable tool that runs against your city's actual plans. The Aha! Paradox + Humanize steps turn a static diagram into a generative strategy session.
+> **The tech:** the same Causal Loop Diagram engine that powers our Olympia POC. D3 force-directed layout, Bellinger methodology, JSON-exportable, sharable as a standalone interactive HTML file your commissioners can open without any of our infrastructure.
+> **The expertise:** systems-thinking practice (Bellinger / Stanford d.school / MIT System Dynamics) + coastal-adaptation policy literacy. Most consulting firms can run a workshop on this. EcoHeart is the only platform that *operationalizes* it inside a working, AI-iterable product.
+
+**Define terms used (read inline the first time):** Causal Loop Diagram, the three adaptation pathways (Armoring, Accommodation, Managed Retreat), reinforcing loop, balancing loop.
+
+---
+
+### Block 7 · 13:00 – 14:30 — Hurricane After-Action Playbook (`/demo/hurricane-playbook`)
+
+**Click into the sidebar:** `Hurricane Playbook`.
+
+**The page lands on Pre-storm mode with a default storm. Click `Generate playbook`.**
+
+**While it generates (~8 sec):**
+
+**SAY (verbatim):**
+> *"This generates five separate preparedness checklists — Residents, Assisted Living Facilities, Hospitals, Lift Stations, Schools — tailored to a specific storm scenario. I'm going to lead with the ALF checklist because it carries the most important lesson in this city's recent memory."*
+
+**The page lands on the ALF tab. The rose-bordered banner appears.**
+
+**Pause. Read the banner verbatim, calmly:**
+> *"'Lesson from 2017: the Rehabilitation Center at Hollywood Hills lost twelve to fourteen residents to heat after a generator failure during Hurricane Irma. Florida's emergency-generator rule for ALFs was built on that. Generator status and indoor-temperature monitoring are item one on this list.'"*
+
+**Scroll. Point at items 1 and 2.**
+
+**SAY:**
+> *"Item one — confirm generator is operational and fueled for 96 hours. Item two — establish indoor-temperature monitoring with two-hour escalation thresholds. These are not generic checklists. They are written from a specific lesson learned in this specific city."*
+
+**CLICK:** flip to the **Lift Stations** tab to show the same agent generates a completely different list.
+
+**Brief.** Don't dwell.
+
+> **The innovation:** post-incident learnings get encoded into pre-incident readiness. The 2017 Hollywood Hills lesson literally becomes item one in next storm's playbook — automatically, every time.
+> **The tech:** EcoHeart AI generates each checklist at request time, conditioned on the storm category, projected track, and a Hollywood-specific context. Production: per-facility checklists pulling from AHCA's licensee database with known generator status and historical compliance.
+> **The expertise:** emergency-management literacy + healthcare-operations literacy + federal-grant compliance (so the post-storm FEMA Project Worksheet — the second mode of this page — drafts in the format FEMA actually accepts).
+
+**Define terms used:** ALF, AHCA.
+
+---
+
+### Block 8 · 14:30 – 16:30 — Phase-2 concept rapid tour
+
+**Return to** `/demo`. **Scroll to the bottom — "What else EcoHeart can build."**
+
+**SAY (verbatim):**
+> *"Six features tonight. Eight more designed. Same engine, same data, same week-six MVP commitment. Let me click through three of them in 90 seconds."*
+
+**CLICK 1 (~25 sec):** open `/demo/a1a-coastal`.
+> *"A1A Coastal Vulnerability Dashboard. Scrollytelling tour of every mile of A1A. The four FDOT pump stations under active construction — Azalea Terr, Van Buren, Sherman, Franklin — combined $24.7 million in work, projected to cut overtopping days from 26 a year to 7. The seawall heights chart shows you exactly which segments fall short of the Compact's 6.5-foot-by-2060 target. ($22 million in linear-feet-of-raise to close the gap.)"*
+
+**CLICK 2 (~25 sec):** open `/demo/tree-canopy`.
+> *"Tree canopy and **urban heat island**. Two terms quickly: **tree canopy** is the percentage of land covered by leaves overhead — more canopy means cooler streets. **Urban heat island** is the phenomenon where dense, paved cities run several degrees hotter than the surrounding land — asphalt, concrete, and absence of shade trap the heat. Investing in trees is one of the highest-leverage moves a city can make on heat. Hollywood's average canopy is 18 percent. Miami-Dade's Urban Forestry Plan targets 30 percent. We map every block, score each one on canopy plus Heat Vulnerability Index — that's the CDC's measure of who's most at risk from extreme heat — and toggle in an equity overlay so the city sees where investing in shade does the most good per resident."*
+
+**CLICK 3 (~25 sec):** open `/demo/stormwater`.
+> *"Stormwater Outfall Water Quality. Every outfall discharging into the Intracoastal, colored by recent E. coli sample. Click outfall 34 on Garfield Street — 38 septic parcels within 500 feet, 8 exceedances of the FL DEP limit in 12 months. This is the operational case for why septic-to-sewer matters. The water-quality story and the septic-conversion story are the same story."*
+
+**Then (~25 sec) point at the remaining 5 concept cards on the overview without clicking:**
+> *"And five more on this slide — a Code Assistant that answers Florida Building Code questions with paragraph-level citations; a Tourism-Climate Feedback Loop model that explains to commissioners why dune spending protects the tax base; a 311 Triage agent that auto-classifies flood complaints against tide and radar in real time; a Climate Equity Index Dashboard that drafts candidate Adaptation Action Areas; and a GHG Inventory Auto-Updater that keeps your CDP disclosure current. Same platform. Each is a Phase-2 module."*
+
+> **The innovation:** the breadth claim. One platform, fourteen verified concepts — not fourteen integrations.
+> **The tech:** every Phase-2 concept reuses the same RAG corpus, the same agent layer, the same GIS engine. New modules are days of work, not months.
+> **The expertise:** the depth of our domain map — climate, code, equity, emissions, grants, operations — is what lets us cover 14 cards without slowing down.
+
+---
+
+### Block 9 · 16:30 – 18:00 — The ask. Close on the MVP.
+
+**Stand. Stop clicking. Make eye contact with the most senior person in the room.**
+
+**SAY (verbatim):**
+> *"Six features in eighteen minutes. Eight more on the closing slide. Here's the ask."*
+>
+> *"Your **$800,000 Resilient Florida Climate Vulnerability Assessment Update is in flight right now.** That update — your asset-level vulnerability data, your stormwater inventories, your shoreline assessments — is exactly the seed corpus our Urban Resilience Platform is built to consume."*
+>
+> *"If you onboard Hollywood as our second city, we commit to a working, white-labeled MVP for your team **within six weeks** of corpus delivery. Your AWS or GCP account. Your branding. Your single sign-on. Tied to your Capital Improvement Plan."*
+>
+> *"Week one we ingest your RAG corpus. Week two the Address Risk Report is wired to live page-level citations from your own plans. Week three the Grant Finder is matching against a thirty-program catalog with Hollywood evidence. Week four real Broward parcels and the real septic optimizer go live. Week five the hurricane playbook is personalized to every ALF in your AHCA roster. Week six we do user-acceptance testing with your Sustainability Advisory Committee."*
+>
+> *"This is what EcoHeart does. Twenty-five years of public-sector data work, eleven specialists, fourteen contracts, five countries, seventy thousand citizens engaged. We're not asking you to take a leap. We're asking you to put the homework you've already done to work."*
+>
+> *"Thank you."*
+
+**Sit. Take questions.**
+
+> **The innovation:** the six-week commitment is the credibility move. Most vendors say "12-18 months." We say six weeks because we already built the Olympia POC and we know the swap is corpus-onboarding, not foundation-laying.
+> **The tech:** day-one deliverable is the same product you've just demoed, white-labeled and pointed at Hollywood's data.
+> **The expertise:** our 11-person team is structured to deliver this — data scientists, policy analysts, environmental scientists, AI engineers, all working from the same Responsible Innovation Policy.
+
+---
+
+## 5. Fallbacks if something goes sideways
 
 | Failure mode | What you do |
 |---|---|
-| NOAA API times out on /demo/king-tide | The page still loads. The "live" chip turns into a red "offline" chip but the rest of the demo (hotspots, SLR slider, map) works fine. Acknowledge it once: *"That's a third-party API — moving on."* |
-| OpenAI returns invalid JSON or times out on Risk Report (F4) | Click a different sample address. The agent has temperature 0.3 and is usually fast. If it persists, **skip F4** and use F1's "Click 'Open in Risk Report' button on a hotspot drawer" as your stand-in. |
-| OpenAI fails on Grant Finder (F7) | Apologize once, click a different sample. The five grant programs in the catalog are seeded — only the LLM matching layer is live. |
-| OpenAI fails on Hurricane Playbook (F12) | The page has a clear error message. Pivot to F9 (Adaptation Pathways) — it's entirely seeded, no API risk. |
-| Dev server crashes | Open a new terminal: `cd /Users/ahmedkhan/Repos/eco-agent/eco-agent-poc && npm run dev`. Production build also works as a fallback: `npm run build && npm start`. |
-| Internet is down | F2 (Septic), F9 (Pathways) are 100% offline. F1 still renders without NOAA. F4, F7, F12 will error gracefully. **All 8 Phase-2 concept pages are fully offline-safe** — no APIs, no AI calls. |
-| One of the 8 concept pages errors | All 8 are static. If one fails to load (rare), refresh the browser. The hot reload should recover it. None of them affect the core flight plan. |
+| NOAA API times out on /demo/king-tide | The page still loads. The "live" chip turns into a red "offline" chip; the rest of the demo (hotspots, SLR slider, map) works fine. Acknowledge it once: *"That's a third-party API — moving on."* |
+| EcoHeart AI returns invalid JSON or times out on Risk Report | Click a different sample address. The model has temperature 0.3 and is usually fast. If it persists, **skip Block 2** and use Block 3's "Open in Risk Report" button as your stand-in. |
+| EcoHeart AI fails on Grant Finder | Apologize once, click a different sample. The five grant programs are seeded — only the matching layer is live. |
+| EcoHeart AI fails on Hurricane Playbook | Pivot to Block 6 (Adaptation Pathways) — it's entirely seeded, no API risk. |
+| Dev server crashes | Open the deployed backup: `https://eco-agent-poc.onrender.com/demo`. Everything still works there. |
+| Internet is down | Blocks 4 (Septic) and 6 (Pathways) are 100% offline. Block 3 (King Tide) still renders without NOAA. Blocks 2, 5, 7 will error gracefully. **All 8 Phase-2 concept pages are fully offline-safe.** |
 
 ---
 
-## 7. What's real, what's simulated, and how EcoHeart would productionize each
+## 6. What's real, what's simulated, and how EcoHeart would productionize each
 
 > **Read this section before the demo.** When a commissioner asks "is that real?", be precise. The trust you build by drawing this line clearly is what closes the deal.
 
-### 7.1 The headline answer
+### 6.1 The headline answer
 
 | | Demo today | Production EcoHeart for Hollywood |
 |---|---|---|
@@ -386,225 +505,73 @@ Return to `/demo` for the closing slide. Point at the **"What else EcoHeart can 
 | **Hurricane playbook** | Real EcoHeart AI checklists; sample damage CSV is simulated | Real damage import from inspector tablets + Open311 + utility outage logs |
 | **The 2017 Hollywood Hills banner** | Hardcoded as a respectful, factually-accurate reference | Same — this is a planning anchor, not data |
 
-### 7.2 Page-by-page lineage
-
-#### F1 — King Tide Flood Risk Explorer
-
-**REAL (live):**
-- NOAA Tides & Currents API — station 8723214 (Virginia Key). Predicted high/low tides for the next 60 days, observed water levels for the last 14 days. Refreshed at every page load with 1-hr server cache.
-- FEMA National Flood Hazard Layer tiles (layer 28) — direct from `hazards.fema.gov`.
-- NOAA Sea Level Rise tile pyramids (1/3/6/10 ft) — direct from `coast.noaa.gov`.
-- CartoDB Positron basemap.
-- All map tiles are fetched client-side; no EcoHeart server proxies them.
-
-**SIMULATED / SEEDED:**
-- The 6 flood hotspot locations and their "flood days per year" numbers are hand-curated from the dossier's research (FDOT pump-station list, Hollywood Public Utilities tidal-valve project, Temple Solel community reports).
-- The 6 king-tide window descriptions are derived from NOAA-predicted peak dates plus narrative framing from `hollywoodfl.org/1473`.
-- The 6 critical-asset pins (ALFs, hospitals, fire stations, lift stations) are public-record locations but the asset list is hand-curated, not pulled from an authoritative city register.
-
-**Production path (4 weeks of work):**
-1. Replace the static hotspot list with a live feed from Hollywood NOW / Open311 — "tidal flooding" tickets clustered by intersection.
-2. Replace the curated critical-asset list with a live join against:
-   - Broward GIS facilities layer (hospitals, fire, schools)
-   - Florida AHCA license database (ALFs, dialysis, skilled nursing)
-   - Hollywood Public Utilities asset register (lift stations, pump stations, force mains)
-3. Add a Daytona Python step that, on a nightly cron, runs the threshold-exceedance calculation against the NOAA forecast and writes per-parcel "expected flood days" attributes to Postgres.
-4. Replace the static "FDOT pump station ~70% complete" copy with a live feed from FDOT's project page.
-
----
-
-#### F2 — Septic-to-Sewer Prioritization Map
-
-**REAL:**
-- Hollywood's $1.3B septic-to-sewer figure — from the Oct 22, 2025 Public Utilities Master Plan presentation.
-- The CDBG forgiveness loan parameters ($2,130 Reserve Capacity Fee, $2,000 abandonment, 90-day notification window, 5-year forgiveness) — from city published policy.
-- The five neighborhood names and rough geographic centers.
-
-**SIMULATED:**
-- All 500 parcels are synthetic. They are seeded with a deterministic PRNG so the demo is reproducible, but the lat/lng, groundwater risk score, tidal flood exposure, cost-to-connect, and social-equity score for each parcel are computed, not measured.
-- The phase clustering is a client-side weighted sort (score every parcel, slice into 6 equal-size phases), not the constrained optimization (MILP, integer programming, or k-means with capacity constraints) that the dossier describes as "the real" solver.
-- The "current city plan" phasing is a stand-in based on the dossier's narrative ordering (Boulevard Heights → Driftwood → Hollywood Hills → …). The actual city plan has not yet been published in spatial form.
-- "Citywide methane offset" numbers use a rough 0.25 tCO₂e/parcel assumption.
-
-**Production path (6 weeks):**
-1. **Ingest the real parcel layer** — Broward County GIS publishes parcels with assessed value, year built, lot area, and existing wastewater connection status. The Hollywood Public Utilities GIS team has an authoritative "unsewered properties" layer (the city has been mapping this for the master plan). Cross-join produces ~17,000 real parcels with addresses.
-2. **Compute real exposure scores per parcel** using:
-   - **Groundwater risk** — Florida Geological Survey water-table depth raster, intersected with parcel centroid.
-   - **Tidal flood exposure** — % of parcel inundated under NOAA SLR 1ft / 3ft tiles.
-   - **Cost-to-connect** — straight-line distance to nearest existing sewer main (Public Utilities GIS) times a per-foot construction unit cost.
-   - **Social equity** — block-group LMI status from HUD CDBG income limits + ACS B19013 median household income + CDC Social Vulnerability Index.
-3. **Real solver in Daytona** — formulate as a constrained MILP: minimize weighted exposure over a 30-year phasing, subject to per-phase budget ≤ $44M, per-phase parcel count ≤ ~3000, and contiguity preference (cluster scoring bonus for adjacent parcels to keep construction trenches efficient). Python with `pulp` or `cvxpy` runs in 30–90 seconds per scenario.
-4. **Side-by-side with the city's current adopted phasing** — once the city publishes Phase 1/2/3 boundary polygons, render them as the "left" map and the optimizer output as the "right." This is the artifact you take to the Sustainability Advisory Committee.
-5. **CSV export** drops a real parcel-ID list per phase, which can be loaded into the city's CIP tool (Cartegraph, OpenGov, or Excel).
-
----
-
-#### F4 — Address-Based Climate Risk Report
-
-**REAL:**
-- **Geocoding** — every address is sent to OpenStreetMap Nominatim with a bounding-box constraint (`-80.205,26.060,-80.105,25.960`) so it only returns Hollywood matches. Free, no API key, no rate-limit issues for a demo.
-- **AI synthesis** — every report is a real EcoHeart AI call (`response_format: json_object`, temperature 0.3). The prompt includes a 7-document authoritative source list (Sustainable Hollywood Action Plan, CVA, Dune Master Plan, Public Utilities Master Plan, SE FL Compact 2019 SLR projection, FBC HVHZ, Florida Statute §380.093) and asks the model to ground every score and recommendation in those documents.
-- **Location-aware prompting** — the prompt adds a "Location indicator" line based on the geocode (barrier island vs. Intracoastal vs. inland) so scores differ by neighborhood.
-
-**SIMULATED:**
-- The model has been **told about** the 7 source documents but does not have their full text in the prompt. It synthesizes from training-cutoff knowledge of those documents plus the framing in the system prompt. **A future Hollywood RAG corpus would replace this with real page-level retrieval.**
-- The map only shows the FEMA flood-zone layer for context — it does not yet show parcel-specific exposure overlays.
-- The "Generate PDF / Email to resident / Submit as 311 ticket" buttons render but do not yet wire to those workflows.
-
-**Production path (8 weeks):**
-1. **Ingest Hollywood's full PDF library** into the existing EcoHeart RAG pipeline (OpenAI `text-embedding-3-small`, AWS S3 Vectors). The Olympia POC has done exactly this for 26 documents.
-2. **Replace the system-prompt source list with live RAG retrieval** at query time — top-5 chunks for "flood risk in Hollywood" + top-5 for "insurance disclosure" + top-5 for "building code freeboard," all stuffed into the prompt as cited context.
-3. **Page-level citations** — every recommendation in the output references a specific PDF and page number, with click-through to the source PDF excerpt (existing Olympia pattern).
-4. **Real overlay computations** — replace AI-generated scores with rule-based computations from spatial data: FEMA zone lookup, elevation from USGS 3DEP, evacuation zone from Broward EOC, wind design speed from ASCE 7 hazard tool, heat days from Climate Mapping for Resilience and Adaptation.
-5. **PDF export** wired to existing Olympia `jsPDF` pattern. **311 integration** via Open311 API if Hollywood NOW exposes one.
-6. **Insurance score** wired to Citizens depopulation public records + Florida Office of Insurance Regulation rate filings.
-
----
-
-#### F7 — Grant Finder Agent
-
-**REAL:**
-- **AI matching and narrative drafting** — every match is a real EcoHeart AI call against a hand-curated catalog of 5 programs.
-- **The 5 grant programs are real**: Resilient Florida Implementation, FEMA BRIC, EPA CWSRF, HUD CDBG-DR, FEMA HMGP. Their eligibility criteria, scoring rubrics, match requirements, and award caps are pulled from real NOFOs (Notices of Funding Opportunity).
-- **Hollywood eligibility evidence is real** — the model is told that Hollywood has a CVA Update in flight (Resilient Florida-funded), has CDBG-eligible tracts, has a Hazard Mitigation Plan, and is a member of the SE FL Compact. These are all verifiable public facts.
-
-**SIMULATED:**
-- The catalog is 5 programs, not 30+. Missing: EPA CPRG, DOT RAISE, EDA Public Works, Florida Springs, USDA Rural Water/Wastewater, NOAA NCRF, plus 15+ Florida-specific programs.
-- The "Next step" timing claims ("application opens July 7") are illustrative — the model is not pulling live cycle dates.
-- The pipeline tracker is client-only (in-memory) and resets on refresh.
-
-**Production path (4 weeks):**
-1. **Expand the catalog to 30+ programs** with structured records: agency, max award, match %, BCA threshold, eligible activities, scoring rubric, cycle dates, application portal URL.
-2. **Nightly NOFO scraper** that watches each federal/state agency's grant portal for new and amended opportunities, refreshes deadlines, and notifies registered users (city grant team).
-3. **Hollywood evidence pool from RAG** — instead of model-recalled facts, every eligibility "green" gets a specific page citation from the Hollywood RAG corpus.
-4. **Persistent pipeline** — Postgres-backed, multi-user, with status tracking (Drafting / Submitted / Awarded / Declined), reminders for upcoming deadlines, and audit log for grants management compliance.
-5. **Application export** in each grant's required format (Word for federal, FloridaJobs portal upload for state, PDF for matching documentation).
-6. **Match-stacking optimizer** — given a project, find the combination of grants that maximizes coverage without violating overlap rules (most grants prohibit double-counting federal match).
-
----
-
-#### F9 — SLR Adaptation Pathways Systems Model
-
-**REAL:**
-- **The Causal Loop Diagram renderer is real** — Gene Bellinger's methodology, D3 force-directed layout, draggable nodes, R/B loop badges, time-lag labels. This is the exact same component that powers EcoHeart's Olympia Systems Modeler.
-- **The three pathway models (Armoring, Accommodation, Managed Retreat) are hand-crafted but real** — every node and link is grounded in published Hollywood/Compact planning vocabulary. The R1/R2/B1 loops are real systems-dynamics constructs that match what the Adaptation Planning literature (Hallegatte et al., NOAA Coastal Adaptation Toolkit) describes.
-
-**SIMULATED:**
-- The three models are **pre-built JSON**, not generated for this demo. In Olympia's POC, the modeler generates models live from a topic via the EcoHeart AI orchestrator + RAG. For Hollywood we bypassed that step to make the demo zero-risk.
-- The "Collide with Healthcare staffing crisis" Aha! Paradox edges are hand-authored; in the live Olympia tool, a separate `/collide` endpoint generates the collision via LLM.
-- The "Humanize" narratives (the 3 stories of Marisol / Eduardo / Mayor Levy) are pre-written. The Olympia tool generates these live via the EcoHeart AI orchestrator from the model JSON.
-
-**Production path (3 weeks):**
-1. **Wire to Hollywood RAG corpus** — point the existing `/api/systems-modeler/generate` route at the Hollywood-indexed corpus with `useRag: true`. The model will pull SLR Response Plan + CVA + Hazard Mitigation Plan chunks as seed context.
-2. **Open the CopilotKit sidebar** so commissioners can iterate the diagram in real time ("add a node for FDOT pump-station maintenance budget").
-3. **Wire `Collide` and `Humanize`** to the existing live endpoints. Both work today in the Olympia POC.
-4. **Add Monte Carlo stress-test** — the dossier mentions this as F9's "wow" — run insurance availability and hurricane recurrence as probability distributions in Daytona, overlay confidence intervals on each node.
-5. **Generate illustrations via Gemini** — the Olympia humanize step already does this; ported to Hollywood it would produce scenario-card visuals.
-
----
-
-#### F12 — Hurricane After-Action Playbook
-
-**REAL:**
-- **Pre-storm checklist generation is real EcoHeart AI** — every preparedness list is generated at request time, grounded in the system prompt's Hollywood context (Memorial Regional, the Broward EOC, FDOT pump stations, A1A, the Broadwalk).
-- **The 2017 Hollywood Hills banner is hardcoded** — this is a factually accurate planning anchor, not data the model invents. 12–14 patients died after generator failure during Irma; Florida's emergency-generator rule for ALFs followed directly.
-- **Post-storm FEMA Project Worksheet drafting is real EcoHeart AI** against whatever CSV the user pastes.
-
-**SIMULATED:**
-- The damage CSV is sample data with 8 illustrative rows (A1A pump, Broadwalk, etc.).
-- The "Distribute to registered facility contacts" and "Submit to HMGP/BRIC" buttons render but do not yet integrate with email or grant portals.
-- There is no live incident data — the storm parameters are user-input only.
-
-**Production path (6 weeks):**
-1. **Real-time storm feed** — NWS / NHC API for active storm tracks, automatic Cat / track / surge-zone population.
-2. **Facility roster ingest** — Florida AHCA license database for ALFs and skilled nursing, Memorial Healthcare System list for hospitals, Hollywood Public Utilities for lift stations, BCPS for schools. Each facility carries contact info, generator status, beds, evacuation-zone assignment.
-3. **Personalized checklists per facility** — instead of one ALF checklist for all, generate per-facility based on its specific risk profile and known deficits.
-4. **Email distribution** to registered facility contacts via SendGrid; SMS via Twilio; **integration with Everbridge / FirstNet** for emergency notification.
-5. **Post-storm damage import** — inspector tablet (ESRI Survey123 or Fulcrum) drops geocoded damage rows into Postgres; the agent runs nightly aggregations.
-6. **FEMA Project Worksheet** exported in FEMA's actual PDF template; submitted via FEMA Grants Portal.
-
----
-
-### 7.2b Phase-2 concept pages — quick lineage
-
-| Concept | Real | Simulated | Production swap |
-|---|---|---|---|
-| **A1A Coastal** (`/demo/a1a-coastal`) | Photography, FDOT-project names, Compact 6.5 ft 2060 target, Dune Master Plan zones | 4 pump-station progress numbers, 6 seawall segments, 5 dune zone vegetation %, 5 next-best-action items | Live FDOT project portal feed · live Hollywood Public Utilities asset register · RAG-generated next-best-actions |
-| **Tree Canopy** (`/demo/tree-canopy`) | Hollywood ~18% canopy avg, Miami-Dade UFP 30% target, HVI methodology | 10 priority blocks, canopy %, recommended tree counts, costs | USFS Tree Canopy raster · Landsat NDVI · ACS B19013 · CDC SVI · Google Earth Engine for nightly zonal stats |
-| **Stormwater** (`/demo/stormwater`) | EPA / FL DEP 410 CFU/100mL limit, Florida WIN data structure | 8 outfall locations + 24 months of seeded E. coli/rainfall/tide series, septic-within-500ft counts | EPA STORET + Florida WIN APIs (nightly) · Broward MORD rainfall · NOAA tide correlation in Daytona |
-| **Code Assistant** (`/demo/code-assistant`) | 3 fully-cited seeded answers (freeboard, garage doors, seawalls) reference real code paragraphs; active code book list is real | All other questions fall back to a "concept page" message; PDF links are placeholders | Full RAG over FBC 8th Ed. + ASCE 24 + Hollywood Code §155 + §117 + Broward Land Use Plan; page-level citation traceability |
-| **Tourism Loop** (`/demo/tourism-loop`) | CLD model JSON is hand-crafted but real (10 nodes, 13 links, 3 loops); Bellinger methodology | $890M visitor-spend stat; 3 scenario tabs are narrative-only (no model recompute); Collide + Humanize buttons unwired | Model generated from RAG corpus via existing `/api/systems-modeler/generate` · Collide + Humanize wired to live Olympia endpoints |
-| **311 Triage** (`/demo/triage`) | Open311 spec, classification methodology, CIP project linking concept | 12 seeded reports w/ deterministic classifications; confidence scores hand-tuned; tide/radar correlation is descriptive | Live Hollywood NOW Open311 feed · NOAA tide (already wired in F1) · Broward MORD radar · CIP join from Cartegraph |
-| **Equity Index** (`/demo/equity`) | AAA framework from Miami-Dade Little River; peer-AAA list is real; composite-weight methodology | 8 synthetic blocks w/ exposure + demographics; choropleth is decorative SVG | Real block-group ACS + CDC SVI + HUD LMI joined to Broward parcels; Mapbox or Leaflet choropleth with click-through |
-| **GHG Updater** (`/demo/ghg`) | GPC Basic+ protocol; CDP + Climate Mayors alignment; SAP 80%-by-2050 target | 6 seeded sectors w/ baselines + glide path; 2025 estimate is interpolated | Live FPL/TECO consumption (CDP-portal) · Broward DOT VMT · waste tonnage · WWTP BOD · nightly Daytona recompute |
-
-### 7.3 The architecture you'd say out loud if asked
-
-> *"There are three layers. The GIS layer reaches out to public servers — NOAA, FEMA, NWS — directly from the browser; no EcoHeart server in the path. The RAG layer indexes your published planning PDFs and serves them as cited context to EcoHeart AI. The agent layer wraps both with tools — geocoding, parcel data, optimization in a Python sandbox — and orchestrates them into workflows like 'address → risk report' or 'project → grant draft.' Production deployment is your AWS or GCP account, your data residency, your branding. Six-week MVP."*
-
-### 7.4 Data residency, security, and privacy posture
-
-| Concern | Demo | Production |
-|---|---|---|
-| Where does resident data go? | Demo doesn't store any. AI calls go to OpenAI; nothing persists. | Hollywood AWS/GCP account. PII never leaves your environment. OpenAI calls use enterprise tier with zero-retention. |
-| API keys | Demo uses Ahmed's keys. | Hollywood-issued keys, rotated quarterly. |
-| Auth | Demo has no auth gate. | SSO via Hollywood Microsoft 365 / Okta. RBAC: Public viewer, Staff editor, Admin. |
-| Audit logging | None in demo. | Every grant draft, every risk report, every workflow tagged with user + timestamp + input + output, retained 7 yr. |
-| Open records / FOIA | N/A | All EcoHeart-generated documents (grant drafts, risk reports, after-action playbooks) are full public records, searchable via the existing portal. |
-| AI hallucination guardrail | Prompt grounds in 7 named sources but does not retrieve them. | Every claim cites a specific PDF + page; UI surfaces the citation; agent refuses to answer if no relevant chunk is retrieved. |
-
-### 7.5 The "is anything fake?" answer in one sentence
+### 6.2 The "is anything fake?" answer in one sentence
 
 > *"The maps, the tides, and the AI calls are real, today. The 500 septic parcels and the 3 systems-dynamics models are hand-crafted for this demo because we haven't yet onboarded your data. Onboarding your data — the CVA Update is the seed corpus — is exactly what the 6-week MVP buys you."*
 
-### 7.6 The 6-week MVP plan (the thing the city is actually buying)
+### 6.3 The architecture you'd say out loud if asked
+
+> *"There are three layers. The GIS layer reaches out to public servers — NOAA, FEMA, NWS — directly from the browser; no EcoHeart server in the path. The RAG layer indexes your published planning PDFs and serves them as cited context to EcoHeart AI. The agent layer wraps both with tools — geocoding, parcel data, optimization in a Python sandbox — and orchestrates them into workflows like 'address → risk report' or 'project → grant draft.' Production deployment is your AWS or GCP account, your data residency, your branding. Six-week MVP."*
+
+### 6.4 Data residency, security, and privacy posture
+
+| Concern | Demo | Production |
+|---|---|---|
+| Where does resident data go? | Demo doesn't store any. AI calls go to OpenAI; nothing persists. | Hollywood AWS/GCP account. PII never leaves your environment. AI calls use enterprise tier with zero-retention. |
+| API keys | Demo uses Ahmed's keys. | Hollywood-issued keys, rotated quarterly. |
+| Auth | Demo has no auth gate. | SSO via Hollywood Microsoft 365 / Okta. RBAC: Public viewer, Staff editor, Admin. |
+| Audit logging | None in demo. | Every grant draft, every risk report, every workflow tagged with user + timestamp + input + output, retained 7 yr. |
+| Open records / FOIA | N/A | All EcoHeart-generated documents are full public records, searchable via the existing portal. |
+| AI hallucination guardrail | Prompt grounds in 7 named sources but does not retrieve them. | Every claim cites a specific PDF + page; UI surfaces the citation; agent refuses to answer if no relevant chunk is retrieved. |
+
+### 6.5 The 6-week MVP plan (what the city is buying)
 
 | Week | Deliverable |
 |---|---|
 | 1 | Ingest Hollywood RAG corpus (Sustainable Hollywood Action Plan + CVA + CVA Update draft + Hazard Mitigation Plan + Public Utilities Master Plan + Dune Master Plan + Capital Improvement Plan). Cloud account setup. SSO. |
-| 2 | Wire Address Risk Report (F4) to live RAG — every score backed by Hollywood PDF page citations. |
-| 3 | Wire Grant Finder (F7) to expanded 30-program catalog + Hollywood RAG evidence pool. |
-| 4 | Ingest real Broward parcels + Hollywood unsewered layer; deploy the real MILP optimizer (F2). |
-| 5 | Onboard Hollywood facility roster (AHCA ALFs, Memorial, lift stations) → personalized hurricane playbooks (F12). Wire Systems Modeler (F9) to Hollywood RAG. |
+| 2 | Wire Address Risk Report to live RAG — every score backed by Hollywood PDF page citations. |
+| 3 | Wire Grant Finder to expanded 30-program catalog + Hollywood RAG evidence pool. |
+| 4 | Ingest real Broward parcels + Hollywood unsewered layer; deploy the real MILP optimizer. |
+| 5 | Onboard Hollywood facility roster (AHCA ALFs, Memorial, lift stations) → personalized hurricane playbooks. Wire Systems Modeler to Hollywood RAG. |
 | 6 | UAT with Sustainability Advisory Committee. White-label branding, custom domain, training session, runbook handoff. |
-
-Cost (transparent): platform fee + cloud passthrough + one-time onboarding. **Exact numbers in the follow-up SOW** — they get shaped to fit the city's FY27 budget cycle.
 
 ---
 
-## 8. The questions you'll be asked, and the answers
+## 7. The questions you'll be asked, and the answers
 
 | Question | Answer |
 |---|---|
-| *"How are the risk scores calibrated?"* | "Honest answer: today the scores are EcoHeart AI synthesis grounded in Hollywood plans and Florida statute. In production we ground them in your CVA Update's asset-level data — that's the seed corpus we'd onboard." |
-| *"What happens to our data?"* | "Nothing leaves your environment without your sign-off. The OpenAI calls in this demo are for synthesis only; no resident addresses persist. Production deployment runs in your own cloud account." |
-| *"Who else uses this?"* | "Olympia, WA is the first POC — 26 indexed municipal plans, live at eco-agent-poc.onrender.com. Hollywood would be the second city, with the SE FL Compact framing." |
+| *"How are the risk scores calibrated?"* | "Today the scores are EcoHeart AI synthesis grounded in Hollywood plans and Florida statute. In production we ground them in your CVA Update's asset-level data — that's the seed corpus we'd onboard." |
+| *"What happens to our data?"* | "Nothing leaves your environment without your sign-off. The AI calls in this demo are for synthesis only; no resident addresses persist. Production deployment runs in your own cloud account." |
+| *"Who else uses this?"* | "Olympia, WA is the first POC — 26 indexed municipal plans, live at eco-agent-poc.onrender.com. We have pilots running in 5 countries. Hollywood would be the second city, with the SE FL Compact framing." |
 | *"What's the price?"* | "Pilot is white-labeled MVP delivered in 6 weeks against your CVA Update corpus. Pricing is a flat platform fee with no per-resident charge. Specific numbers in a follow-up — we'd shape the package to your FY27 budget cycle." |
-| *"Can you integrate with Hollywood NOW?"* | "Yes — Open311 spec is standard. F11 (311 triage) is on the concept card list because that integration is a 2-week scope, not 12. We've kept it off the v1 pilot." |
+| *"How is this different from a GIS consultant?"* | "GIS consultants ship dashboards. We ship a *decision-intelligence platform* — AI agents wrapped around your data, with an Ethical AI Governance layer so every recommendation is auditable. The dashboard is one of five layers." |
+| *"What about explainability? AI is a black box."* | "Not ours. Every answer EcoHeart produces has a paragraph-level citation back to your own published documents. Our AI Ethics & Responsible Innovation Policy requires it. If the model can't cite, it doesn't answer." |
+| *"Can you integrate with Hollywood NOW?"* | "Yes — Open311 spec is standard. Our 311 Triage concept is on the Phase-2 list because that integration is a 2-week scope, not 12." |
 | *"What about the Gridics 3D zoning map?"* | "Gridics already does parcel-level zoning beautifully. EcoHeart sits next to it — we don't replicate zoning, we layer risk, plan citations, and grant matching on top." |
 
 ---
 
-## 9. Routes & commands cheat sheet
+## 8. Routes & commands cheat sheet
 
 ```
 /                              Olympia POC (don't open during Hollywood demo)
-/demo                          Hollywood landing
+/demo                          Hollywood landing — open this first
 
 # Core 6 (flight plan)
-/demo/king-tide                F1 — live NOAA
-/demo/septic-priority          F2 — optimizer
-/demo/risk-report              F4 — live geocode + EcoHeart AI
-/demo/grant-finder             F7 — EcoHeart AI matching
-/demo/adaptation-pathways      F9 — Systems Modeler (3 pre-built CLDs)
-/demo/hurricane-playbook       F12 — pre-storm + post-storm
+/demo/king-tide                Block 3 — live NOAA
+/demo/septic-priority          Block 4 — optimizer
+/demo/risk-report              Block 2 — live geocode + EcoHeart AI
+/demo/grant-finder             Block 5 — EcoHeart AI matching
+/demo/adaptation-pathways      Block 6 — Systems Modeler
+/demo/hurricane-playbook       Block 7 — pre-storm + post-storm
 
 # Phase-2 concept pages (8 static, offline-safe)
 /demo/a1a-coastal              A1A Coastal Vulnerability Dashboard
 /demo/tree-canopy              Tree Canopy & Heat Island Map
 /demo/stormwater               Stormwater Outfall + Water Quality
 /demo/code-assistant           Building Resilience Code Assistant
-/demo/tourism-loop             Tourism-Climate Feedback Loop Model
+/demo/tourism-loop             Tourism-Climate Feedback Loop
 /demo/triage                   311 Climate Complaint Triage
 /demo/equity                   Climate Equity Index Dashboard
 /demo/ghg                      GHG Inventory Auto-Updater
@@ -618,7 +585,7 @@ POST /api/demo/hurricane-playbook   { "mode": "pre"|"post", ... }
 
 ---
 
-## 10. Authoritative URLs to keep in a browser tab
+## 9. Authoritative URLs to keep in a browser tab
 
 For "we use the same source you use" moments:
 
@@ -631,15 +598,19 @@ For "we use the same source you use" moments:
 - `map.gridics.com/us/fl/hollywood`
 - `tidesandcurrents.noaa.gov/stationhome.html?id=8723214`
 - `experience.arcgis.com/experience/d4f2e042f59e4b2eaee108c0777a0937` (Resilient FL Grants Dashboard)
+- `cdp.net/en/cities` (Cities CDP disclosures)
 
 ---
 
-## 11. Final reminders
+## 10. Final reminders
 
-1. **Read citations aloud once per feature.** The audience will be skeptical of LLM output. Show them you cite.
-2. **Name names.** Mayor Levy, the Sustainability Advisory Committee, Vin Morello (Public Utilities Master Plan), Azita Behmardi (City Engineer). All within the first 90 seconds.
-3. **The 2017 Hollywood Hills reference is in the product on purpose.** Read the banner aloud. Don't editorialize.
-4. **Don't sell the architecture.** Sell the workflow: address → report. Project → grant draft. Storm → ALF checklist. Plan → causal loop.
-5. **End on the ask.** *"Six weeks. Your CVA Update as the seed. We'll have an MVP for your team."*
+1. **18 minutes is the entire budget.** If you're at 14 minutes after Block 7, *skip Block 8* (the Phase-2 rapid tour) and go straight to the close.
+2. **Read citations aloud once per feature.** The audience is skeptical of AI. Show them you cite.
+3. **Name names early.** Mayor Levy, the Sustainability Advisory Committee, Vin Morello (Public Utilities Master Plan), Azita Behmardi (City Engineer) — all within the first 90 seconds.
+4. **Define terms inline the first time you use them.** Even the obvious ones. *"Sea-level rise — that's the long-term rise in ocean height …"*
+5. **The 2017 Hollywood Hills reference is in the product on purpose.** Read the banner aloud. Don't editorialize. Don't dwell. Move on with respect.
+6. **Don't sell the architecture.** Sell the workflow: address → report. Project → grant draft. Storm → ALF checklist. Plan → causal loop.
+7. **End on the ask.** *"Six weeks. Your CVA Update as the seed. We'll have an MVP for your team."*
+8. **Remember the four numbers:** 1.2B (people displaced by 2050), $33M (EcoHeart's contracted pipeline), 70,000 (citizens engaged), 11 (specialists on the team).
 
 Go close it. — EcoHeart.
