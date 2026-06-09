@@ -114,3 +114,11 @@
 .demo-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
 .demo-scroll::-webkit-scrollbar-thumb { background: var(--hw-slate-200); border-radius: 3px; }
 .demo-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* About-modal stacking: the demo's Leaflet maps use z-index up to ~1000, which
+   otherwise renders over the dialog. Raise the overlay above the map, but scope
+   it to the demo's dialog only (a global override would hide other app dialogs'
+   content, which sits at z-50). Content z-index is set in about-modal.tsx. */
+[data-slot="dialog-overlay"]:has(+ [data-slot="dialog-content"].demo-root) {
+  z-index: 1100;
+}

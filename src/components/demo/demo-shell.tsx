@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -22,6 +23,8 @@ import {
   Flame,
 } from "lucide-react";
 import { EcoheartLogo } from "@/components/ecoheart-logo";
+import { AboutModal } from "@/components/demo/about-modal";
+import { aboutForPath } from "@/lib/demo/about-content";
 
 const NAV = [
   { href: "/demo", label: "Overview", icon: Home, group: "" },
@@ -44,6 +47,9 @@ const NAV = [
 
 export function DemoShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const aboutSection = aboutForPath(pathname);
+  const onOverview = pathname === "/demo";
 
   return (
     <div className="demo-root min-h-screen flex flex-col">
@@ -85,10 +91,11 @@ export function DemoShell({ children }: { children: React.ReactNode }) {
               Olympia POC
             </Link>
             <button
+              onClick={() => setAboutOpen(true)}
               className="text-sm inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[var(--hw-teal)] hover:bg-[var(--hw-teal-600)] text-white transition"
             >
               <Info className="h-3.5 w-3.5" />
-              About
+              {onOverview ? "About EcoHeart" : "About this feature"}
             </button>
           </div>
         </div>
@@ -141,6 +148,12 @@ export function DemoShell({ children }: { children: React.ReactNode }) {
         </aside>
         <main className="flex-1 min-w-0 overflow-y-auto demo-scroll">{children}</main>
       </div>
+
+      <AboutModal
+        section={aboutSection}
+        open={aboutOpen}
+        onOpenChange={setAboutOpen}
+      />
     </div>
   );
 }

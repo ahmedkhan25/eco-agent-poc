@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer } from "leaflet";
+import { patchEsriRasterLayer } from "@/lib/demo/leaflet-esri-safe";
 
 export type HollywoodLayerId =
   | "fema-flood"
@@ -151,7 +152,9 @@ export function HollywoodMap({
 
     // Add
     (async () => {
+      const L = (await import("leaflet")).default;
       const esri = await import("esri-leaflet");
+      patchEsriRasterLayer(L, esri);
       for (const id of layerIds) {
         if (layerRefs.current.has(id)) continue;
         const cfg = LAYER_CONFIG[id];
