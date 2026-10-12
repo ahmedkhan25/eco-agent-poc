@@ -3,6 +3,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { getRateLimitDisplay } from '@/lib/rate-limit';
+import { ANONYMOUS_DAILY_LIMIT } from '@/lib/rate-limit-config';
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -52,7 +53,7 @@ export function useRateLimit(): UseRateLimitReturn {
       // Anonymous user - handle cookies client-side
       const today = new Date().toISOString().split('T')[0];
       const COOKIE_NAME = '$dekcuf_teg';
-      const ANONYMOUS_LIMIT = 1;
+      const ANONYMOUS_LIMIT = ANONYMOUS_DAILY_LIMIT;
       
       const getCookie = (name: string): string | null => {
         if (typeof window === 'undefined') return null;
@@ -118,7 +119,7 @@ export function useRateLimit(): UseRateLimitReturn {
       
       const today = new Date().toISOString().split('T')[0];
       const COOKIE_NAME = '$dekcuf_teg';
-      const ANONYMOUS_LIMIT = 1;
+      const ANONYMOUS_LIMIT = ANONYMOUS_DAILY_LIMIT;
       
       // Cookie handling functions
       const getCookie = (name: string): string | null => {

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { ANONYMOUS_DAILY_LIMIT } from './rate-limit-config';
 
 // Consistent environment check as per spec
 const isDevelopment = process.env.NEXT_PUBLIC_APP_MODE === 'development';
@@ -13,7 +14,7 @@ export interface RateLimitResult {
 }
 
 // Constants for rate limiting
-const ANONYMOUS_LIMIT = 1;
+const ANONYMOUS_LIMIT = ANONYMOUS_DAILY_LIMIT;
 const FREE_LIMIT = 5;
 const UNLIMITED_LIMIT = 999999;
 

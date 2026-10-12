@@ -15,6 +15,7 @@ import {
   type MapLayerDef,
 } from "@/lib/map-layers";
 import { useMapStore } from "@/lib/stores/use-map-store";
+import { addBasemap } from "@/lib/basemap";
 
 // ---------------------------------------------------------------------------
 // Public handle exposed via ref
@@ -99,16 +100,7 @@ const MapContainer = forwardRef<MapHandle, MapContainerProps>(
 
         mapRef.current = map;
 
-        // CARTO Positron basemap — free, no API key
-        L.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-          {
-            attribution:
-              '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: "abcd",
-            maxZoom: 20,
-          }
-        ).addTo(map);
+        addBasemap(L, map);
 
         // Force a resize after mount (fixes grey tiles in split view)
         setTimeout(() => {

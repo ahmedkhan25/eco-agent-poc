@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer } from "leaflet";
 import { patchEsriRasterLayer } from "@/lib/demo/leaflet-esri-safe";
+import { addBasemap } from "@/lib/basemap";
 
 export type HollywoodLayerId =
   | "fema-flood"
@@ -105,14 +106,7 @@ export function HollywoodMap({
         zoomControl: true,
         attributionControl: true,
       });
-      L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-        {
-          attribution: '&copy; OpenStreetMap &copy; CARTO',
-          maxZoom: 20,
-          subdomains: "abcd",
-        }
-      ).addTo(map);
+      addBasemap(L, map);
       mapRef.current = map;
       setReady(true);
 
