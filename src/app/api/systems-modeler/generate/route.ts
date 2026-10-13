@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { completeText, parseJsonObject } from "@/lib/llm";
+import { completeText, parseJsonObject, type Effort } from "@/lib/llm";
 
 export const maxDuration = 300;
 import {
@@ -7,6 +7,10 @@ import {
   buildMCUserPrompt,
 } from "@/lib/systems-modeler/prompts";
 import type { SystemModel } from "@/lib/systems-modeler/types";
+import { SYSTEM_MODEL_SCHEMA, validateModel } from "@/lib/systems-modeler/collision-diff";
+
+const GENERATE_EFFORT: Effort =
+  (process.env.GENERATE_EFFORT as Effort) || "high";
 
 export async function POST(req: NextRequest) {
   try {
@@ -62,8 +66,8 @@ export async function POST(req: NextRequest) {
     const { text: raw } = await completeText({
       system: MC_SYSTEM_PROMPT,
       prompt: buildMCUserPrompt(topic, ragContext),
-      effort: "high",
-      json: true,
+      effort: GENERATE_EFFORT,
+      jsonSchema: { name: "system_model", schema: SYSTEM_MODEL_SCHEMA },
     });
     if (!raw) {
       return NextResponse.json(
@@ -72,7 +76,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const model = parseJsonObject<SystemModel>(raw);
+    const { model, warnings } = validateModel(parseJsonObject<SystemModel>(raw));
+    if (warnings.length) console.warn("[systems-modeler/generate] dropped:", warnings);
     return NextResponse.json(model);
   } catch (error) {
     console.error("[systems-modeler/generate]", error);

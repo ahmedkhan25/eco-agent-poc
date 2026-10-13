@@ -374,26 +374,62 @@ export function SystemsModelerPage() {
       const oldModel = store.model;
       store.setLoading(true);
       store.setError(null);
-      store.setProgress("Initiating concept collision", 15);
+      store.setProgress(`Colliding model with "${concept}"`, 5);
+
+      // Real progress from the streamed response, plus elapsed time.
+      const started = Date.now();
+      let stage = "thinking";
+      let chars = 0;
+      const EXPECTED_CHARS = 9000; // typical narrative + diff size
+      const stageLabel: Record<string, string> = {
+        thinking: "Finding the load-bearing delusion",
+        narrative: "Writing the collision narrative",
+        changes: "Mapping new variables, links and loops",
+      };
+      const render = () => {
+        const secs = Math.round((Date.now() - started) / 1000);
+        const percent = stage === "thinking"
+          ? Math.min(20, 5 + secs / 2)
+          : 20 + Math.min(75, (chars / EXPECTED_CHARS) * 75);
+        store.setProgress(`${stageLabel[stage] ?? "Working"} (${secs}s)`, percent);
+      };
+      const timer = setInterval(render, 1000);
 
       try {
-        await new Promise((r) => setTimeout(r, 300));
-        store.setProgress(`Colliding model with "${concept}"`, 30);
-
-        await new Promise((r) => setTimeout(r, 300));
-        store.setProgress("Identifying loadbearing delusions", 50);
-
         const res = await fetch("/api/systems-modeler/collide", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ model: store.model, collisionConcept: concept }),
         });
+        if (!res.ok || !res.body) throw new Error(await res.text());
 
-        store.setProgress("Applying isomorphic mappings", 80);
+        let data: { narrative: string; updatedModel: SystemModel } | null = null;
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let newline: number;
+          while ((newline = buffer.indexOf("\n")) !== -1) {
+            const line = buffer.slice(0, newline).trim();
+            buffer = buffer.slice(newline + 1);
+            if (!line) continue;
+            const event = JSON.parse(line);
+            if (event.type === "progress") {
+              stage = event.stage;
+              chars = event.chars;
+              render();
+            } else if (event.type === "result") {
+              data = event;
+            } else if (event.type === "error") {
+              throw new Error(event.error);
+            }
+          }
+        }
+        if (!data) throw new Error("Collision ended without a result");
 
-        if (!res.ok) throw new Error(await res.text());
-
-        const data = await res.json();
         store.setProgress("Updating diagram with new insights", 95);
         store.setCollisionResult({
           concept,
@@ -446,15 +482,17 @@ export function SystemsModelerPage() {
         }
         summary += `\n*All changes above have already been applied to the diagram automatically. The new nodes are highlighted. Do NOT call addNode, addLink, or updateSystemModel — the model is already updated. You can ask me to explain the changes or refine the model further.*`;
 
-        // Open chat and send the summary
+        // Open chat and show the summary. followUp: false so the assistant
+        // doesn't run on its own message and re-apply the changes.
         store.setChatOpen(true);
         appendMessage(new TextMessage({
           role: MessageRole.Assistant,
           content: summary,
-        }));
+        }), { followUp: false });
       } catch (err) {
         store.setError(err instanceof Error ? err.message : "Collision failed");
       } finally {
+        clearInterval(timer);
         store.setLoading(false);
       }
     },
@@ -1122,6 +1160,8 @@ ${characters}
         onClose={() => store.setPhase("iterate")}
         onCollide={handleCollide}
         isLoading={store.isLoading}
+        progressMessage={store.progressMessage}
+        progressPercent={store.progressPercent}
       />
 
       {/* About modal */}

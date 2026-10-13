@@ -96,6 +96,14 @@ interface CompleteOptions {
   maxTokens?: number;
   /** Ask for a single JSON object. On OpenAI this sets response_format. */
   json?: boolean;
+  /**
+   * Constrain the response to this JSON schema (structured outputs). Every
+   * object needs additionalProperties: false and all properties required.
+   * Implies json.
+   */
+  jsonSchema?: { name: string; schema: Record<string, unknown> };
+  /** Called with each text delta as the response streams (Anthropic path). */
+  onTextDelta?: (delta: string) => void;
   fallback?: keyof typeof OPENAI_FALLBACK_MODELS;
 }
 
@@ -110,22 +118,29 @@ export async function completeText({
   effort = "high",
   maxTokens = 64000,
   json = false,
+  jsonSchema,
+  onTextDelta,
   fallback = "reasoning",
 }: CompleteOptions): Promise<{ text: string; outputTokens: number }> {
+  if (jsonSchema) json = true;
   if (hasAnthropicKey()) {
     const stream = getAnthropic().beta.messages.stream({
       model: CLAUDE_MODEL,
       max_tokens: maxTokens,
-      system: json
+      system: json && !jsonSchema
         ? `${system}\n\nRespond with a single JSON object only. No prose before or after it, no code fences.`
         : system,
       messages: [{ role: "user", content: prompt }],
       thinking: { type: "adaptive" },
-      output_config: { effort },
+      output_config: {
+        effort,
+        ...(jsonSchema ? { format: { type: "json_schema" as const, schema: jsonSchema.schema } } : {}),
+      },
       // On a policy decline, the API retries on a fallback model in the same call.
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
     });
+    if (onTextDelta) stream.on("text", (delta) => onTextDelta(delta));
     const message = await stream.finalMessage();
     if (message.stop_reason === "refusal") {
       throw new ModelRefusalError(message.stop_details?.category);
@@ -143,7 +158,16 @@ export async function completeText({
 
   const completion = await getOpenAI().chat.completions.create({
     model: OPENAI_FALLBACK_MODELS[fallback],
-    ...(json ? { response_format: { type: "json_object" as const } } : {}),
+    ...(jsonSchema
+      ? {
+          response_format: {
+            type: "json_schema" as const,
+            json_schema: { name: jsonSchema.name, schema: jsonSchema.schema, strict: true },
+          },
+        }
+      : json
+        ? { response_format: { type: "json_object" as const } }
+        : {}),
     messages: [
       { role: "system", content: system },
       { role: "user", content: prompt },

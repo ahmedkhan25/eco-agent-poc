@@ -175,16 +175,18 @@ PROCESS — Follow this exact six-part structure:
    - Core Wisdom: What systemic paradoxes emerge from observing First Principles at work?
    - Leverage Points: Where are the highest-impact places to intervene (focusing on Goals, Power, and Rules)?
 
-8. OUTPUT an updated SystemModel JSON that incorporates ALL new insights:
-   - Add new nodes representing previously invisible variables (processes, not things)
-   - Add new links revealing hidden causal relationships
-   - Add updated or new loops that emerge from the collision
-   - Identify new system archetypes created by the collision
-   - For each addition, include a brief explanation in the node/loop description
-   - Preserve all existing nodes/links that remain valid
+8. RETURN THE MODEL CHANGES AS A DIFF (not the whole model):
+   - addNodes: previously invisible variables (processes, not things). Use new, unique snake_case ids.
+   - updateNodes: existing variables whose label, description, category or key status changes (send the full node with its existing id).
+   - removeNodeIds: variables the collision shows are not real or not useful (rare).
+   - addLinks / removeLinks: hidden causal relationships to add, and links that no longer hold. Links may connect existing and new variables, by id.
+   - addLoops / updateLoops / removeLoopIds: loops that emerge from or change with the collision. Loop ids continue the existing numbering (e.g. R5, B4); list member variable ids in order.
+   - addArchetypes: system archetypes the collision reveals, referencing loop ids.
+   - Leave everything that stays valid out of the diff; it is preserved automatically.
+   - In each new or updated node or loop description, briefly explain what the collision revealed.
 
 RESPONSE FORMAT:
-Write a narrative section with these clearly labeled parts:
+Return one JSON object matching the provided schema. Its "narrative" field is markdown with these clearly labeled parts, written tightly (about 500-700 words in total):
 - **The Anchor (The Load-Bearing Delusion)**: Named and explained
 - **The Default (The Status Quo)**: How the standard path feeds the delusion
 - **The Bottleneck (The Constraint)**: What must be forbidden; relational latency identified
@@ -193,10 +195,7 @@ Write a narrative section with these clearly labeled parts:
 - **The Commitment Filter (The Stop Rule)**: What must stop immediately
 - **The Kinetic Result**: Aha! Insight, First Domino, First Principles, Core Wisdom, Leverage Points
 
-Then output the COMPLETE updated model JSON in a code block:
-\`\`\`json
-{ ... updated SystemModel ... }
-\`\`\``;
+The remaining fields carry the model diff described in step 8. Use empty arrays for anything that doesn't change.`;
 
 export function buildAhaParadoxPrompt(
   modelJson: string,
@@ -206,9 +205,9 @@ export function buildAhaParadoxPrompt(
 
   if (collisionConcept) {
     prompt += `COLLISION CONCEPT (Isomorph): "${collisionConcept}"\n\n`;
-    prompt += `Take this model and collide it with "${collisionConcept}". Identify the loadbearing delusion, apply the isomorph lens, and produce an updated model.`;
+    prompt += `Take this model and collide it with "${collisionConcept}". Identify the loadbearing delusion, apply the isomorph lens, and return the narrative and the model diff.`;
   } else {
-    prompt += `Select a radically unrelated concept at random and collide it with this model. Identify the loadbearing delusion, apply the isomorph lens, and produce an updated model.`;
+    prompt += `Select a radically unrelated concept at random and collide it with this model. Identify the loadbearing delusion, apply the isomorph lens, and return the narrative and the model diff.`;
   }
 
   return prompt;

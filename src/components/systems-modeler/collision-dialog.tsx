@@ -11,6 +11,8 @@ interface CollisionDialogProps {
   onClose: () => void;
   onCollide: (concept: string) => void;
   isLoading: boolean;
+  progressMessage?: string;
+  progressPercent?: number;
 }
 
 export function CollisionDialog({
@@ -18,6 +20,8 @@ export function CollisionDialog({
   onClose,
   onCollide,
   isLoading,
+  progressMessage,
+  progressPercent = 0,
 }: CollisionDialogProps) {
   const [concept, setConcept] = useState("");
 
@@ -188,6 +192,21 @@ export function CollisionDialog({
                     </>
                   )}
                 </button>
+
+                {/* Live progress from the streamed collision */}
+                {isLoading && progressMessage && (
+                  <div className="space-y-1.5" aria-live="polite">
+                    <div className="h-1 w-full rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-rose-500 transition-all duration-700 ease-out"
+                        style={{ width: `${Math.round(progressPercent)}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
+                      {progressMessage}
+                    </p>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
