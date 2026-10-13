@@ -2771,8 +2771,8 @@ export function ChatInterface({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-900/30 dark:to-teal-800/30 rounded-lg flex items-center justify-center">
-                      <Image src="/eco/home-cards/climate.png" alt="" width={48} height={48} className="w-10 h-10" />
+                    <div className="w-14 h-14 flex-shrink-0 bg-white border border-slate-200 dark:bg-white rounded-lg flex items-center justify-center overflow-hidden">
+                      <Image src="/eco/home-cards/climate.png" alt="" width={48} height={48} className="w-14 h-14 scale-125" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
@@ -2797,8 +2797,8 @@ export function ChatInterface({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 rounded-lg flex items-center justify-center">
-                      <Image src="/eco/home-cards/climate-goals.png" alt="" width={48} height={48} className="w-10 h-10" />
+                    <div className="w-14 h-14 flex-shrink-0 bg-white border border-slate-200 dark:bg-white rounded-lg flex items-center justify-center overflow-hidden">
+                      <Image src="/eco/home-cards/climate-goals.png" alt="" width={48} height={48} className="w-14 h-14 scale-125" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
@@ -2823,8 +2823,8 @@ export function ChatInterface({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center">
-                      <Image src="/eco/home-cards/trans.png" alt="" width={48} height={48} className="w-10 h-10" />
+                    <div className="w-14 h-14 flex-shrink-0 bg-white border border-slate-200 dark:bg-white rounded-lg flex items-center justify-center overflow-hidden">
+                      <Image src="/eco/home-cards/trans.png" alt="" width={48} height={48} className="w-14 h-14 scale-125" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
@@ -2849,8 +2849,8 @@ export function ChatInterface({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-800/30 rounded-lg flex items-center justify-center">
-                      <Image src="/eco/home-cards/budget.png" alt="" width={48} height={48} className="w-10 h-10" />
+                    <div className="w-14 h-14 flex-shrink-0 bg-white border border-slate-200 dark:bg-white rounded-lg flex items-center justify-center overflow-hidden">
+                      <Image src="/eco/home-cards/budget.png" alt="" width={48} height={48} className="w-14 h-14 scale-125" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
@@ -2875,8 +2875,8 @@ export function ChatInterface({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-lg flex items-center justify-center">
-                      <Image src="/eco/home-cards/infra-plan.png" alt="" width={48} height={48} className="w-10 h-10" />
+                    <div className="w-14 h-14 flex-shrink-0 bg-white border border-slate-200 dark:bg-white rounded-lg flex items-center justify-center overflow-hidden">
+                      <Image src="/eco/home-cards/infra-plan.png" alt="" width={48} height={48} className="w-14 h-14 scale-125" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-gray-800 dark:text-gray-200 text-xs font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
@@ -2901,8 +2901,8 @@ export function ChatInterface({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-teal-100 to-cyan-200 dark:from-teal-800/40 dark:to-cyan-700/40 rounded-lg flex items-center justify-center">
-                      <Image src="/eco/home-cards/deep.png" alt="" width={48} height={48} className="w-10 h-10" />
+                    <div className="w-14 h-14 flex-shrink-0 bg-white border border-slate-200 dark:bg-white rounded-lg flex items-center justify-center overflow-hidden">
+                      <Image src="/eco/home-cards/deep.png" alt="" width={48} height={48} className="w-14 h-14 scale-125" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-teal-700 dark:text-teal-300 text-xs font-semibold group-hover:text-teal-800 dark:group-hover:text-teal-200 transition-colors">
