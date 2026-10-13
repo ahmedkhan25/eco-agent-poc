@@ -79,13 +79,25 @@ export async function GET(request: Request) {
     }
   }
 
-  // OAuth failed - redirect with error
-  console.error('[Auth Callback] OAuth failed or no code provided');
-  
-  // Handle load balancer for error redirect too
+  // Handle load balancer for the redirects below
   const forwardedHost = request.headers.get('x-forwarded-host');
   const isLocalEnv = process.env.NODE_ENV === 'development';
-  
+
+  // The callback can be hit twice (the second time the code is already used).
+  // If the user already has a valid session, treat it as a success.
+  {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      console.log('[Auth Callback] Code not usable but session exists for', user.email, '- continuing');
+      const base = !isLocalEnv && forwardedHost ? `https://${forwardedHost}` : origin;
+      return NextResponse.redirect(`${base}${next}`);
+    }
+  }
+
+  // OAuth failed - redirect with error
+  console.error('[Auth Callback] OAuth failed or no code provided');
+
   if (isLocalEnv) {
     return NextResponse.redirect(`${origin}/?error=auth_failed`);
   } else if (forwardedHost) {

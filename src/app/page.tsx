@@ -2,7 +2,7 @@
 
 import { ChatInterface } from '@/components/chat-interface';
 import { RateLimitDialog } from '@/components/rate-limit-dialog';
-import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomBar from '@/components/bottom-bar';
 import { createClient } from '@/utils/supabase/client';
@@ -85,20 +85,29 @@ function HomeContent() {
     setCurrentSessionId(chatIdFromUrl || undefined);
   }, [searchParams]); // Only watch searchParams, not currentSessionId to avoid loops
 
-  // Handle URL messages from auth callbacks
+  // Handle URL messages from auth callbacks. Each distinct query string is
+  // handled once: the old version depended on `notification` and set a new
+  // one every run, so when router.replace() couldn't complete it looped,
+  // firing RSC requests nonstop.
+  const handledParamsRef = useRef<string | null>(null);
   useEffect(() => {
+    const paramsKey = searchParams.toString();
+    if (handledParamsRef.current === paramsKey) return;
+    handledParamsRef.current = paramsKey;
+
     const message = searchParams.get('message');
     const error = searchParams.get('error');
+    const clearUrlParams = () => router.replace('/', { scroll: false });
 
     if (message === 'email_updated') {
       setNotification({ type: 'success', message: 'Email address successfully updated!' });
-      router.replace('/'); // Remove URL params
+      clearUrlParams();
     } else if (message === 'email_link_expired') {
       setNotification({ type: 'error', message: 'Email confirmation link has expired. Please request a new email change.' });
-      router.replace('/'); // Remove URL params
+      clearUrlParams();
     } else if (error === 'auth_failed') {
       setNotification({ type: 'error', message: 'Authentication failed. Please try again.' });
-      router.replace('/'); // Remove URL params
+      clearUrlParams();
     }
 
     // Handle checkout success
@@ -150,17 +159,19 @@ function HomeContent() {
       };
 
       processCheckout();
-      router.replace('/'); // Remove checkout params from URL
+      clearUrlParams();
+    } else if (checkoutSuccess === 'success' && !user) {
+      // Wait for auth to load before handling checkout
+      handledParamsRef.current = null;
     }
+  }, [searchParams, user, router]);
 
-    // Auto-hide notifications after 5 seconds
-    if (notification) {
-      const timer = setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [searchParams, router, notification, user]);
+  // Auto-hide notifications after 5 seconds
+  useEffect(() => {
+    if (!notification) return;
+    const timer = setTimeout(() => setNotification(null), 5000);
+    return () => clearTimeout(timer);
+  }, [notification]);
 
 
   const updateUrlWithSession = useCallback((sessionId: string | null) => {
