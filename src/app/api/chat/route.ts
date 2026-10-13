@@ -712,11 +712,27 @@ DO NOT attempt any new olympiaRAGSearch calls.
       }
     }
 
+    // Cap tool calls per user turn. The client re-sends after every tool
+    // result (sendAutomaticallyWhen), so without a cap a model that keeps
+    // searching for data that isn't there can loop indefinitely.
+    const MAX_TOOL_CALLS_PER_TURN = Number(process.env.MAX_TOOL_CALLS_PER_TURN) || 16;
+    const toolCallsThisTurn =
+      lastMessage?.role === 'assistant' && Array.isArray(lastMessage.parts)
+        ? lastMessage.parts.filter((p: any) => typeof p?.type === 'string' && (p.type.startsWith('tool-') || p.type === 'dynamic-tool')).length
+        : 0;
+    const toolBudgetExhausted = toolCallsThisTurn >= MAX_TOOL_CALLS_PER_TURN;
+    if (toolBudgetExhausted) {
+      console.log(`[Chat API] Tool budget reached (${toolCallsThisTurn}/${MAX_TOOL_CALLS_PER_TURN}); answering without tools`);
+    }
+    const toolBudgetNote = toolBudgetExhausted
+      ? `\n\nTOOL LIMIT REACHED: You have used ${toolCallsThisTurn} tool calls for this question. Do not call any more tools. Answer now with what you have found, say clearly which data you could not find, and suggest where the user could get it.\n`
+      : '';
+
     const result = streamText({
       model: selectedModel as any,
       messages: convertToModelMessages(trimmedMessages),
       tools: healthcareTools,
-      toolChoice: "auto",
+      toolChoice: toolBudgetExhausted ? "none" : "auto",
       experimental_context: {
         userId: user?.id,
         userTier,
@@ -725,7 +741,7 @@ DO NOT attempt any new olympiaRAGSearch calls.
       providerOptions,
       // DON'T pass abortSignal - we want the stream to continue even if user switches tabs
       system: `You are an expert AI research assistant for the City of Olympia, Washington, specializing in city planning, climate action, environmental initiatives, smart city operations, infrastructure, and municipal sustainability.
-${ragLimitWarning}${ragContextData}
+${ragLimitWarning}${ragContextData}${toolBudgetNote}
 
 AVAILABLE OLYMPIA DOCUMENTS (26 indexed documents):
 
