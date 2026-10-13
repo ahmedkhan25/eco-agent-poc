@@ -291,7 +291,7 @@ export function SystemsModelerPage() {
 
         // Small delay so the user sees the first message
         await new Promise((r) => setTimeout(r, 400));
-        store.setProgress("GPT-5.4 is reasoning about your system model (this may take a moment)", 45);
+        store.setProgress("Building your system model. This can take a minute or two.", 45);
 
         const res = await fetch("/api/systems-modeler/generate", {
           method: "POST",
@@ -339,7 +339,7 @@ export function SystemsModelerPage() {
 
       try {
         await new Promise((r) => setTimeout(r, 300));
-        store.setProgress("AI is interpreting the file content", 35);
+        store.setProgress("Reading the file content", 35);
 
         const res = await fetch("/api/systems-modeler/generate", {
           method: "POST",
@@ -501,7 +501,7 @@ export function SystemsModelerPage() {
       }).catch(() => null);
 
       store.setProgress(
-        isProfessional ? "GPT-5.4 is reasoning through your report (this may take a moment)" : "GPT-5.4 is reasoning through your story (this may take a moment)",
+        isProfessional ? "Writing your report. This can take a minute or two." : "Writing your story. This can take a minute or two.",
         45
       );
 

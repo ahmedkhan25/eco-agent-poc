@@ -4,7 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import {
   FileInput,
-  Sparkles,
+  Network,
   MessageSquare,
   Zap,
   BookOpen,
@@ -24,7 +24,7 @@ const PHASE_ORDER: ModelPhase[] = [
 
 const PHASE_ICONS: Record<ModelPhase, React.ReactNode> = {
   input: <FileInput className="w-4 h-4" />,
-  generate: <Sparkles className="w-4 h-4" />,
+  generate: <Network className="w-4 h-4" />,
   iterate: <MessageSquare className="w-4 h-4" />,
   collide: <Zap className="w-4 h-4" />,
   humanize: <BookOpen className="w-4 h-4" />,

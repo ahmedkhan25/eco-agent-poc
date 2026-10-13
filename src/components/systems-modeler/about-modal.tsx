@@ -111,7 +111,7 @@ function Slide1Content() {
       {/* Description */}
       <div className="space-y-4">
         <p className="text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-          A dynamic, AI-powered tool that helps you investigate relationships
+          An interactive tool that helps you investigate relationships
           and their implications across <strong>any topic</strong>. Move beyond
           static lists and &ldquo;incomprehensible spaghetti diagrams&rdquo; into
           interactive models that promote deep understanding.
@@ -152,7 +152,7 @@ const slides: Slide[] = [
     id: 1,
     icon: <Network className="w-6 h-6" />,
     title: "Universal Interactive System Modeler",
-    subtitle: "AI-Powered Systems Thinking by ecoheart.ai",
+    subtitle: "Systems thinking by ecoheart.ai",
     accentColor: "from-teal-500 to-emerald-600",
     content: <Slide1Content />,
   },

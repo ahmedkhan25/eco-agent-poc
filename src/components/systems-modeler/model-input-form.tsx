@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2, FileText, Database, Upload, X } from "lucide-react";
+import { Network, Loader2, FileText, Database, Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { parseImportedFile, type ImportResult } from "@/lib/systems-modeler/import-utils";
 import { extractTextFromPDF, extractTextFromMarkdown, truncateContent, topicFromFilename, isContentFile, extractTextFromFiles } from "@/lib/systems-modeler/file-extraction";
@@ -368,7 +368,7 @@ export function ModelInputForm({ onGenerate, onImport, onImportFallback, isLoadi
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4" />
+                  <Network className="w-4 h-4" />
                   <span>Generate Model</span>
                 </>
               )}
@@ -498,7 +498,7 @@ export function ModelInputForm({ onGenerate, onImport, onImportFallback, isLoadi
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-4 h-4" />
+                      <Network className="w-4 h-4" />
                       <span>Generate Model from {stagedFiles.length} File{stagedFiles.length > 1 ? "s" : ""}</span>
                     </>
                   )}
