@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { completeText, parseJsonObject } from "@/lib/llm";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 import {
   HUMANIZE_SYSTEM_PROMPT,
   buildHumanizePrompt,
@@ -9,8 +9,6 @@ import {
   buildProfessionalHumanizePrompt,
 } from "@/lib/systems-modeler/prompts";
 import type { SystemModel, NarrativeResult, NarrativeMode } from "@/lib/systems-modeler/types";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,16 +36,12 @@ export async function POST(req: NextRequest) {
         ? buildProfessionalHumanizePrompt(modelJson)
         : buildHumanizePrompt(modelJson);
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-5.4",
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
+    const { text: raw } = await completeText({
+      system: systemPrompt,
+      prompt: userPrompt,
+      effort: "high",
+      json: true,
     });
-
-    const raw = completion.choices[0].message.content;
     if (!raw) {
       return NextResponse.json(
         { error: "No response from model" },
@@ -55,7 +49,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result: NarrativeResult = JSON.parse(raw);
+    const result = parseJsonObject<NarrativeResult>(raw);
     return NextResponse.json(result);
   } catch (error) {
     console.error("[systems-modeler/humanize]", error);

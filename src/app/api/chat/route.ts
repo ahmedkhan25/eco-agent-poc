@@ -1,7 +1,7 @@
 import { streamText, convertToModelMessages } from "ai";
 import { healthcareTools } from "@/lib/tools";
 import { BiomedUIMessage } from "@/lib/types";
-import { openai, createOpenAI } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { createOllama, ollama } from "ollama-ai-provider-v2";
 import { checkAnonymousRateLimit, incrementRateLimit } from "@/lib/rate-limit";
 import { createClient } from '@supabase/supabase-js';
@@ -11,6 +11,7 @@ import { getPolarTrackedModel } from '@/lib/polar-llm-strategy';
 import * as db from '@/lib/db';
 import { isDevelopmentMode } from '@/lib/local-db/local-auth';
 import { saveChatMessages } from '@/lib/db';
+import { getAiSdkModel, aiSdkProviderOptions, activeModelLabel, hasAnthropicKey, CHAT_EFFORT } from '@/lib/llm';
 
 // 13mins max streaming (vercel limit)
 export const maxDuration = 800;
@@ -415,7 +416,6 @@ export async function POST(req: Request) {
     }
 
     // Detect available API keys and select provider/tools accordingly
-    const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
     const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
     const lmstudioBaseUrl = process.env.LMSTUDIO_BASE_URL || 'http://localhost:1234';
 
@@ -527,36 +527,31 @@ export async function POST(req: Request) {
           'x-local-provider': req.headers.get('x-local-provider'),
           'x-ollama-model': req.headers.get('x-ollama-model')
         });
-        selectedModel = hasOpenAIKey ? openai("gpt-5.1") : "openai/gpt-5.1";
-        modelInfo = hasOpenAIKey
-          ? "OpenAI (gpt-5.1) - Development Mode Fallback"
-          : 'Vercel AI Gateway ("gpt-5.1") - Development Mode Fallback';
+        selectedModel = getAiSdkModel();
+        modelInfo = `${activeModelLabel()} - Development Mode Fallback`;
       }
     } else {
-      // Production mode: Use Polar-wrapped OpenAI ONLY for pay-per-use users
+      // Production mode: Claude (CHAT_MODEL) when ANTHROPIC_API_KEY is set,
+      // otherwise the previous OpenAI model.
       if (user) {
         // Get user subscription tier to determine billing approach
         const { data: userData } = await db.getUserProfile(user.id);
 
         const userTier = userData?.subscription_tier || userData?.subscriptionTier || 'free';
         const isActive = (userData?.subscription_status || userData?.subscriptionStatus) === 'active';
-        
-        // Only use Polar LLM Strategy for pay-per-use users
-        if (isActive && userTier === 'pay_per_use') {
+
+        // Polar per-token tracking is wired to the OpenAI provider only, so it
+        // applies to pay-per-use users on the OpenAI fallback path.
+        if (isActive && userTier === 'pay_per_use' && !hasAnthropicKey()) {
           selectedModel = getPolarTrackedModel(user.id, "gpt-5.1");
           modelInfo = "OpenAI (gpt-5.1) - Production Mode (Polar Tracked - Pay-per-use)";
         } else {
-          // Unlimited users and free users use regular model (no per-token billing)
-          selectedModel = hasOpenAIKey ? openai("gpt-5.1") : "openai/gpt-5.1";
-          modelInfo = hasOpenAIKey
-            ? `OpenAI (gpt-5.1) - Production Mode (${userTier} tier - Flat Rate)`
-            : `Vercel AI Gateway ("gpt-5.1") - Production Mode (${userTier} tier - Flat Rate)`;
+          selectedModel = getAiSdkModel();
+          modelInfo = `${activeModelLabel()} - Production Mode (${userTier} tier)`;
         }
       } else {
-        selectedModel = hasOpenAIKey ? openai("gpt-5.1") : "openai/gpt-5.1";
-        modelInfo = hasOpenAIKey
-          ? "OpenAI (gpt-5.1) - Production Mode (Anonymous)"
-          : 'Vercel AI Gateway ("gpt-5.1") - Production Mode (Anonymous)';
+        selectedModel = getAiSdkModel();
+        modelInfo = `${activeModelLabel()} - Production Mode (Anonymous)`;
       }
     }
 
@@ -602,6 +597,9 @@ export async function POST(req: Request) {
         };
         console.log(`[Chat API] Disabled thinking mode for ${localProvider} non-reasoning model`);
       }
+    } else if (hasAnthropicKey() && !modelInfo.includes('Polar')) {
+      // Claude: adaptive thinking, effort from CHAT_EFFORT (default medium)
+      Object.assign(providerOptions, aiSdkProviderOptions(CHAT_EFFORT));
     } else {
       // OpenAI-specific options (only when using OpenAI)
       providerOptions.openai = {
@@ -648,7 +646,7 @@ export async function POST(req: Request) {
     
     // Trim messages to prevent context window overflow
     // Using token-aware trimming: keep as many recent messages as fit in token budget
-    // Set to 50000 tokens - GPT-5.1 supports 128K+ context, giving room for RAG data + charts
+    // 50000 tokens leaves room for RAG data + charts well inside the model's context window
     const trimmedMessages = trimMessages(summarizedMessages, 50000);
     
     // Debug: Log message structure to understand format

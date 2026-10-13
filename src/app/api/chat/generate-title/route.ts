@@ -1,5 +1,6 @@
 import { generateText } from 'ai';
-import { openai, createOpenAI } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { getAiSdkModel, aiSdkProviderOptions, hasAnthropicKey } from '@/lib/llm';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(req: Request) {
@@ -89,21 +90,24 @@ export async function POST(req: Request) {
       }
     }
 
-    // Fallback to OpenAI if Ollama not available
+    // Default: Claude (or the OpenAI fallback when ANTHROPIC_API_KEY is unset)
+    const usingDefaultModel = !selectedModel;
     if (!selectedModel) {
-      selectedModel = openai('gpt-5-nano');
+      selectedModel = getAiSdkModel('title');
     }
 
     // Generate title using AI
     const { text } = await generateText({
       model: selectedModel,
-      prompt: `Generate a concise title (max 50 characters) for a biomedical research chat conversation that starts with this message.
+      prompt: `Generate a concise title (max 50 characters) for a city planning research chat that starts with this message.
       The title should capture the main topic or question.
-      If it's about a specific drug, disease, or clinical trial, include it.
+      If it names a specific plan, place, program, or dataset, include it.
       Return ONLY the title, no quotes, no explanation.
 
       User message: "${message}"`,
-      temperature: 0.3
+      ...(usingDefaultModel && hasAnthropicKey()
+        ? { providerOptions: aiSdkProviderOptions('low') }
+        : { temperature: 0.3 }),
     });
 
     const title = text.trim().substring(0, 50);

@@ -47,8 +47,11 @@ export function validatePaymentEnvironment(): EnvValidationResult {
     if (!process.env.DAYTONA_API_KEY) {
       warnings.push('DAYTONA_API_KEY missing - code execution will fail');
     }
+    if (!process.env.ANTHROPIC_API_KEY) {
+      warnings.push('ANTHROPIC_API_KEY missing - chat, RAG compression and Systems Modeler fall back to OpenAI models');
+    }
     if (!process.env.OPENAI_API_KEY) {
-      warnings.push('OPENAI_API_KEY missing - will use Vercel AI Gateway');
+      warnings.push('OPENAI_API_KEY missing - RAG embeddings and image generation will fail');
     }
   }
 

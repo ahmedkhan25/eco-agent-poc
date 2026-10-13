@@ -10,8 +10,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.109",
     "@ai-sdk/openai": "^2.0.16",
     "@ai-sdk/react": "^2.0.16",
+    "@anthropic-ai/sdk": "^0.133.0",
     "@aws-sdk/client-s3vectors": "^3.936.0",
     "@copilotkit/react-core": "^1.53.0",
     "@copilotkit/react-ui": "^1.53.0",

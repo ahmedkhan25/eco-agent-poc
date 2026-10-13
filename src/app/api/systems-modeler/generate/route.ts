@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { completeText, parseJsonObject } from "@/lib/llm";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 import {
   MC_SYSTEM_PROMPT,
   buildMCUserPrompt,
 } from "@/lib/systems-modeler/prompts";
 import type { SystemModel } from "@/lib/systems-modeler/types";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,40 +45,26 @@ export async function POST(req: NextRequest) {
     // Compress very large content to fit within prompt limits
     if (ragContext && ragContext.length > 30000) {
       try {
-        const compressRes = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [
-            {
-              role: "system",
-              content:
-                "Compress this document into key facts, relationships, dynamics, and stakeholders relevant to systems modeling. Preserve specifics: names, numbers, dates, causal relationships, policies, and organizational structures. Max 6000 tokens.",
-            },
-            {
-              role: "user",
-              content: `Topic: "${topic}"\n\nDocument:\n${ragContext.slice(0, 50000)}`,
-            },
-          ],
-          max_tokens: 6500,
-          temperature: 0.1,
+        const compressRes = await completeText({
+          system:
+            "Compress this document into key facts, relationships, dynamics, and stakeholders relevant to systems modeling. Preserve specifics: names, numbers, dates, causal relationships, policies, and organizational structures. Max 6000 tokens.",
+          prompt: `Topic: "${topic}"\n\nDocument:\n${ragContext.slice(0, 50000)}`,
+          effort: "medium",
+          maxTokens: 16000,
+          fallback: "compress",
         });
-        ragContext =
-          compressRes.choices[0]?.message?.content ||
-          ragContext.slice(0, 24000);
+        ragContext = compressRes.text || ragContext.slice(0, 24000);
       } catch {
         ragContext = ragContext.slice(0, 24000);
       }
     }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-5.4",
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: MC_SYSTEM_PROMPT },
-        { role: "user", content: buildMCUserPrompt(topic, ragContext) },
-      ],
+    const { text: raw } = await completeText({
+      system: MC_SYSTEM_PROMPT,
+      prompt: buildMCUserPrompt(topic, ragContext),
+      effort: "high",
+      json: true,
     });
-
-    const raw = completion.choices[0].message.content;
     if (!raw) {
       return NextResponse.json(
         { error: "No response from model" },
@@ -88,7 +72,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const model: SystemModel = JSON.parse(raw);
+    const model = parseJsonObject<SystemModel>(raw);
     return NextResponse.json(model);
   } catch (error) {
     console.error("[systems-modeler/generate]", error);

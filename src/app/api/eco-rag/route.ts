@@ -1,4 +1,5 @@
 import { OpenAI } from 'openai';
+import { completeText, activeModelLabel, hasAnthropicKey } from '@/lib/llm';
 import { S3VectorsClient, QueryVectorsCommand } from "@aws-sdk/client-s3vectors";
 import * as db from '@/lib/db';
 
@@ -117,16 +118,15 @@ function buildContext(results: VectorResult[]): string {
 }
 
 /**
- * Compress retrieved context using GPT-4o
- * Budget: max 4000 tokens output for comprehensive summaries
- * Using GPT-4o instead of reasoning models to avoid reasoning artifacts in summaries
+ * Compress retrieved context (Claude via CHAT_MODEL, or gpt-4o when
+ * ANTHROPIC_API_KEY is unset). Budget: ~8000 tokens of output.
  */
 async function compressContext(
   openai: OpenAI,
   query: string,
   results: VectorResult[]
 ): Promise<{ summary: string; tokenCount: number }> {
-  console.log('[Eco-RAG] Compressing context with GPT-4o...');
+  console.log(`[Eco-RAG] Compressing context with ${activeModelLabel('compress')}...`);
   
   const rawContext = buildContext(results);
   
@@ -147,7 +147,18 @@ ${rawContext}
 
 COMPRESSED SUMMARY (max 8000 tokens, preserve ALL exact numbers and dollar amounts):`;
 
-  // Use GPT-4o for clean summarization (no reasoning artifacts)
+  if (hasAnthropicKey()) {
+    const { text, outputTokens } = await completeText({
+      system: systemPrompt,
+      prompt: userPrompt,
+      effort: "low",
+      maxTokens: 16000,
+    });
+    console.log(`[Eco-RAG] ✓ Compressed to ${outputTokens} tokens`);
+    return { summary: text, tokenCount: outputTokens };
+  }
+
+  // Fallback: gpt-4o at low temperature for exact factual preservation
   const completion = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -155,13 +166,13 @@ COMPRESSED SUMMARY (max 8000 tokens, preserve ALL exact numbers and dollar amoun
       { role: "user", content: userPrompt },
     ],
     max_tokens: 8500,
-    temperature: 0.1, // Very low temp for exact factual preservation
+    temperature: 0.1,
   });
 
   // Extract summary from chat completion response
   const summary = completion.choices[0]?.message?.content || "";
   const tokenCount = completion.usage?.completion_tokens || 0;
-  
+
   console.log(`[Eco-RAG] ✓ Compressed to ${tokenCount} tokens`);
   return { summary, tokenCount };
 }
@@ -280,7 +291,7 @@ export async function POST(req: Request) {
       } as RAGResponse);
     }
 
-    // Step 3: Compress context using GPT-4o-mini (instead of generating full answer)
+    // Step 3: Compress context (instead of generating a full answer)
     const { summary, tokenCount } = await compressContext(openai, query, results);
 
     // Step 4: Format sources for citation system
