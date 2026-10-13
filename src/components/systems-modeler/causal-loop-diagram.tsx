@@ -89,7 +89,7 @@ export function CausalLoopDiagram({
       .attr("id", "bgGrad")
       .attr("cx", "50%")
       .attr("cy", "50%");
-    grad.append("stop").attr("offset", "0%").attr("stop-color", "#243d2e");
+    grad.append("stop").attr("offset", "0%").attr("stop-color", "#1e293b");
     grad.append("stop").attr("offset", "100%").attr("stop-color", "#0f172a");
     svg.append("rect")
       .attr("width", "100%")

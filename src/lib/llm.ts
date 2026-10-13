@@ -108,7 +108,7 @@ export async function completeText({
   system,
   prompt,
   effort = "high",
-  maxTokens = 32000,
+  maxTokens = 64000,
   json = false,
   fallback = "reasoning",
 }: CompleteOptions): Promise<{ text: string; outputTokens: number }> {
@@ -131,7 +131,8 @@ export async function completeText({
       throw new ModelRefusalError(message.stop_details?.category);
     }
     if (message.stop_reason === "max_tokens") {
-      console.warn(`[llm] ${CLAUDE_MODEL} hit max_tokens (${maxTokens})`);
+      // A cut-off response is unusable for JSON callers; fail clearly.
+      throw new Error(`${CLAUDE_MODEL} hit max_tokens (${maxTokens}); response truncated`);
     }
     const text = message.content
       .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")

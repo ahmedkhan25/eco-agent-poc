@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const { text: raw } = await completeText({
       system: AHA_PARADOX_SYSTEM_PROMPT,
       prompt: buildAhaParadoxPrompt(modelJson, collisionConcept),
-      effort: "high",
+      effort: "medium",
     });
 
     if (!raw) {

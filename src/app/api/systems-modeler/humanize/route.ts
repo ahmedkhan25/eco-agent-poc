@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const { text: raw } = await completeText({
       system: systemPrompt,
       prompt: userPrompt,
-      effort: "high",
+      effort: "medium",
       json: true,
     });
     if (!raw) {
