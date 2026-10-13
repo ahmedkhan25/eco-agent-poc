@@ -21,6 +21,13 @@ const nextConfig: NextConfig = {
     // Don't optimize external favicon URLs
     unoptimized: process.env.NODE_ENV === 'development',
   },
+  experimental: {
+    // The Render free instance has 512 MB. Resizing many images in parallel
+    // (sharp) got it OOM-killed on the home page, so optimize one at a time
+    // and stream source files instead of buffering them.
+    imgOptConcurrency: 1,
+    imgOptSequentialRead: true,
+  },
   // Suppress favicon fetch errors in development
   onDemandEntries: {
     maxInactiveAge: 60 * 1000, // Increased to 60 seconds to prevent page disposal when switching tabs

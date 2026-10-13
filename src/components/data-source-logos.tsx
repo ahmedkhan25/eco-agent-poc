@@ -459,6 +459,7 @@ const DataSourceLogos = () => {
                     src={logo.src}
                     alt={logo.name}
                     fill
+                    sizes="160px"
                     className="object-contain transition-all duration-500"
                     style={{
                       filter: isHovered
