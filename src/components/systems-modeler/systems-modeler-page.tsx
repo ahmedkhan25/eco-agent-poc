@@ -77,7 +77,7 @@ export function SystemsModelerPage() {
       });
     },
     render: (props: { status: string; result?: unknown }) => {
-      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Updating model...</span>;
+      if (props.status === "executing") return <span className="text-xs text-[#94a3b8]">Updating model...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
         const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
@@ -88,7 +88,7 @@ export function SystemsModelerPage() {
           />
         );
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
+        return <span className="text-xs text-[#94a3b8]">{String(props.result)}</span>;
       }
     },
   });
@@ -115,13 +115,13 @@ export function SystemsModelerPage() {
       return JSON.stringify({ message: `Added node "${label}" to the model.`, id, label });
     },
     render: (props: { status: string; result?: unknown }) => {
-      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Adding node...</span>;
+      if (props.status === "executing") return <span className="text-xs text-[#94a3b8]">Adding node...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
         const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={[{ id: data.id, label: data.label }]} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
+        return <span className="text-xs text-[#94a3b8]">{String(props.result)}</span>;
       }
     },
   });
@@ -139,13 +139,13 @@ export function SystemsModelerPage() {
       return JSON.stringify({ message: `Removed node "${label}" and its connected links.`, id: nodeId, label });
     },
     render: (props: { status: string; result?: unknown }) => {
-      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Removing node...</span>;
+      if (props.status === "executing") return <span className="text-xs text-[#94a3b8]">Removing node...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
         const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={[{ id: data.id, label: data.label, removed: true }]} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
+        return <span className="text-xs text-[#94a3b8]">{String(props.result)}</span>;
       }
     },
   });
@@ -172,7 +172,7 @@ export function SystemsModelerPage() {
       return JSON.stringify({ message: `Added ${type} link from ${source} to ${target}.`, source, target, linkType: type });
     },
     render: (props: { status: string; result?: unknown }) => {
-      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Adding link...</span>;
+      if (props.status === "executing") return <span className="text-xs text-[#94a3b8]">Adding link...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
         const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
@@ -183,7 +183,7 @@ export function SystemsModelerPage() {
           />
         );
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
+        return <span className="text-xs text-[#94a3b8]">{String(props.result)}</span>;
       }
     },
   });
@@ -201,13 +201,13 @@ export function SystemsModelerPage() {
       return JSON.stringify({ message: `Removed link from ${source} to ${target}.`, source, target, linkType });
     },
     render: (props: { status: string; result?: unknown }) => {
-      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Removing link...</span>;
+      if (props.status === "executing") return <span className="text-xs text-[#94a3b8]">Removing link...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
         const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={[{ id: data.source, label: data.source }, { id: data.target, label: data.target }]} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
+        return <span className="text-xs text-[#94a3b8]">{String(props.result)}</span>;
       }
     },
   });
@@ -234,13 +234,13 @@ export function SystemsModelerPage() {
       });
     },
     render: (props: { status: string; result?: unknown }) => {
-      if (props.status === "executing") return <span className="text-xs text-[#9ab8a2]">Changing loop type...</span>;
+      if (props.status === "executing") return <span className="text-xs text-[#94a3b8]">Changing loop type...</span>;
       if (props.status !== "complete" || !props.result) return <></>;
       try {
         const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={data.nodeRefs} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
+        return <span className="text-xs text-[#94a3b8]">{String(props.result)}</span>;
       }
     },
   });
@@ -266,7 +266,7 @@ export function SystemsModelerPage() {
         const data = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
         return <ActionResult message={data.message} nodeRefs={data.nodeRefs} />;
       } catch {
-        return <span className="text-xs text-[#9ab8a2]">{String(props.result)}</span>;
+        return <span className="text-xs text-[#94a3b8]">{String(props.result)}</span>;
       }
     },
   });
@@ -845,9 +845,13 @@ ${characters}
   const showNarrative = store.phase === "humanize" && store.narrativeResult;
 
   return (
-    <div className="h-screen flex flex-col bg-[#1a2f22] text-white overflow-hidden dark">
+    // Inline background: CopilotKit's stylesheet has an unlayered `.dark` rule
+    // that would otherwise paint this container gray.
+    <div className="h-screen flex flex-col bg-[#0f172a] text-white overflow-hidden dark" style={{ backgroundColor: "#0f172a" }}>
+      {/* Indigo accent bar, as on ecoheart.ai */}
+      <div className="h-1 bg-indigo-600 flex-shrink-0" />
       {/* Phase indicator */}
-      <div className="flex-shrink-0 border-b border-[#2a4535] bg-[#1a2f22]/95 backdrop-blur-sm z-10">
+      <div className="flex-shrink-0 border-b border-[#334155] bg-[#0f172a]/95 backdrop-blur-sm z-10">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-3">
             <button
@@ -855,10 +859,10 @@ ${characters}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <EcoheartLogo className="w-7 h-7" />
-              <span className="text-[#3ddc84] font-bold text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>ecoheart</span>
+              <span className="text-white font-semibold text-lg tracking-tight">ecoheart</span>
             </button>
-            <div className="w-px h-6 bg-[#2a4535]" />
-            <span className="text-[#9ab8a2] text-sm">Systems Modeler</span>
+            <div className="w-px h-6 bg-[#334155]" />
+            <span className="text-[#94a3b8] text-sm">Systems Modeler</span>
           </div>
           <div className="flex items-center gap-2">
             <PhaseIndicator
@@ -870,14 +874,14 @@ ${characters}
             />
             <button
               onClick={() => store.setAboutOpen(true)}
-              className="ml-2 px-3 py-1 text-xs border border-[#2a4535] text-[#9ab8a2] rounded-full hover:text-[#3ddc84] hover:border-[#3ddc84] transition-colors"
+              className="ml-2 px-3 py-1 text-xs border border-[#334155] text-[#94a3b8] rounded-full hover:text-[#2dd4bf] hover:border-[#2dd4bf] transition-colors"
             >
               About
             </button>
             {store.model && (
               <button
                 onClick={handleExportJSON}
-                className="px-3 py-1 text-xs border border-[#2a9c5e] text-[#3ddc84] rounded-full hover:bg-[#3ddc84] hover:text-[#1a2f22] transition-colors"
+                className="px-3 py-1 text-xs border border-[#2a9c5e] text-[#2dd4bf] rounded-full hover:bg-[#2dd4bf] hover:text-[#0f172a] transition-colors"
               >
                 Export JSON
               </button>
@@ -945,7 +949,7 @@ ${characters}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs backdrop-blur-sm transition-all ${
                       store.activeFilters[filter]
                         ? "border-current opacity-100"
-                        : "border-[#2a4535] opacity-50"
+                        : "border-[#334155] opacity-50"
                     }`}
                     style={{
                       color:
@@ -953,7 +957,7 @@ ${characters}
                           ? "#e05c5c"
                           : filter === "balancing"
                             ? "#5ca8e0"
-                            : "#3ddc84",
+                            : "#2dd4bf",
                       background: "rgba(13,26,18,0.8)",
                     }}
                   >
@@ -965,7 +969,7 @@ ${characters}
                             ? "#e05c5c"
                             : filter === "balancing"
                               ? "#5ca8e0"
-                              : "#3ddc84",
+                              : "#2dd4bf",
                       }}
                     />
                     {filter === "reinforcing"
@@ -1005,7 +1009,7 @@ ${characters}
               {!store.isChatOpen && (
                 <button
                   onClick={() => store.setChatOpen(true)}
-                  className="absolute top-4 right-4 z-10 flex items-center gap-2 px-3 py-2 rounded-lg border border-[#2a4535] bg-[#213a2b]/90 backdrop-blur-sm text-[#9ab8a2] hover:text-[#3ddc84] hover:border-[#3ddc84] transition-colors"
+                  className="absolute top-4 right-4 z-10 flex items-center gap-2 px-3 py-2 rounded-lg border border-[#334155] bg-[#1e293b]/90 backdrop-blur-sm text-[#94a3b8] hover:text-[#2dd4bf] hover:border-[#2dd4bf] transition-colors"
                   title="Open AI chat"
                 >
                   <PanelRightOpen className="w-4 h-4" />
@@ -1053,13 +1057,13 @@ ${characters}
               <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
                 <button
                   onClick={() => store.setPhase("iterate")}
-                  className="px-4 py-2 text-sm bg-[#213a2b] border border-[#2a4535] text-[#9ab8a2] rounded-full hover:text-[#3ddc84] hover:border-[#3ddc84] transition-colors backdrop-blur-sm"
+                  className="px-4 py-2 text-sm bg-[#1e293b] border border-[#334155] text-[#94a3b8] rounded-full hover:text-[#2dd4bf] hover:border-[#2dd4bf] transition-colors backdrop-blur-sm"
                 >
                   Back to Diagram
                 </button>
                 <button
                   onClick={handleExportStory}
-                  className={`px-4 py-2 text-sm bg-[#213a2b] border rounded-full transition-colors backdrop-blur-sm ${
+                  className={`px-4 py-2 text-sm bg-[#1e293b] border rounded-full transition-colors backdrop-blur-sm ${
                     store.narrativeMode === "professional"
                       ? "border-blue-700/50 text-blue-400 hover:text-blue-300 hover:border-blue-500"
                       : "border-amber-700/50 text-amber-400 hover:text-amber-300 hover:border-amber-500"
@@ -1075,27 +1079,27 @@ ${characters}
         {/* Right: CopilotKit Chat Panel (resizable) */}
         {showDiagram && !showNarrative && store.isChatOpen && (
           <div
-            className="border-l border-[#2a4535] flex-shrink-0 hidden lg:flex flex-col bg-[#1a2f22] relative"
+            className="border-l border-[#334155] flex-shrink-0 hidden lg:flex flex-col bg-[#0f172a] relative"
             style={{ width: store.chatPanelWidth }}
           >
             {/* Resize handle */}
             <div
               onPointerDown={handleResizePointerDown}
               className={`absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 transition-colors ${
-                isResizing ? "bg-[#3ddc84]/30" : "hover:bg-[#3ddc84]/20"
+                isResizing ? "bg-[#2dd4bf]/30" : "hover:bg-[#2dd4bf]/20"
               }`}
             />
-            <div className="flex items-center justify-between px-3 py-2 border-b border-[#2a4535]">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-[#334155]">
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-[#3ddc84]" />
-                <span className="text-sm font-medium text-[#d4e8d8]">Systems Modeler AI</span>
+                <MessageSquare className="w-4 h-4 text-[#2dd4bf]" />
+                <span className="text-sm font-medium text-[#e2e8f0]">Model assistant</span>
               </div>
               <button
                 onClick={() => store.setChatOpen(false)}
-                className="p-1 rounded hover:bg-[#2a4535] transition-colors"
+                className="p-1 rounded hover:bg-[#334155] transition-colors"
                 title="Hide chat panel"
               >
-                <PanelRightClose className="w-4 h-4 text-[#9ab8a2]" />
+                <PanelRightClose className="w-4 h-4 text-[#94a3b8]" />
               </button>
             </div>
             <div className="flex-1 overflow-hidden">

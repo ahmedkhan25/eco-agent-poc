@@ -7,7 +7,7 @@ import {
   Waves,
   Droplets,
   Building2,
-  Sparkles,
+  HandCoins,
   Network,
   ShieldAlert,
   Home,
@@ -31,7 +31,7 @@ const NAV = [
   { href: "/demo/king-tide", label: "King Tide Explorer", icon: Waves, group: "GIS" },
   { href: "/demo/septic-priority", label: "Septic-to-Sewer Map", icon: Droplets, group: "GIS" },
   { href: "/demo/risk-report", label: "Address Risk Report", icon: Building2, group: "RAG + GIS" },
-  { href: "/demo/grant-finder", label: "Grant Finder Agent", icon: Sparkles, group: "RAG" },
+  { href: "/demo/grant-finder", label: "Grant Finder Agent", icon: HandCoins, group: "RAG" },
   { href: "/demo/adaptation-pathways", label: "SLR Adaptation Pathways", icon: Network, group: "Systems" },
   { href: "/demo/hurricane-playbook", label: "Hurricane Playbook", icon: ShieldAlert, group: "RAG" },
   // Phase 2 concepts

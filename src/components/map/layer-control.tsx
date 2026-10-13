@@ -68,29 +68,29 @@ export default function LayerControl() {
     return (
       <button
         onClick={() => setCollapsed(false)}
-        className="flex items-center justify-center w-10 h-10 rounded-[16px] bg-[#fcf9f4]/80 backdrop-blur-[24px] shadow-[0px_12px_32px_rgba(28,28,25,0.06)] hover:scale-105 transition-transform"
+        className="flex items-center justify-center w-10 h-10 rounded-[16px] bg-[#f8fafc]/80 backdrop-blur-[24px] shadow-[0px_12px_32px_rgba(28,28,25,0.06)] hover:scale-105 transition-transform"
         title="Show layer controls"
       >
-        <Layers className="w-4 h-4 text-[#414844]" />
+        <Layers className="w-4 h-4 text-[#475569]" />
       </button>
     );
   }
 
   return (
-    <div className="w-64 bg-[#fcf9f4]/80 backdrop-blur-[24px] rounded-[16px] shadow-[0px_12px_32px_rgba(28,28,25,0.06)] p-4 max-h-[70vh] overflow-y-auto">
+    <div className="w-64 bg-[#f8fafc]/80 backdrop-blur-[24px] rounded-[16px] shadow-[0px_12px_32px_rgba(28,28,25,0.06)] p-4 max-h-[70vh] overflow-y-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Layers className="w-3.5 h-3.5 text-[#414844]" />
-          <h3 className="text-[11px] font-extrabold text-[#1c1c19] uppercase tracking-[0.1em] font-[Manrope]">
+          <Layers className="w-3.5 h-3.5 text-[#475569]" />
+          <h3 className="text-[11px] font-extrabold text-[#0f172a] uppercase tracking-[0.1em]">
             Layer Controls
           </h3>
         </div>
         <button
           onClick={() => setCollapsed(true)}
-          className="p-1 rounded-lg hover:bg-[#f6f3ee] transition-colors"
+          className="p-1 rounded-lg hover:bg-[#f1f5f9] transition-colors"
         >
-          <X className="w-3.5 h-3.5 text-[#414844]" />
+          <X className="w-3.5 h-3.5 text-[#475569]" />
         </button>
       </div>
 
@@ -104,11 +104,11 @@ export default function LayerControl() {
               className="flex items-center gap-1.5 w-full py-1 text-left hover:opacity-80 transition-opacity"
             >
               {expandedCategories.has(group.category) ? (
-                <ChevronDown className="w-3 h-3 text-[#414844]" />
+                <ChevronDown className="w-3 h-3 text-[#475569]" />
               ) : (
-                <ChevronRight className="w-3 h-3 text-[#414844]" />
+                <ChevronRight className="w-3 h-3 text-[#475569]" />
               )}
-              <span className="text-[10px] font-bold text-[#414844] uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-[#475569] uppercase tracking-wider">
                 {group.label}
               </span>
             </button>
@@ -122,8 +122,8 @@ export default function LayerControl() {
                       <span
                         className={`text-xs font-medium transition-colors ${
                           activeLayerIds.includes(layer.id)
-                            ? "text-[#1c1c19]"
-                            : "text-[#414844]"
+                            ? "text-[#0f172a]"
+                            : "text-[#475569]"
                         }`}
                       >
                         {layer.name}
@@ -141,7 +141,7 @@ export default function LayerControl() {
                           }}
                           className="p-0.5 rounded opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity"
                         >
-                          <Info className="w-3 h-3 text-[#414844]" />
+                          <Info className="w-3 h-3 text-[#475569]" />
                         </button>
                         {/* Toggle switch */}
                         <button
@@ -155,7 +155,7 @@ export default function LayerControl() {
                           }}
                           className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${
                             activeLayerIds.includes(layer.id)
-                              ? "bg-[#012d1d]"
+                              ? "bg-[#0d9488]"
                               : "bg-[#e5e2dd]"
                           }`}
                         >
@@ -172,7 +172,7 @@ export default function LayerControl() {
 
                     {/* Info tooltip */}
                     {infoLayerId === layer.id && (
-                      <div className="mt-1 mb-2 p-2.5 bg-[#f6f3ee] rounded-[12px] text-[10px] text-[#414844] space-y-1">
+                      <div className="mt-1 mb-2 p-2.5 bg-[#f1f5f9] rounded-[12px] text-[10px] text-[#475569] space-y-1">
                         <p>{layer.description}</p>
                         <p className="text-[#717973]">
                           Source: {layer.source}
@@ -196,11 +196,11 @@ export default function LayerControl() {
       {/* SLR Slider — appears when any SLR layer is active */}
       {hasSLR && (
         <div className="mt-4 pt-3 border-t border-[#c1c8c2]/15">
-          <p className="text-[10px] font-bold text-[#1c1c19] uppercase tracking-wider mb-2">
+          <p className="text-[10px] font-bold text-[#0f172a] uppercase tracking-wider mb-2">
             Sea Level Rise Scenario
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-[9px] text-[#414844] font-medium">1ft</span>
+            <span className="text-[9px] text-[#475569] font-medium">1ft</span>
             <input
               type="range"
               min={0}
@@ -210,15 +210,15 @@ export default function LayerControl() {
                 const idx = parseInt(e.target.value, 10);
                 handleSlrChange(SLR_SCENARIOS[idx].feet);
               }}
-              className="flex-1 h-1 appearance-none rounded-full bg-[#c1c8c2]/20 accent-[#012d1d] cursor-pointer
+              className="flex-1 h-1 appearance-none rounded-full bg-[#c1c8c2]/20 accent-[#0d9488] cursor-pointer
                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
-                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#012d1d]
-                [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-[#fcf9f4]
+                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#0d9488]
+                [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-[#f8fafc]
                 [&::-webkit-slider-thumb]:shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
             />
-            <span className="text-[9px] text-[#414844] font-medium">10ft</span>
+            <span className="text-[9px] text-[#475569] font-medium">10ft</span>
           </div>
-          <p className="text-center text-[11px] font-semibold text-[#012d1d] mt-1">
+          <p className="text-center text-[11px] font-semibold text-[#0d9488] mt-1">
             {slrScenario}ft selected
           </p>
         </div>

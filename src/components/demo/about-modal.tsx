@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   Gauge,
   Database,
-  Sparkles,
+  Lightbulb,
   UsersRound,
   ImageOff,
   ChevronDown,
@@ -163,7 +163,7 @@ export function AboutModal({
           <div className="rounded-xl bg-[#0f172a] text-white p-5">
             <div className="flex items-center gap-2 mb-2.5">
               <Database className="h-4 w-4 text-[var(--hw-teal)]" />
-              <Sparkles className="h-4 w-4 text-[var(--hw-teal)]" />
+              <Lightbulb className="h-4 w-4 text-[var(--hw-teal)]" />
               <UsersRound className="h-4 w-4 text-[var(--hw-teal)]" />
               <span className="text-[11px] uppercase tracking-wider font-semibold text-white/60">
                 How our platform brings it to fruition

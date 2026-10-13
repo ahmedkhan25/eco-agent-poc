@@ -51,7 +51,7 @@ export default function SplitView({ children, onAskQuery }: SplitViewProps) {
             {/* Close button */}
             <button
               onClick={hideMap}
-              className="absolute top-4 right-4 z-[1000] w-10 h-10 bg-[#fcf9f4]/70 backdrop-blur-[24px] rounded-full flex items-center justify-center text-[#1c1c19] hover:bg-[#fcf9f4] transition-all shadow-[0px_12px_32px_rgba(28,28,25,0.06)]"
+              className="absolute top-4 right-4 z-[1000] w-10 h-10 bg-[#f8fafc]/70 backdrop-blur-[24px] rounded-full flex items-center justify-center text-[#0f172a] hover:bg-[#f8fafc] transition-all shadow-[0px_12px_32px_rgba(28,28,25,0.06)]"
             >
               <X className="w-4 h-4" />
             </button>
@@ -65,7 +65,7 @@ export default function SplitView({ children, onAskQuery }: SplitViewProps) {
             <FeaturePopup onAskEcoHeart={onAskQuery} />
 
             {/* Map attribution overlay */}
-            <div className="absolute bottom-2 left-4 z-[999] text-[9px] text-[#414844]/60 font-medium pointer-events-none">
+            <div className="absolute bottom-2 left-4 z-[999] text-[9px] text-[#475569]/60 font-medium pointer-events-none">
               EcoHeart Earth Ledger
             </div>
           </motion.div>
@@ -83,7 +83,7 @@ export default function SplitView({ children, onAskQuery }: SplitViewProps) {
             transition={{ duration: 0.3, ease: "easeOut" }}
             style={{ height: "70vh" }}
           >
-            <div className="h-full bg-[#fcf9f4] rounded-t-[24px] shadow-[0px_-12px_32px_rgba(28,28,25,0.1)] overflow-hidden relative">
+            <div className="h-full bg-[#f8fafc] rounded-t-[24px] shadow-[0px_-12px_32px_rgba(28,28,25,0.1)] overflow-hidden relative">
               {/* Drag handle */}
               <div className="flex justify-center pt-3 pb-2">
                 <div className="w-10 h-1 bg-[#c1c8c2] rounded-full" />
@@ -92,9 +92,9 @@ export default function SplitView({ children, onAskQuery }: SplitViewProps) {
               {/* Close */}
               <button
                 onClick={hideMap}
-                className="absolute top-3 right-4 z-[1000] w-8 h-8 bg-[#fcf9f4]/70 backdrop-blur-[24px] rounded-full flex items-center justify-center"
+                className="absolute top-3 right-4 z-[1000] w-8 h-8 bg-[#f8fafc]/70 backdrop-blur-[24px] rounded-full flex items-center justify-center"
               >
-                <X className="w-3.5 h-3.5 text-[#1c1c19]" />
+                <X className="w-3.5 h-3.5 text-[#0f172a]" />
               </button>
 
               {/* Map */}

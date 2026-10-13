@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   Send,
   BookOpen,
-  Sparkles,
+  Lightbulb,
   ExternalLink,
   GitCompareArrows,
   Hammer,
@@ -80,7 +80,7 @@ export function CodeAssistantClient() {
                 mode === "ask" ? "bg-[var(--hw-teal)] text-white" : "demo-btn-ghost"
               }`}
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              <Lightbulb className="h-3.5 w-3.5" />
               Ask
             </button>
             <button
@@ -122,7 +122,7 @@ export function CodeAssistantClient() {
                       <div className="demo-card p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="demo-chip demo-chip-teal inline-flex items-center gap-1">
-                            <Sparkles className="h-2.5 w-2.5" />
+                            <Lightbulb className="h-2.5 w-2.5" />
                             EcoHeart AI
                           </span>
                           <span className="demo-chip">

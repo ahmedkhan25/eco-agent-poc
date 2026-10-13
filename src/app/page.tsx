@@ -199,14 +199,14 @@ function HomeContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#FAF9F6] dark:bg-slate-900">
+      <div className="flex items-center justify-center min-h-screen bg-[#F8FAFC] dark:bg-slate-900">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
       </div>
     );
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-[#FAF9F6] via-[#F5F5F0] to-[#EDE8E3] dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 flex'>
+    <div className='min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#F5F5F0] to-[#EDE8E3] dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 flex'>
       {/* Enterprise Banner */}
       <EnterpriseBanner />
 
@@ -264,7 +264,7 @@ function HomeContent() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1, duration: 0.6, ease: "easeOut" }}
                 >
-                  <h1 className="text-gray-800 dark:text-gray-200 text-lg sm:text-2xl font-semibold">
+                  <h1 className="font-serif text-slate-900 dark:text-gray-100 text-2xl sm:text-4xl">
                     City of Olympia AI Researcher
                   </h1>
                   
@@ -359,7 +359,7 @@ function HomeContent() {
 export default function Home() {
   return (
     <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen bg-[#FAF9F6] dark:bg-slate-900">
+      <div className="flex items-center justify-center min-h-screen bg-[#F8FAFC] dark:bg-slate-900">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 dark:border-teal-400"></div>
       </div>
     }>

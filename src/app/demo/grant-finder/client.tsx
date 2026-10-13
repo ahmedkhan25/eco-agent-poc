@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   Send,
   Loader2,
-  Sparkles,
+  Lightbulb,
   CheckCircle2,
   AlertCircle,
   XCircle,
@@ -348,7 +348,7 @@ export function GrantFinderClient() {
           )}
           <div className="mt-4 pt-3 border-t border-[var(--hw-slate-200)] text-[11px] text-[var(--hw-slate-500)] leading-snug">
             <div className="flex items-center gap-1.5 mb-1 text-[var(--hw-slate-700)] font-medium">
-              <Sparkles className="h-3 w-3" />
+              <Lightbulb className="h-3 w-3" />
               Why this matters
             </div>
             Every Compact city spends staff hours on the same grant-narrative work. Single highest-ROI feature for a budget-constrained city.

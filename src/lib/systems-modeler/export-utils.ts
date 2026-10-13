@@ -18,10 +18,10 @@ export function generateInteractiveHTML(model: SystemModel): string {
 <title>${model.name} — EcoHeart Systems Modeler</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"><\/script>
 <style>
-  :root { --bg:#1a2f22; --panel:#162219; --green:#3ddc84; --text:#d4e8d8; --text-dim:#7a9e82; --border:#1e3528; }
+  :root { --bg:#0f172a; --panel:#111827; --green:#2dd4bf; --text:#e2e8f0; --text-dim:#64748b; --border:#1e293b; }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--bg); color:var(--text); font-family:system-ui,sans-serif; height:100vh; overflow:hidden; }
-  header { position:fixed; top:0; left:0; right:0; height:50px; background:linear-gradient(180deg,#1a2f22,transparent); display:flex; align-items:center; padding:0 20px; gap:12px; z-index:50; }
+  header { position:fixed; top:0; left:0; right:0; height:50px; background:linear-gradient(180deg,#0f172a,transparent); display:flex; align-items:center; padding:0 20px; gap:12px; z-index:50; }
   .logo { font-size:18px; font-weight:700; color:var(--green); }
   .logo span { color:var(--text-dim); font-weight:400; font-size:12px; margin-left:8px; }
   .model-name { color:var(--text); font-size:13px; }
@@ -70,8 +70,8 @@ const defs = svg.append('defs');
 });
 
 const grad = defs.append('radialGradient').attr('id','bgGrad').attr('cx','50%').attr('cy','50%');
-grad.append('stop').attr('offset','0%').attr('stop-color','#172b1e');
-grad.append('stop').attr('offset','100%').attr('stop-color','#1a2f22');
+grad.append('stop').attr('offset','0%').attr('stop-color','#1e293b');
+grad.append('stop').attr('offset','100%').attr('stop-color','#0f172a');
 svg.append('rect').attr('width','100%').attr('height','100%').attr('fill','url(#bgGrad)');
 
 const g = svg.append('g');
@@ -95,7 +95,7 @@ const linkSel = g.append('g').selectAll('path').data(links).enter().append('path
   .attr('stroke-width',1.5).attr('opacity',0.7).attr('marker-end',d=>'url(#arrow-'+d.type+')');
 
 const edgeLabels = g.append('g').selectAll('text').data(links).enter().append('text')
-  .attr('font-size','9px').attr('fill','#5a7a62').attr('text-anchor','middle').text(d=>d.lag);
+  .attr('font-size','9px').attr('fill','#64748b').attr('text-anchor','middle').text(d=>d.lag);
 
 const loopSel = g.append('g').selectAll('g').data(model.loops).enter().append('g').style('cursor','pointer');
 loopSel.append('circle').attr('r',16).attr('fill',d=>d.type==='R'?linkColors.reinforcing:linkColors.balancing).attr('opacity',0.9);
@@ -113,7 +113,7 @@ nodeSel.append('circle').attr('r',d=>d.key?38:32)
 
 nodeSel.each(function(d){const el=d3.select(this);d.label.split('\\n').forEach((line,i,arr)=>{
   el.append('text').attr('y',arr.length===2?(i===0?-7:7):0).attr('font-size',d.key?'11px':'10px')
-    .attr('fill',d.key?'white':'#c8e0cc').attr('font-weight',d.key?'600':'400')
+    .attr('fill',d.key?'white':'#cbd5e1').attr('font-weight',d.key?'600':'400')
     .attr('text-anchor','middle').attr('dominant-baseline','middle').text(line);});});
 
 function linkPath(d){const dx=d.target.x-d.source.x,dy=d.target.y-d.source.y,dr=Math.sqrt(dx*dx+dy*dy)*0.8;return 'M'+d.source.x+','+d.source.y+'A'+dr+','+dr+' 0 0,1 '+d.target.x+','+d.target.y;}

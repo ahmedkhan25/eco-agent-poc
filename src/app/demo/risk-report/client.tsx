@@ -7,7 +7,7 @@ import {
   Download,
   Mail,
   Ticket,
-  Sparkles,
+  Lightbulb,
   ChevronDown,
   Loader2,
   MapPin,
@@ -131,7 +131,7 @@ export function RiskReportClient() {
             disabled={loading || !address.trim()}
             className="demo-btn-primary px-6 inline-flex items-center gap-2"
           >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lightbulb className="h-4 w-4" />}
             Get my risk report
           </button>
         </form>
@@ -277,7 +277,7 @@ export function RiskReportClient() {
                 </h3>
               </div>
               <span className="demo-chip demo-chip-teal inline-flex items-center gap-1">
-                <Sparkles className="h-3 w-3" />
+                <Lightbulb className="h-3 w-3" />
                 AI synthesis
               </span>
             </div>
@@ -354,7 +354,7 @@ export function RiskReportClient() {
                 href="/demo/grant-finder"
                 className="demo-btn-accent text-sm inline-flex items-center gap-1.5"
               >
-                <Sparkles className="h-3.5 w-3.5" />
+                <Lightbulb className="h-3.5 w-3.5" />
                 Find grants
               </a>
             </div>

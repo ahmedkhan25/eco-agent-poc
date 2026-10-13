@@ -90,7 +90,7 @@ export function CausalLoopDiagram({
       .attr("cx", "50%")
       .attr("cy", "50%");
     grad.append("stop").attr("offset", "0%").attr("stop-color", "#243d2e");
-    grad.append("stop").attr("offset", "100%").attr("stop-color", "#1a2f22");
+    grad.append("stop").attr("offset", "100%").attr("stop-color", "#0f172a");
     svg.append("rect")
       .attr("width", "100%")
       .attr("height", "100%")
@@ -200,7 +200,7 @@ export function CausalLoopDiagram({
       .enter()
       .append("text")
       .attr("font-size", "8px")
-      .attr("fill", "#5a7a62")
+      .attr("fill", "#64748b")
       .attr("text-anchor", "middle")
       .attr("font-family", "system-ui, sans-serif")
       .attr("opacity", showLagLabels ? 0.8 : 0)
@@ -222,7 +222,7 @@ export function CausalLoopDiagram({
       .append("circle")
       .attr("r", 18)
       .attr("fill", (d) => (d.type === "R" ? LINK_COLORS.reinforcing : LINK_COLORS.balancing))
-      .attr("stroke", "#1a2f22")
+      .attr("stroke", "#0f172a")
       .attr("stroke-width", 2.5)
       .attr("opacity", 1);
 
@@ -321,7 +321,7 @@ export function CausalLoopDiagram({
         el.append("text")
           .attr("y", labelY + i * lineHeight)
           .attr("font-size", `${fontSize}px`)
-          .attr("fill", d.key ? "white" : "#c8e0cc")
+          .attr("fill", d.key ? "white" : "#cbd5e1")
           .attr("font-weight", d.key ? "600" : "400")
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "hanging")
@@ -336,8 +336,8 @@ export function CausalLoopDiagram({
       .select(container)
       .append("div")
       .style("position", "absolute")
-      .style("background", "#213a2b")
-      .style("border", "1px solid #2a4535")
+      .style("background", "#1e293b")
+      .style("border", "1px solid #334155")
       .style("border-radius", "10px")
       .style("padding", "10px 14px")
       .style("font-size", "12px")
@@ -353,7 +353,7 @@ export function CausalLoopDiagram({
         const label = d.label.replace("\n", " ");
         tooltip
           .html(
-            `<div style="font-weight:600;color:#3ddc84;margin-bottom:4px">${label}</div><div style="color:#9ab8a2;line-height:1.5">${d.desc}</div>`
+            `<div style="font-weight:600;color:#2dd4bf;margin-bottom:4px">${label}</div><div style="color:#94a3b8;line-height:1.5">${d.desc}</div>`
           )
           .style("opacity", "1")
           .style("left", e.offsetX + 12 + "px")

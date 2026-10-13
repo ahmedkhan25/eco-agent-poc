@@ -101,7 +101,7 @@ interface ActionResultProps {
 
 export function ActionResult({ message, nodeRefs, linkRefs }: ActionResultProps) {
   return (
-    <div className="text-xs text-[#9ab8a2] space-y-1.5 py-1">
+    <div className="text-xs text-[#94a3b8] space-y-1.5 py-1">
       <p>{message}</p>
       {((nodeRefs && nodeRefs.length > 0) || (linkRefs && linkRefs.length > 0)) && (
         <div className="flex flex-wrap gap-1">

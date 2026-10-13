@@ -92,7 +92,7 @@ export default function SpatialTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcf9f4]">
+    <div className="min-h-screen bg-[#f8fafc]">
       {/* Banner */}
       <nav className="bg-slate-900/95 backdrop-blur-sm px-6 py-3">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
@@ -120,10 +120,10 @@ export default function SpatialTestPage() {
       <div className="max-w-[1400px] mx-auto p-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl font-bold text-[#1c1c19] font-[Manrope] tracking-tight">
+          <h1 className="text-xl font-bold text-[#0f172a] font-[Manrope] tracking-tight">
             Spatial Query Test
           </h1>
-          <p className="text-sm text-[#414844]">
+          <p className="text-sm text-[#475569]">
             Test the AI spatial pipeline: gpt-5.4-mini parses intent &rarr;
             geocode &rarr; ArcGIS fetch &rarr; map render
           </p>
@@ -140,7 +140,7 @@ export default function SpatialTestPage() {
                 className={`px-3 py-1.5 rounded-full text-xs border transition-all ${
                   query === q
                     ? "border-[#E8761B] bg-[#E8761B]/8 text-[#E8761B]"
-                    : "border-[#e5e2dd] text-[#414844] hover:border-[#c1c8c2]"
+                    : "border-[#e5e2dd] text-[#475569] hover:border-[#c1c8c2]"
                 } disabled:opacity-50`}
               >
                 {q}
@@ -155,12 +155,12 @@ export default function SpatialTestPage() {
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && runQuery(query)}
               placeholder="Enter a spatial query about Olympia..."
-              className="flex-1 px-4 py-2.5 rounded-[12px] bg-[#f6f3ee] border border-[#e5e2dd] text-sm text-[#1c1c19] placeholder:text-[#717973] focus:outline-none focus:border-[#2D6A4F]"
+              className="flex-1 px-4 py-2.5 rounded-[12px] bg-[#f1f5f9] border border-[#e5e2dd] text-sm text-[#0f172a] placeholder:text-[#717973] focus:outline-none focus:border-[#2D6A4F]"
             />
             <button
               onClick={() => runQuery(query)}
               disabled={loading || !query.trim()}
-              className="px-5 py-2.5 rounded-[12px] bg-[#012d1d] hover:bg-[#1b4332] text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-5 py-2.5 rounded-[12px] bg-[#0d9488] hover:bg-[#0f766e] text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -192,7 +192,7 @@ export default function SpatialTestPage() {
                 {/* Summary card */}
                 <div className="bg-white rounded-[16px] shadow-[0px_12px_32px_rgba(28,28,25,0.06)] p-5">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-bold text-[#1c1c19] uppercase tracking-wider">
+                    <h3 className="text-sm font-bold text-[#0f172a] uppercase tracking-wider">
                       Result
                     </h3>
                     <span className="flex items-center gap-1 text-xs text-[#717973]">
@@ -202,19 +202,19 @@ export default function SpatialTestPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-[#f6f3ee] rounded-[12px] p-3">
+                    <div className="bg-[#f1f5f9] rounded-[12px] p-3">
                       <p className="text-[10px] text-[#717973] uppercase tracking-wider">
                         Source
                       </p>
-                      <p className="text-sm font-semibold text-[#1c1c19]">
+                      <p className="text-sm font-semibold text-[#0f172a]">
                         {result.meta.source}
                       </p>
                     </div>
-                    <div className="bg-[#f6f3ee] rounded-[12px] p-3">
+                    <div className="bg-[#f1f5f9] rounded-[12px] p-3">
                       <p className="text-[10px] text-[#717973] uppercase tracking-wider">
                         Features
                       </p>
-                      <p className="text-sm font-semibold text-[#1c1c19]">
+                      <p className="text-sm font-semibold text-[#0f172a]">
                         {result.textForLLM?.featureCount ?? "N/A"}
                       </p>
                     </div>
@@ -225,7 +225,7 @@ export default function SpatialTestPage() {
                       <p className="text-xs font-semibold text-[#2D6A4F]">
                         Layer Activation
                       </p>
-                      <p className="text-xs text-[#414844] mt-1">
+                      <p className="text-xs text-[#475569] mt-1">
                         {result.layerActivation
                           .map((la) => la.layerId)
                           .join(", ")}
@@ -268,9 +268,9 @@ export default function SpatialTestPage() {
                 <div className="bg-white rounded-[16px] shadow-[0px_12px_32px_rgba(28,28,25,0.06)] overflow-hidden">
                   <button
                     onClick={() => setShowDebug(!showDebug)}
-                    className="w-full flex items-center justify-between p-4 hover:bg-[#f6f3ee] transition-colors"
+                    className="w-full flex items-center justify-between p-4 hover:bg-[#f1f5f9] transition-colors"
                   >
-                    <span className="text-sm font-bold text-[#1c1c19] uppercase tracking-wider">
+                    <span className="text-sm font-bold text-[#0f172a] uppercase tracking-wider">
                       Debug — Pipeline Stages
                     </span>
                     {showDebug ? (
@@ -361,7 +361,7 @@ export default function SpatialTestPage() {
             {loading && (
               <div className="bg-white rounded-[16px] shadow-[0px_12px_32px_rgba(28,28,25,0.06)] p-12 text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-[#2D6A4F] mx-auto mb-3" />
-                <p className="text-sm text-[#414844]">
+                <p className="text-sm text-[#475569]">
                   Running spatial pipeline...
                 </p>
                 <p className="text-xs text-[#717973] mt-1">
@@ -405,14 +405,14 @@ function StageCard({
       className={`rounded-[12px] p-3 border ${
         status === "warn"
           ? "bg-amber-50 border-amber-200"
-          : "bg-[#f6f3ee] border-[#e5e2dd]"
+          : "bg-[#f1f5f9] border-[#e5e2dd]"
       }`}
     >
       <div className="flex items-center gap-2 mb-2">
         <span className={status === "warn" ? "text-amber-600" : "text-[#2D6A4F]"}>
           {icon}
         </span>
-        <span className="text-[10px] font-bold uppercase tracking-wider text-[#414844]">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-[#475569]">
           {label}
         </span>
       </div>
@@ -440,8 +440,8 @@ function KV({
           warn
             ? "text-amber-700 font-medium"
             : mono
-              ? "font-mono text-[#414844]"
-              : "text-[#1c1c19]"
+              ? "font-mono text-[#475569]"
+              : "text-[#0f172a]"
         }`}
       >
         {value}

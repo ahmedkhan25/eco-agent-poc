@@ -44,8 +44,8 @@ function ToolbarButton({
         "w-9 h-9 flex items-center justify-center rounded-full border transition-all duration-150",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400",
         active
-          ? "border-green-500 text-green-400 bg-green-500/10"
-          : "border-slate-600 text-slate-400 hover:border-green-500 hover:text-green-400",
+          ? "border-teal-500 text-teal-300 bg-teal-500/10"
+          : "border-slate-600 text-slate-400 hover:border-teal-500 hover:text-teal-300",
         disabled && "opacity-30 cursor-not-allowed hover:border-slate-600 hover:text-slate-400"
       )}
     >

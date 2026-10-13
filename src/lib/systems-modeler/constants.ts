@@ -14,7 +14,7 @@ export const CATEGORY_COLORS: Record<NodeCategory, string> = {
   resource: "#5ca8e0",
   policy: "#f5a623",
   economic: "#e8aa7d",
-  default: "#7a9e82",
+  default: "#64748b",
 };
 
 export const CATEGORY_LABELS: Record<NodeCategory, string> = {

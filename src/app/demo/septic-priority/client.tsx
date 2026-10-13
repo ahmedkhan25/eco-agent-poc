@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Droplets,
-  Sparkles,
+  Lightbulb,
   Loader2,
   Download,
   GitCompareArrows,
@@ -187,7 +187,7 @@ export function SepticClient() {
               disabled={solving}
               className="demo-btn-primary text-sm w-full mt-3 inline-flex items-center justify-center gap-2"
             >
-              {solving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+              {solving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Lightbulb className="h-3.5 w-3.5" />}
               Solve
             </button>
           </div>

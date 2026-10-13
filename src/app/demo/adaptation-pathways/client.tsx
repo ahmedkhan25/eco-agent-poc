@@ -6,7 +6,7 @@ import {
   Shield,
   Home,
   Compass,
-  Sparkles,
+  Lightbulb,
   Wand2,
   RotateCcw,
   Download,
@@ -270,7 +270,7 @@ export function PathwaysClient() {
                   onClick={() => setHumanized((h) => !h)}
                   className="demo-btn-primary text-sm inline-flex items-center gap-2 justify-center"
                 >
-                  <Sparkles className="h-3.5 w-3.5" />
+                  <Lightbulb className="h-3.5 w-3.5" />
                   {humanized ? "Hide narrative" : "Humanize (800–1200 words)"}
                 </button>
               </div>

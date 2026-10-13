@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState } from "react";
-import { Download, Sparkles, Wand2, TrendingUp, TrendingDown, Hotel } from "lucide-react";
+import { Download, Lightbulb, Wand2, TrendingUp, TrendingDown, Hotel } from "lucide-react";
 import { ConceptHeader } from "@/components/demo/concept-header";
 import { InsightCard } from "@/components/demo/insight-card";
 import { TOURISM_CLIMATE_MODEL } from "@/lib/demo/concept-data";
@@ -174,7 +174,7 @@ export function TourismLoopClient() {
                   Collide with "Climate migration"
                 </button>
                 <button className="demo-btn-primary text-sm inline-flex items-center gap-2 justify-center">
-                  <Sparkles className="h-3.5 w-3.5" />
+                  <Lightbulb className="h-3.5 w-3.5" />
                   Humanize (800–1200 words)
                 </button>
               </div>

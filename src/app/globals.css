@@ -7,7 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -45,40 +46,40 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  /* Cream/beige background matching business website */
-  --background: oklch(0.975 0.008 90);
-  --foreground: oklch(0.25 0.02 250);
-  --card: oklch(0.995 0.002 90);
-  --card-foreground: oklch(0.25 0.02 250);
-  --popover: oklch(0.995 0.002 90);
-  --popover-foreground: oklch(0.25 0.02 250);
-  /* Teal primary color matching business website */
-  --primary: oklch(0.7 0.15 175);
-  --primary-foreground: oklch(0.995 0 0);
-  --secondary: oklch(0.96 0.008 90);
-  --secondary-foreground: oklch(0.25 0.02 250);
-  --muted: oklch(0.94 0.01 90);
-  --muted-foreground: oklch(0.45 0.02 250);
-  --accent: oklch(0.7 0.15 175);
-  --accent-foreground: oklch(0.995 0 0);
+  /* Tokens follow ecoheart.ai (eco-web BRAND_GUIDELINES.md):
+     slate-50 page, white cards, slate-200 borders, teal-600 as the action color. */
+  --radius: 0.75rem;
+  --background: oklch(0.984 0.003 247.858); /* slate-50 #F8FAFC */
+  --foreground: oklch(0.208 0.042 265.755); /* slate-900 #0F172A */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.208 0.042 265.755);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.208 0.042 265.755);
+  --primary: oklch(0.6 0.118 184.704); /* teal-600 #0D9488 */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.968 0.007 247.896); /* slate-100 */
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.446 0.043 257.281); /* slate-600 */
+  --accent: oklch(0.984 0.014 180.72); /* teal-50 */
+  --accent-foreground: oklch(0.437 0.078 188.216); /* teal-800 */
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.015 90);
-  --input: oklch(0.92 0.01 90);
-  --ring: oklch(0.7 0.15 175);
-  --chart-1: oklch(0.7 0.15 175);
-  --chart-2: oklch(0.6 0.118 184.704);
+  --border: oklch(0.929 0.013 255.508); /* slate-200 */
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.6 0.118 184.704);
+  --chart-1: oklch(0.6 0.118 184.704);
+  --chart-2: oklch(0.511 0.096 186.391);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.98 0.005 90);
-  --sidebar-foreground: oklch(0.25 0.02 250);
-  --sidebar-primary: oklch(0.7 0.15 175);
-  --sidebar-primary-foreground: oklch(0.995 0 0);
-  --sidebar-accent: oklch(0.94 0.01 90);
-  --sidebar-accent-foreground: oklch(0.25 0.02 250);
-  --sidebar-border: oklch(0.9 0.015 90);
-  --sidebar-ring: oklch(0.7 0.15 175);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-primary: oklch(0.6 0.118 184.704);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.6 0.118 184.704);
 }
 
 .dark {

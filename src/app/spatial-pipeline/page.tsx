@@ -5,9 +5,9 @@ import { EcoheartLogo } from "@/components/ecoheart-logo";
 import Link from "next/link";
 
 const COLORS = {
-  bg: "#fcf9f4",
+  bg: "#f8fafc",
   surface: "#ffffff",
-  surfaceLight: "#f6f3ee",
+  surfaceLight: "#f1f5f9",
   border: "#e5e2dd",
   borderActive: "#2D6A4F",
   green: "#2D6A4F",
@@ -18,12 +18,12 @@ const COLORS = {
   orangeDim: "rgba(232,118,27,0.08)",
   blue: "#2563EB",
   teal: "#0891B2",
-  text: "#1c1c19",
-  textMuted: "#414844",
+  text: "#0f172a",
+  textMuted: "#475569",
   textDim: "#717973",
   code: "#7c3aed",
   codeBlock: "#0D1117",
-  white: "#1c1c19",
+  white: "#0f172a",
 };
 
 const STAGES = [
@@ -445,7 +445,7 @@ export default function SpatialQueryPipeline() {
           style={{
             fontSize: 22,
             fontWeight: 700,
-            color: "#012d1d",
+            color: "#0d9488",
             margin: "0 0 6px",
             letterSpacing: "-0.02em",
             fontFamily: "'Manrope', 'DM Sans', sans-serif",
@@ -748,7 +748,7 @@ const geojson = await response.json();
                   }}
                 >
                   {"\u2705"}{" "}
-                  <span style={{ color: "#1c1c19" }}>
+                  <span style={{ color: "#0f172a" }}>
                     No API key. No token. No account needed. Just a public URL
                     with
                   </span>{" "}

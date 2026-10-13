@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, ExternalLink } from "lucide-react";
+import { Lightbulb, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
 interface Source {
@@ -43,7 +43,7 @@ export function InsightCard({
           className="h-7 w-7 rounded-md flex items-center justify-center shrink-0"
           style={{ backgroundColor: accent + "1a", color: accent }}
         >
-          <Sparkles className="h-3.5 w-3.5" />
+          <Lightbulb className="h-3.5 w-3.5" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1">

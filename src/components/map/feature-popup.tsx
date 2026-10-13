@@ -56,9 +56,9 @@ export default function FeaturePopup({ onAskEcoHeart }: FeaturePopupProps) {
         </span>
         <button
           onClick={() => setSelectedFeature(null)}
-          className="p-1 rounded-lg hover:bg-[#f6f3ee] transition-colors"
+          className="p-1 rounded-lg hover:bg-[#f1f5f9] transition-colors"
         >
-          <X className="w-3 h-3 text-[#414844]" />
+          <X className="w-3 h-3 text-[#475569]" />
         </button>
       </div>
 
@@ -70,7 +70,7 @@ export default function FeaturePopup({ onAskEcoHeart }: FeaturePopupProps) {
               <span className="text-[11px] text-[#717973] truncate shrink-0 max-w-[40%]">
                 {formatKey(key)}
               </span>
-              <span className="text-[11px] text-[#1c1c19] font-medium text-right truncate">
+              <span className="text-[11px] text-[#0f172a] font-medium text-right truncate">
                 {String(value)}
               </span>
             </div>
@@ -84,17 +84,17 @@ export default function FeaturePopup({ onAskEcoHeart }: FeaturePopupProps) {
       </div>
 
       {/* Action buttons */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-[#f6f3ee]">
+      <div className="flex items-center gap-2 px-4 py-3 bg-[#f1f5f9]">
         <button
           onClick={handleAsk}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-gradient-to-br from-[#012d1d] to-[#1b4332] text-white text-[11px] font-semibold rounded-full hover:scale-[1.02] active:scale-[0.98] transition-transform"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-semibold rounded-full transition-colors"
         >
           <MessageCircle className="w-3 h-3" />
           Ask EcoHeart
         </button>
         <button
           onClick={handleCopy}
-          className="flex items-center justify-center gap-1 py-2 px-3 bg-[#e5e2dd] text-[#1c1c19] text-[11px] font-medium rounded-full hover:bg-[#dcdad5] transition-colors"
+          className="flex items-center justify-center gap-1 py-2 px-3 bg-[#e5e2dd] text-[#0f172a] text-[11px] font-medium rounded-full hover:bg-[#dcdad5] transition-colors"
         >
           {copied ? (
             <Check className="w-3 h-3 text-[#059669]" />

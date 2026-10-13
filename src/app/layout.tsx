@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { DM_Sans, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { MissingKeysDialog } from "@/components/missing-keys-dialog";
 import { OllamaProvider } from "@/lib/ollama-context";
@@ -9,18 +9,19 @@ import { QueryProvider } from "@/components/query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { logEnvironmentStatus } from "@/lib/env-validation";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Same type pairing as ecoheart.ai: DM Sans for UI/body, Playfair Display for headings.
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
 
@@ -71,7 +72,7 @@ export const viewport: Viewport = {
   userScalable: false,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F5F5F5" },
+    { media: "(prefers-color-scheme: light)", color: "#F8FAFC" },
     { media: "(prefers-color-scheme: dark)", color: "#030712" },
   ],
 };
@@ -89,7 +90,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} antialiased overflow-x-hidden`}
+        className={`${dmSans.variable} ${playfair.variable} ${geistMono.variable} font-sans antialiased overflow-x-hidden`}
       >
         <ThemeProvider
           attribute="class"
@@ -102,7 +103,7 @@ export default function RootLayout({
               <PostHogProvider>
                 <OllamaProvider>
                   <MissingKeysDialog />
-                  {/* <ProviderSelector /> */} {/* Disabled - using OpenAI only */}
+                  {/* <ProviderSelector /> */} {/* Disabled - hosted models only */}
                   {children}
                   <Analytics />
                 </OllamaProvider>

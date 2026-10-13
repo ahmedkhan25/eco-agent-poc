@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 
 interface Props {
   tag: string;
@@ -19,7 +19,7 @@ export function ConceptHeader({ tag, title, subtitle, badge = "Phase-2 concept Â
             {tag}
           </span>
           <span className="demo-chip demo-chip-coral inline-flex items-center gap-1">
-            <Sparkles className="h-2.5 w-2.5" />
+            <Lightbulb className="h-2.5 w-2.5" />
             {badge}
           </span>
         </div>

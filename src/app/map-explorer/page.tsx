@@ -27,7 +27,7 @@ export default function MapExplorerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcf9f4] flex">
+    <div className="min-h-screen bg-[#f8fafc] flex">
       <Sidebar
         onNewChat={() => router.push("/")}
         onSessionSelect={(sessionId) => router.push(`/?chatId=${sessionId}`)}
@@ -36,18 +36,18 @@ export default function MapExplorerPage() {
       {/* Main content — full-width map */}
       <div className="flex-1 flex flex-col pt-16 md:pl-24 h-screen overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-3 flex items-center justify-between bg-[#fcf9f4]/80 backdrop-blur-md z-10">
+        <div className="px-6 py-3 flex items-center justify-between bg-[#f8fafc]/80 backdrop-blur-md z-10">
           <div>
-            <h1 className="text-lg font-bold text-[#1c1c19] font-[Manrope] tracking-tight">
+            <h1 className="font-serif text-2xl text-[#0f172a]">
               Map Explorer
             </h1>
-            <p className="text-xs text-[#414844]">
+            <p className="text-xs text-[#475569]">
               Browse environmental layers for the Olympia region
             </p>
           </div>
           <Link
             href="/spatial-pipeline"
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#012d1d] hover:bg-[#1b4332] text-white text-xs font-semibold transition-colors shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#0d9488] hover:bg-[#0f766e] text-white text-xs font-semibold transition-colors shadow-sm"
           >
             <Info className="w-3.5 h-3.5" />
             How It Works
@@ -67,7 +67,7 @@ export default function MapExplorerPage() {
           <FeaturePopup onAskEcoHeart={handleAskEcoHeart} />
 
           {/* Attribution */}
-          <div className="absolute bottom-2 left-4 z-[999] text-[9px] text-[#414844]/60 font-medium pointer-events-none">
+          <div className="absolute bottom-2 left-4 z-[999] text-[9px] text-[#475569]/60 font-medium pointer-events-none">
             EcoHeart Earth Ledger
           </div>
         </div>

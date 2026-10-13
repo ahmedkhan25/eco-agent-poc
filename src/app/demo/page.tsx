@@ -4,7 +4,7 @@ import {
   Waves,
   Droplets,
   Building2,
-  Sparkles,
+  HandCoins,
   Network,
   ShieldAlert,
   ArrowRight,
@@ -52,7 +52,7 @@ const FEATURES = [
   },
   {
     href: "/demo/grant-finder",
-    icon: Sparkles,
+    icon: HandCoins,
     tag: "RAG · Agent",
     title: "Grant Finder Agent",
     subtitle:
