@@ -1,0 +1,322 @@
+"use client";
+
+// Registers what the ROI chat agent can see and do. Mounted once in the ROI
+// shell, so the agent works from every tab. Each action renders a small card
+// in the chat (generative UI) and changes the workspace itself.
+
+import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { FileText } from "lucide-react";
+import { fmtMoney, type InputKey, type RoiInputs } from "@/lib/roi/engine";
+import { BASIS_LABEL, type Basis } from "@/lib/roi/defaults";
+import { costTotals, scenarioResult, useRoiStore } from "@/lib/roi/store";
+import { MiniScenario, Working, headline, ink } from "./ui";
+
+const INPUT_KEYS: { name: InputKey; description: string }[] = [
+  { name: "prem", description: "Annual property insurance premium, dollars" },
+  { name: "credit", description: "Premium credit at renewal, percent (5 = 5%)" },
+  { name: "claims", description: "Small claims under the deductible per year, dollars" },
+  { name: "claimsCut", description: "Share of small claims avoided, percent" },
+  { name: "ded", description: "Wind and water deductibles per year, dollars" },
+  { name: "dedCut", description: "Share of deductibles avoided, percent" },
+  { name: "ot", description: "Emergency overtime and pumping per year, dollars" },
+  { name: "otCut", description: "Share of overtime avoided, percent" },
+  { name: "hrs", description: "Staff hours saved per year on insurer and grant reports" },
+  { name: "hourly", description: "Fully loaded staff cost per hour, dollars" },
+  { name: "fee", description: "ecoheart fee, dollars" },
+  { name: "grants", description: "Number of neighborhood micro-grants" },
+  { name: "grantSize", description: "Size of each grant, dollars" },
+];
+
+const overridesParam = {
+  name: "overrides",
+  type: "object" as const,
+  description: "Only the inputs that differ from the shared assumption library. Leave out everything else.",
+  required: false,
+  attributes: INPUT_KEYS.map((k) => ({ name: k.name, type: "number" as const, description: k.description, required: false })),
+};
+
+function clean(o: unknown): Partial<RoiInputs> {
+  if (!o || typeof o !== "object") return {};
+  const out: Partial<RoiInputs> = {};
+  for (const k of INPUT_KEYS) {
+    const v = (o as Record<string, unknown>)[k.name];
+    if (typeof v === "number" && Number.isFinite(v)) out[k.name] = v;
+    else if (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v))) out[k.name] = Number(v);
+  }
+  return out;
+}
+
+const asBasis = (b: unknown): Basis => (b === "low" || b === "high" ? b : "expected");
+
+function summarize(id: string) {
+  const { scenarios, assumptions } = useRoiStore.getState();
+  const s = scenarios.find((x) => x.id === id);
+  if (!s) return null;
+  const r = scenarioResult(s, assumptions);
+  return {
+    id: s.id,
+    name: s.name,
+    city: s.city,
+    basis: BASIS_LABEL[s.basis],
+    overrides: s.overrides,
+    netYearOne: fmtMoney(r.net),
+    returnPerDollar: `$${r.returnPerDollar.toFixed(2)}`,
+    paybackMonths: r.paybackMonths,
+    citySpends: fmtMoney(r.spent),
+    grossSavings: fmtMoney(r.saved),
+    stormAndInsuranceToday: fmtMoney(r.today),
+    biggestDrivers: r.drivers.slice(0, 3).map((d) => `${d.label}: ${fmtMoney(d.value)}`),
+  };
+}
+
+export function RoiAgent() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const store = useRoiStore();
+  const goCanvas = () => {
+    if (pathname !== "/roi") router.push("/roi");
+  };
+
+  useCopilotReadable({
+    description: "The page of the ROI Advisor the person is looking at",
+    value: pathname,
+  });
+
+  useCopilotReadable({
+    description:
+      "Shared assumption library. Each scenario uses one basis column (low = cautious, expected, high = business case) unless it overrides a key.",
+    value: store.assumptions.map((a) => ({
+      key: a.key,
+      label: a.label,
+      unit: a.unit,
+      cautious: a.low,
+      expected: a.expected,
+      businessCase: a.high,
+      confidence: a.confidence,
+      source: a.source,
+    })),
+  });
+
+  useCopilotReadable({
+    description: "Scenarios on the canvas with their calculated results (from the calculator, not estimates)",
+    value: store.scenarios.map((s) => summarize(s.id)),
+  });
+
+  useCopilotReadable({
+    description: "Which scenario is open and which are being compared",
+    value: { activeId: store.activeId, compareIds: store.compareIds },
+  });
+
+  useCopilotReadable({
+    description: "Internal ecoheart cost model (never share with cities): team hours, cost, run cost and margin on the early partner project",
+    value: (() => {
+      const t = costTotals(store.roles, store.run, store.offers);
+      return {
+        teamHours: t.hours,
+        teamCost: fmtMoney(t.teamCost),
+        listValueAt200: fmtMoney(t.listValue),
+        runCostPerMonth: `$${t.runMonthly}`,
+        partnerProjectPrice: fmtMoney(t.partnerPrice),
+        marginOnPartnerProject: `${fmtMoney(t.margin)} (${Math.round(t.marginPct * 100)}%)`,
+        offers: store.offers.map((o) => `${o.name}: ${fmtMoney(o.price)} (${o.weeks})`),
+      };
+    })(),
+  });
+
+  useCopilotAction({
+    name: "createScenario",
+    description:
+      "Create a new ROI scenario card on the canvas and calculate it. Use for every new what-if. Returns the calculated numbers to quote.",
+    parameters: [
+      { name: "name", type: "string", description: "Short card title, e.g. 'Flagstaff, cautious'", required: true },
+      { name: "city", type: "string", description: "City and state", required: true },
+      { name: "question", type: "string", description: "The question this scenario answers, in plain words", required: true },
+      { name: "basis", type: "string", description: "low (cautious), expected or high (business case)", enum: ["low", "expected", "high"], required: true },
+      overridesParam,
+      { name: "notes", type: "string", description: "Where the overrides came from, or what to confirm", required: false },
+    ],
+    handler: async ({ name, city, question, basis, overrides, notes }) => {
+      const s = useRoiStore.getState().addScenario({
+        name,
+        city,
+        question,
+        basis: asBasis(basis),
+        overrides: clean(overrides),
+        notes: notes ?? "",
+        createdBy: "agent",
+      });
+      goCanvas();
+      return JSON.stringify(summarize(s.id));
+    },
+    render: ({ status, args }) => {
+      if (status === "inProgress") return <Working text="Setting up the scenario..." />;
+      const s = { basis: asBasis(args.basis), overrides: clean(args.overrides) };
+      const r = scenarioResult(s, useRoiStore.getState().assumptions);
+      return <MiniScenario name={args.name ?? "Scenario"} city={args.city} basis={s.basis} r={r} onOpen={goCanvas} />;
+    },
+  });
+
+  useCopilotAction({
+    name: "updateScenario",
+    description: "Change an existing scenario: rename it, switch basis, or change overrides. Overrides you pass are merged in; pass resetKeys to go back to the library value.",
+    parameters: [
+      { name: "id", type: "string", description: "Scenario id", required: true },
+      { name: "name", type: "string", required: false },
+      { name: "basis", type: "string", enum: ["low", "expected", "high"], required: false },
+      overridesParam,
+      { name: "resetKeys", type: "string[]", description: "Input keys to reset to the library value", required: false },
+      { name: "notes", type: "string", required: false },
+    ],
+    handler: async ({ id, name, basis, overrides, resetKeys, notes }) => {
+      const st = useRoiStore.getState();
+      const s = st.scenarios.find((x) => x.id === id);
+      if (!s) return `No scenario with id ${id}. Existing ids: ${st.scenarios.map((x) => x.id).join(", ")}`;
+      const merged = { ...s.overrides, ...clean(overrides) };
+      for (const k of (resetKeys as string[] | undefined) ?? []) delete merged[k as InputKey];
+      st.updateScenario(id, {
+        ...(name ? { name } : {}),
+        ...(basis ? { basis: asBasis(basis) } : {}),
+        ...(notes ? { notes } : {}),
+        overrides: merged,
+      });
+      st.setActive(id);
+      goCanvas();
+      return JSON.stringify(summarize(id));
+    },
+    render: ({ status, args }) => {
+      if (status !== "complete") return <Working text="Updating the scenario..." />;
+      const s = useRoiStore.getState().scenarios.find((x) => x.id === args.id);
+      if (!s) return <></>;
+      return (
+        <MiniScenario
+          name={s.name}
+          city={s.city}
+          basis={s.basis}
+          r={scenarioResult(s, useRoiStore.getState().assumptions)}
+          onOpen={goCanvas}
+        />
+      );
+    },
+  });
+
+  useCopilotAction({
+    name: "compareScenarios",
+    description: "Show two to four scenarios side by side on the canvas.",
+    parameters: [{ name: "ids", type: "string[]", description: "Scenario ids to compare", required: true }],
+    handler: async ({ ids }) => {
+      const st = useRoiStore.getState();
+      const valid = (ids as string[]).filter((i) => st.scenarios.some((s) => s.id === i));
+      st.setCompare(valid);
+      goCanvas();
+      return JSON.stringify(valid.map(summarize));
+    },
+    render: ({ status, args }) => {
+      if (status !== "complete") return <Working text="Lining them up..." />;
+      const { scenarios, assumptions } = useRoiStore.getState();
+      const rows = ((args.ids as string[]) ?? [])
+        .map((i) => scenarios.find((s) => s.id === i))
+        .filter(Boolean)
+        .map((s) => ({ s: s!, h: headline(scenarioResult(s!, assumptions)) }));
+      return (
+        <div className="my-2 overflow-hidden rounded-xl border border-slate-200 bg-white text-xs shadow-sm">
+          <table className="w-full">
+            <thead className="bg-slate-50 text-slate-500">
+              <tr>
+                <th className="px-2 py-1.5 text-left font-medium">Scenario</th>
+                <th className="px-2 py-1.5 text-right font-medium">Net</th>
+                <th className="px-2 py-1.5 text-right font-medium">Per $1</th>
+                <th className="px-2 py-1.5 text-right font-medium">Payback</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(({ s, h }) => (
+                <tr key={s.id} className="border-t border-slate-100">
+                  <td className={`px-2 py-1.5 ${ink}`}>{s.name}</td>
+                  <td className={`px-2 py-1.5 text-right font-medium ${ink}`}>{h.net}</td>
+                  <td className="px-2 py-1.5 text-right">{h.perDollar}</td>
+                  <td className="px-2 py-1.5 text-right">{h.payback}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    },
+  });
+
+  useCopilotAction({
+    name: "updateAssumption",
+    description:
+      "Change the shared assumption library (affects every scenario that doesn't override this key). Field is low (cautious), expected, high (business case), source, confidence or owner.",
+    parameters: [
+      { name: "key", type: "string", enum: INPUT_KEYS.map((k) => k.name), required: true },
+      { name: "field", type: "string", enum: ["low", "expected", "high", "source", "confidence", "owner"], required: true },
+      { name: "value", type: "string", description: "New value. Numbers as plain digits; confidence is low, medium or high.", required: true },
+    ],
+    handler: async ({ key, field, value }) => {
+      const st = useRoiStore.getState();
+      const a = st.assumptions.find((x) => x.key === key);
+      if (!a) return `Unknown key ${key}`;
+      const numeric = field === "low" || field === "expected" || field === "high";
+      const v = numeric ? Number(value) : value;
+      if (numeric && !Number.isFinite(v as number)) return `Value must be a number`;
+      const before = a[field as keyof typeof a];
+      st.setAssumption(key as InputKey, field as "low", v as number);
+      return JSON.stringify({ changed: a.label, field, from: before, to: v, scenarios: st.scenarios.map((s) => summarize(s.id)) });
+    },
+    render: ({ status, args }) => {
+      if (status !== "complete") return <Working text="Updating the assumption library..." />;
+      const a = useRoiStore.getState().assumptions.find((x) => x.key === args.key);
+      const field = args.field === "low" ? "cautious" : args.field === "high" ? "business case" : args.field;
+      return (
+        <div className="my-2 rounded-lg border border-teal-200 bg-teal-50/60 px-3 py-2 text-xs text-teal-900">
+          Library updated: <b>{a?.label}</b> ({field}) is now <b>{String(args.value)}</b>.{" "}
+          <Link href="/roi/model" className="underline">
+            See the model
+          </Link>
+        </div>
+      );
+    },
+  });
+
+  useCopilotAction({
+    name: "createReport",
+    description: "Prepare the printable ROI report for one scenario and open it.",
+    parameters: [
+      { name: "scenarioId", type: "string", required: true },
+      { name: "audience", type: "string", description: "Who will read it, e.g. 'Flagstaff city manager'", required: true },
+      { name: "summary", type: "string", description: "Three to five plain sentences for that reader: the answer, why, and what is still uncertain", required: true },
+      { name: "nextSteps", type: "string[]", description: "Three short next steps", required: true },
+    ],
+    handler: async ({ scenarioId, audience, summary, nextSteps }) => {
+      const st = useRoiStore.getState();
+      if (!st.scenarios.some((s) => s.id === scenarioId)) return `No scenario with id ${scenarioId}`;
+      st.setReport({ scenarioId, audience, summary, nextSteps: (nextSteps as string[]) ?? [], createdAt: Date.now() });
+      st.setActive(scenarioId);
+      router.push("/roi/report");
+      return "Report opened. The person can print it or save it as PDF.";
+    },
+    render: ({ status, args }) => {
+      if (status !== "complete") return <Working text="Writing the report..." />;
+      const s = useRoiStore.getState().scenarios.find((x) => x.id === args.scenarioId);
+      return (
+        <Link
+          href="/roi/report"
+          className="my-2 flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm hover:border-teal-400"
+        >
+          <FileText className="h-5 w-5 flex-none text-teal-600" />
+          <div className="min-w-0">
+            <div className={`text-sm font-semibold ${ink}`}>ROI report ready</div>
+            <div className="truncate text-xs text-slate-500">
+              {s?.name} for {args.audience}
+            </div>
+          </div>
+        </Link>
+      );
+    },
+  });
+
+  return null;
+}

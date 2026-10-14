@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>ecoheart ROI Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap">
+<style>
+/* Layout: mirrors ecoheart.ai. Video hero with slate overlay, centered pill + serif section heads, white and slate-50 bands, ink illustrations on warm cards. Every section has a one-glance summary and a "details" drawer. Light only, like the site. */
+:root{
+  color-scheme:light;
+  --slate-900:#0F172A; --slate-800:#1E293B; --slate-700:#334155; --slate-600:#475569; --slate-500:#64748B; --slate-400:#94A3B8; --slate-300:#CBD5E1; --slate-200:#E2E8F0; --slate-100:#F1F5F9; --slate-50:#F8FAFC;
+  --teal-700:#0F766E; --teal-600:#0D9488; --teal-400:#2DD4BF; --teal-100:#CCFBF1; --teal-50:#F0FDFA;
+  --indigo:#4F46E5; --paper:#F7F6F2; --sun:#FDF3C7; --amber:#B45309; --amber-50:#FFFBEB;
+  --serif:"Playfair Display",Georgia,"Times New Roman",serif;
+  --sans:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{background:#FFFFFF;color:var(--slate-600);font-family:var(--sans);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{color:var(--slate-900);margin:0;text-wrap:balance}
+p{margin:0}
+img{display:block;max-width:100%}
+a{color:var(--teal-600)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.num{font-variant-numeric:tabular-nums}
+
+/* Header (site pattern) */
+.site-head{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(15,23,42,.95);backdrop-filter:blur(6px);border-top:4px solid var(--indigo)}
+.site-head .wrap{display:flex;align-items:center;gap:24px;height:62px}
+.logo{display:flex;align-items:center;gap:9px;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;flex:none}
+.logo svg{width:30px;height:30px}
+.nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-left:auto;min-width:0}
+.nav::-webkit-scrollbar{display:none}
+.nav a{color:var(--slate-300);text-decoration:none;font-size:.86rem;font-weight:500;padding:6px 10px;border-radius:8px;white-space:nowrap;transition:color .2s}
+.nav a:hover,.nav a:focus-visible{color:#fff}
+.nav a.cta{background:var(--teal-600);color:#fff;margin-left:6px}
+.nav a.cta:hover{background:var(--teal-700)}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;color:var(--slate-300);background:var(--slate-900)}
+.hero video,.hero .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.12);transform-origin:35% 35%}
+.hero::after{content:"";position:absolute;inset:0;background:rgba(15,23,42,.72)}
+.hero .wrap{position:relative;z-index:1;text-align:center;padding-block:96px 84px;display:grid;justify-items:center;gap:22px}
+.hero .kicker{display:inline-flex;gap:8px;align-items:center;font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-400)}
+.hero h1{font-family:var(--serif);font-style:italic;font-weight:500;color:#fff;font-size:clamp(2.6rem,6.4vw,5.2rem);line-height:1.05;letter-spacing:-.01em;max-width:15ch}
+.hero .sub{font-size:clamp(1.05rem,1.8vw,1.3rem);color:var(--slate-300);max-width:46rem;line-height:1.6}
+.btns{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:6px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:1rem;padding:14px 26px;border-radius:12px;text-decoration:none;transition:background .2s}
+.btn.primary{background:var(--teal-600);color:#fff}
+.btn.primary:hover{background:var(--teal-700)}
+.btn.ghost{border:1px solid rgba(255,255,255,.3);color:#fff}
+.btn.ghost:hover{background:rgba(255,255,255,.1)}
+.btn svg{width:18px;height:18px}
+.glass{margin-top:18px;max-width:44rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(4px);border-radius:14px;padding:16px 22px;font-size:.98rem;color:rgba(203,213,225,.95)}
+.glass b{color:var(--teal-400);font-weight:600}
+
+/* Sections */
+.band{padding-block:clamp(64px,9vw,104px)}
+.band.tint{background:var(--slate-50)}
+.band.warm{background:#F3F1EC}
+.shead{display:grid;justify-items:center;text-align:center;gap:14px;margin:0 auto 52px;max-width:760px}
+.pill{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-600);background:var(--teal-50);border:1px solid var(--teal-100);padding:5px 12px;border-radius:999px}
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(2rem,4.4vw,3.1rem);line-height:1.12}
+h2 em{font-style:italic;color:var(--slate-700)}
+.shead p{font-size:1.1rem;max-width:60ch}
+.label{font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-600)}
+
+/* Story cards */
+.story{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.card{background:#fff;border:1px solid var(--slate-200);border-radius:14px;box-shadow:0 4px 14px -6px rgba(15,23,42,.12);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .3s,border-color .3s,transform .3s}
+.card:hover{box-shadow:0 12px 30px -10px rgba(15,23,42,.22);border-color:var(--teal-400)}
+.card .art{background:var(--paper);aspect-ratio:4/3;display:grid;place-items:center;overflow:hidden}
+.card .art img{width:100%;height:100%;object-fit:cover}
+.card .body{padding:20px 20px 22px;display:grid;gap:8px;flex:1;align-content:start}
+.card .step{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-400)}
+.card h3{font-size:1.08rem;font-weight:600;line-height:1.35}
+.card p{font-size:.95rem}
+.card .go{margin-top:auto;padding-top:8px;font-size:.88rem;font-weight:600;color:var(--teal-600);text-decoration:none;display:inline-flex;gap:6px;align-items:center}
+.card .go:hover{color:var(--teal-700)}
+
+.glance{margin-top:44px;display:grid;grid-template-columns:repeat(4,1fr);background:var(--slate-900);border-radius:16px;overflow:hidden}
+.glance div{padding:24px 22px;display:grid;gap:2px;border-right:1px solid rgba(148,163,184,.18)}
+.glance div:last-child{border-right:0}
+.glance b{font-family:var(--serif);font-weight:500;color:#fff;font-size:2.2rem;line-height:1.1}
+.glance b small{font-size:1.1rem;color:var(--slate-300)}
+.glance span{font-size:.9rem;color:var(--slate-300)}
+.glance i{font-style:normal;font-size:.76rem;color:var(--slate-400)}
+
+/* Split sections */
+.split{display:grid;grid-template-columns:.95fr 1.05fr;gap:56px;align-items:center}
+.split.flip .visual{order:2}
+.visual{background:var(--paper);border-radius:20px;overflow:hidden;box-shadow:0 20px 40px -24px rgba(15,23,42,.35)}
+.visual img{width:100%}
+.copy{display:grid;gap:18px;min-width:0}
+.copy h2{text-align:left}
+.lead{font-size:1.12rem;color:var(--slate-600)}
+.ticks{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.ticks li{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start}
+.ticks li::before{content:"";width:22px;height:22px;margin-top:2px;border-radius:50%;background:var(--teal-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230D9488' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/13px no-repeat;border:1px solid var(--teal-100)}
+.ticks b{color:var(--slate-900);font-weight:600}
+
+/* Details drawer */
+details.more{border-top:1px solid var(--slate-200);margin-top:6px}
+details.more>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:16px 0 4px;font-weight:600;color:var(--teal-600);font-size:.98rem}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::after{content:"";width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-3px);transition:transform .25s;margin-left:2px}
+details.more[open]>summary::after{transform:rotate(-135deg) translateY(-1px)}
+details.more>summary:hover{color:var(--teal-700)}
+details.more>summary:focus-visible{outline:2px solid var(--teal-600);outline-offset:4px;border-radius:4px}
+.drawer{padding:14px 0 6px;display:grid;gap:18px}
+.wide-drawer{margin-top:36px;background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:4px 26px 18px}
+.wide-drawer details.more{border-top:0}
+
+/* Team */
+.team2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.side{background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:22px;display:grid;gap:14px;align-content:start}
+.side h3{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.side h3 svg{width:20px;height:20px}
+.roles{display:grid;gap:12px}
+.role{display:grid;gap:2px}
+.role b{color:var(--slate-900);font-weight:600;font-size:.96rem}
+.role span{font-size:.88rem;color:var(--slate-500)}
+.loadrow{display:grid;grid-template-columns:minmax(150px,220px) 1fr 70px;gap:12px;align-items:center;font-size:.9rem;padding:6px 0;border-bottom:1px dashed var(--slate-200)}
+.loadrow:last-child{border-bottom:0}
+.loadrow .tr{height:8px;background:var(--slate-100);border-radius:4px;overflow:hidden}
+.loadrow .tr i{display:block;height:100%;background:var(--teal-600);border-radius:4px}
+.loadrow .tr.c i{background:var(--slate-400)}
+.loadrow em{font-style:normal;text-align:right;color:var(--slate-500);font-size:.84rem}
+
+/* Offers */
+.offers{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:22px;align-items:stretch}
+.offer{background:#fff;border:1px solid var(--slate-200);border-radius:18px;padding:28px 26px;display:grid;gap:12px;align-content:start;position:relative}
+.offer.rec{border:2px solid var(--teal-600);box-shadow:0 24px 44px -26px rgba(13,148,136,.55)}
+.offer .tag{position:absolute;top:-13px;left:24px;background:var(--teal-600);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.offer h3{font-size:1.15rem;font-weight:700}
+.offer .price{font-family:var(--serif);color:var(--slate-900);font-size:2.3rem;line-height:1.05}
+.offer .price small{font-family:var(--sans);font-size:.95rem;color:var(--slate-500)}
+.offer .when{font-size:.9rem;color:var(--slate-500)}
+.offer ul{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:8px;font-size:.95rem}
+.offer li{padding-left:22px;position:relative}
+.offer li::before{content:"";position:absolute;left:2px;top:.62em;width:8px;height:8px;border-radius:50%;background:var(--teal-600)}
+.offer .fit{margin-top:auto;font-size:.86rem;background:var(--slate-50);border-radius:10px;padding:10px 12px;color:var(--slate-600)}
+.perks{margin-top:28px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;background:var(--sun);border-radius:16px;padding:22px 26px}
+.perks h3{font-family:var(--serif);font-weight:500;font-size:1.45rem}
+.perks ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:10px}
+.perks li{background:#fff;border-radius:999px;padding:7px 14px;font-size:.9rem;color:var(--slate-700);font-weight:500}
+
+/* How it works */
+.flow{display:grid;grid-template-columns:1fr 44px 1fr 44px 1fr;align-items:stretch;margin-bottom:40px}
+.fstep{background:#fff;border:1px solid var(--slate-200);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.fstep .art{background:var(--paper);aspect-ratio:16/10;overflow:hidden}
+.fstep .art img{width:100%;height:100%;object-fit:cover}
+.fstep .art.chips{aspect-ratio:auto;min-height:0;flex:1 0 auto;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:7px;padding:18px 14px}
+.fstep .art.chips+.tx{flex:none}
+.fstep .art.chips span{background:#fff;border:1px solid var(--slate-200);border-radius:8px;padding:6px 10px;font-size:.8rem;color:var(--slate-700);font-weight:500;display:inline-flex;gap:6px;align-items:center}
+.fstep .art.chips span::before{content:"";width:12px;height:15px;border:1.6px solid var(--slate-500);border-radius:2px;background:linear-gradient(var(--slate-300),var(--slate-300)) 2px 4px/6px 1.5px no-repeat,linear-gradient(var(--slate-300),var(--slate-300)) 2px 8px/6px 1.5px no-repeat}
+.fstep .tx{padding:18px 20px 20px;display:grid;gap:6px}
+.fstep h3{font-size:1.05rem;font-weight:600}
+.fstep p{font-size:.93rem}
+.farrow{display:grid;place-items:center;color:var(--slate-400)}
+.farrow svg{width:26px;height:26px}
+
+.chatwrap{display:grid;grid-template-columns:1fr 1.1fr;gap:44px;align-items:center}
+.chat{background:#fff;border:1px solid var(--slate-200);border-radius:18px;overflow:hidden;box-shadow:0 24px 48px -28px rgba(15,23,42,.45)}
+.chat .top{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--slate-900);color:#fff;font-size:.9rem;font-weight:600}
+.chat .top svg{width:22px;height:22px}
+.chat .top span{margin-left:auto;font-weight:500;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-900);background:var(--sun);border-radius:999px;padding:2px 8px}
+.msgs{padding:18px;display:grid;gap:14px;background:var(--slate-50)}
+.msg{max-width:92%;border-radius:14px;padding:12px 15px;font-size:.93rem;line-height:1.55}
+.msg.u{justify-self:end;background:var(--teal-600);color:#fff;border-bottom-right-radius:4px}
+.msg.a{background:#fff;border:1px solid var(--slate-200);color:var(--slate-800);border-bottom-left-radius:4px;display:grid;gap:12px}
+.msg.a b{color:var(--slate-900)}
+.mini{display:grid;gap:7px}
+.mini .r{display:grid;grid-template-columns:150px 1fr 54px;gap:10px;align-items:center;font-size:.8rem;color:var(--slate-600)}
+.mini .r b{text-align:right}
+.mini .t{height:9px;border-radius:5px;background:var(--slate-100);overflow:hidden}
+.mini .t i{display:block;height:100%;background:var(--teal-600);border-radius:5px}
+.src{display:flex;flex-wrap:wrap;gap:6px}
+.src span{font-size:.72rem;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:6px;padding:2px 8px;color:var(--slate-500)}
+.conf{font-size:.8rem;color:var(--slate-500);background:var(--amber-50);border-radius:8px;padding:8px 10px}
+.conf b{color:var(--amber)}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.acts span{font-size:.78rem;font-weight:600;color:var(--teal-600);border:1.5px solid var(--teal-600);border-radius:8px;padding:4px 10px}
+
+.trust{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.trust div{background:#fff;border:1px solid var(--slate-200);border-radius:12px;padding:16px;display:grid;gap:4px}
+.trust b{color:var(--slate-900);font-weight:600}
+.trust span{font-size:.9rem}
+.doclist{columns:2;column-gap:28px;margin:0;padding-left:18px;font-size:.93rem}
+.doclist li{margin-bottom:6px;break-inside:avoid}
+
+/* Calculator */
+.calc{background:#fff;border:1px solid var(--slate-200);border-radius:20px;box-shadow:0 30px 60px -36px rgba(15,23,42,.4);overflow:hidden}
+.calc-top{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;padding:20px 26px;border-bottom:1px solid var(--slate-200);background:var(--slate-50)}
+.calc-top p{font-size:.92rem;color:var(--slate-500)}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--slate-200);border-radius:12px;padding:4px;gap:4px}
+.seg button{font:inherit;font-size:.9rem;font-weight:600;border:0;background:transparent;color:var(--slate-600);padding:8px 16px;border-radius:9px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--teal-600);color:#fff}
+.seg button:focus-visible{outline:2px solid var(--teal-600);outline-offset:2px}
+.calc-main{display:grid;grid-template-columns:1fr 1.1fr;gap:0}
+.res{padding:30px 28px;display:grid;gap:22px;align-content:start;border-right:1px solid var(--slate-200)}
+.hero-num{display:grid;gap:4px}
+.hero-num b{font-family:var(--serif);font-weight:500;color:var(--teal-700);font-size:clamp(2.8rem,6vw,4rem);line-height:1}
+.hero-num span{font-size:1rem;color:var(--slate-600)}
+.kp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kp div{border:1px solid var(--slate-200);border-radius:12px;padding:12px 14px;display:grid}
+.kp b{font-family:var(--serif);font-weight:500;color:var(--slate-900);font-size:1.7rem;line-height:1.15}
+.kp span{font-size:.82rem;color:var(--slate-500)}
+.note{font-size:.84rem;color:var(--slate-500)}
+.compare{padding:30px 28px;display:grid;gap:18px;align-content:start}
+.compare h4{font-size:.95rem;font-weight:600}
+.cbar{display:grid;gap:6px}
+.cbar .lab{display:flex;justify-content:space-between;font-size:.9rem;color:var(--slate-700);font-weight:500}
+.cbar .lab b{font-variant-numeric:tabular-nums;color:var(--slate-900)}
+.stack{display:flex;height:30px;border-radius:7px;overflow:hidden;background:var(--slate-100)}
+.stack i{display:block;height:100%;transition:width .4s ease}
+.k-prem{background:#1E3A5F}.k-claims{background:#0D9488}.k-ded{background:#5EEAD4}.k-ot{background:#94A3B8}.k-fee{background:#B45309}.k-gr{background:#F59E0B}
+.keys{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.8rem;color:var(--slate-600)}
+.keys span{display:inline-flex;align-items:center;gap:6px}
+.keys span::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c)}
+.saveline{display:block;background:var(--teal-50);border-radius:10px;padding:10px 14px;font-size:.95rem;color:var(--teal-700)}
+.saveline b{font-variant-numeric:tabular-nums}
+.adjust{border-top:1px solid var(--slate-200);padding:0 26px 10px}
+.adjust .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px 40px;padding:6px 0 18px}
+.grp{display:grid;gap:14px;align-content:start}
+.grp h4{font-size:.76rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-500)}
+.f{display:grid;gap:3px}
+.f label{display:flex;justify-content:space-between;gap:10px;font-size:.9rem;color:var(--slate-800);font-weight:500}
+.f output{color:var(--teal-700);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.f small{font-size:.76rem;color:var(--slate-500)}
+input[type=range]{width:100%;accent-color:var(--teal-600)}
+input[type=range]:focus-visible{outline:2px solid var(--teal-600);outline-offset:3px}
+
+.levers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}
+.lever{background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:20px;display:grid;gap:8px;align-content:start}
+.lever .ic{width:40px;height:40px;border-radius:10px;background:var(--teal-50);display:grid;place-items:center;color:var(--teal-600)}
+.lever .ic svg{width:21px;height:21px}
+.lever h3{font-size:1rem;font-weight:600}
+.lever p{font-size:.92rem}
+.lever .src2{font-size:.76rem;color:var(--slate-400)}
+
+/* Timeline */
+.tl{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;position:relative}
+.ph{background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:24px;display:grid;gap:12px;align-content:start;position:relative}
+.ph .wk{display:flex;align-items:center;gap:10px;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal-600)}
+.ph .wk i{width:30px;height:30px;border-radius:50%;background:var(--teal-600);color:#fff;font-style:normal;display:grid;place-items:center;font-size:.85rem;letter-spacing:0}
+.ph h3{font-family:var(--serif);font-weight:500;font-size:1.45rem}
+.ph ul{margin:0;padding-left:18px;font-size:.94rem;display:grid;gap:5px}
+.ph .get{margin-top:4px;background:var(--teal-50);border-radius:10px;padding:10px 12px;font-size:.9rem;color:var(--teal-700)}
+.ph .get b{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
+.ph .you{font-size:.85rem;color:var(--slate-500)}
+
+/* CTA */
+.cta{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--slate-900),var(--slate-800) 55%,#134E4A);color:var(--slate-300)}
+.cta::before{content:"";position:absolute;inset:0;opacity:.05;background-image:linear-gradient(to right,#94A3B8 1px,transparent 1px),linear-gradient(to bottom,#94A3B8 1px,transparent 1px);background-size:24px 24px}
+.cta .wrap{position:relative;display:grid;justify-items:center;text-align:center;gap:18px}
+.cta h2{color:#fff}
+.cta h2 em{color:var(--teal-400)}
+.cta p{max-width:52ch;font-size:1.1rem}
+.contact{display:inline-flex;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:10px 16px;color:#fff;font-weight:500;user-select:all}
+
+/* Internal appendix */
+.internal{background:#FFFBEB;border-top:1px solid #FDE68A}
+.internal .wrap{padding-block:40px}
+.internal details>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-weight:700;color:var(--slate-900);font-size:1.05rem}
+.internal details>summary::-webkit-details-marker{display:none}
+.internal details>summary .tagi{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;background:var(--amber);color:#fff;border-radius:999px;padding:3px 10px}
+.internal details>summary .hint{font-weight:500;font-size:.9rem;color:var(--amber)}
+.internal details>summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}
+.ibox{background:#fff;border:1px solid #FDE68A;border-radius:14px;padding:20px;display:grid;gap:12px;align-content:start;min-width:0}
+.ibox h3{font-size:1rem;font-weight:700}
+.ibox ul{margin:0;padding-left:18px;display:grid;gap:8px;font-size:.92rem}
+.ibox li b{color:var(--slate-900)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--slate-200)}
+th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-500)}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.tot td{font-weight:700;color:var(--slate-900);border-bottom:0}
+
+footer{background:var(--slate-900);color:var(--slate-400);font-size:.88rem}
+footer .wrap{padding-block:30px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center}
+
+@media (max-width:1020px){
+  .story{grid-template-columns:repeat(2,1fr)}
+  .glance{grid-template-columns:repeat(2,1fr)}
+  .glance div:nth-child(2){border-right:0}
+  .glance div:nth-child(-n+2){border-bottom:1px solid rgba(148,163,184,.18)}
+  .split,.chatwrap{grid-template-columns:1fr;gap:36px}
+  .split.flip .visual{order:0}
+  .visual{max-width:620px}
+  .offers{grid-template-columns:1fr;max-width:620px;margin:0 auto}
+  .flow{grid-template-columns:1fr;gap:0}
+  .farrow{height:40px;transform:rotate(90deg)}
+  .calc-main{grid-template-columns:1fr}
+  .res{border-right:0;border-bottom:1px solid var(--slate-200)}
+  .levers{grid-template-columns:1fr 1fr}
+  .tl{grid-template-columns:1fr}
+  .igrid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .nav a:not(.cta){display:none}
+  .story,.team2,.levers,.trust{grid-template-columns:1fr}
+  .glance b{font-size:1.8rem}
+  .perks{grid-template-columns:1fr}
+  .adjust .grid{grid-template-columns:1fr}
+  .seg button{padding:8px 10px;font-size:.82rem;white-space:nowrap}
+  .loadrow{grid-template-columns:1fr 64px;row-gap:4px}
+  .loadrow .tr{grid-column:1 / -1;grid-row:2}
+  .mini .r{grid-template-columns:118px 1fr 48px}
+  .doclist{columns:1}
+  .hero .wrap{padding-block:72px 64px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}.hero video{display:none}}
+</style>
+<style>body{margin:0}</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="hg" x1="6" y1="10" x2="42" y2="42" gradientUnits="userSpaceOnUse"><stop stop-color="#1E3A5F"/><stop offset="1" stop-color="#0F172A"/></linearGradient>
+  <symbol id="logo" viewBox="0 0 48 48"><path d="M24 42L6 24C2 20 2 14 6 10C10 6 16 6 20 10L24 14L28 10C32 6 38 6 42 10C46 14 46 20 42 24L24 42Z" fill="url(#hg)" stroke="#14B8A6" stroke-width="1.5"/><circle cx="12" cy="16" r="2" fill="#14B8A6"/><circle cx="24" cy="20" r="2.5" fill="#14B8A6"/><circle cx="36" cy="16" r="2" fill="#14B8A6"/><circle cx="18" cy="26" r="1.5" fill="#14B8A6"/><circle cx="30" cy="26" r="1.5" fill="#14B8A6"/><circle cx="24" cy="32" r="2" fill="#14B8A6"/><path d="M12 16L24 20L36 16M18 26L24 20L30 26M24 20V32M18 26L24 32L30 26" stroke="#14B8A6" stroke-width="1" opacity=".6" fill="none"/></symbol>
+  <symbol id="arr" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="17.5" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h14V10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-city" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l5-3v15M10 21V4l9 4v13M13 10h3M13 14h3M13 18h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+</defs></svg>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="logo" href="#top"><svg aria-hidden="true"><use href="#logo"/></svg>ecoheart</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#story">The idea</a>
+      <a href="#team">Who's involved</a>
+      <a href="#cost">Cost</a>
+      <a href="#how">How it's used</a>
+      <a href="#value">Value</a>
+      <a href="#plan">12 weeks</a>
+      <a class="cta" href="#partner">Partner with us</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <img class="poster" src="img/hero-city.jpg" alt="">
+  <video autoplay muted loop playsinline poster="img/hero-city.jpg" aria-hidden="true"><source src="img/hero.mp4" type="video/mp4"></video>
+  <div class="wrap">
+    <span class="kicker">ROI Advisor · early partner project</span>
+    <h1>Know what resilience pays back</h1>
+    <p class="sub">Together with one partner city, we'll set up an AI advisor that turns your budgets, insurance and storm costs into a clear answer: what each resilience dollar returns, and how fast.</p>
+    <div class="btns">
+      <a class="btn primary" href="#story">See it in one minute <svg><use href="#arr"/></svg></a>
+      <a class="btn ghost" href="#value">Try the calculator</a>
+    </div>
+    <p class="glass"><b>Example: a Florida coastal city.</b> A draft business case for Hollywood, FL models <b>$1.04M</b> in first-year savings from insurance credits, fewer storm costs and targeted neighborhood grants.</p>
+  </div>
+</section>
+
+<section class="band tint" id="story">
+  <div class="wrap">
+    <div class="shead">
+      <span class="pill">The idea in one minute</span>
+      <h2>Four steps from <em>"what will it cost?"</em> to <em>"here's what it saves"</em></h2>
+      <p>Read the cards for the short version. Every card links to the details further down.</p>
+    </div>
+    <div class="story">
+      <article class="card"><div class="art"><img src="img/il1.jpg" alt="City hall in the rain with money leaking from a storm pipe"></div><div class="body"><span class="step">1 · The problem</span><h3>Small storms quietly drain the budget</h3><p>Floods below the insurance deductible are paid from city reserves, again and again. Nobody adds them up.</p><a class="go" href="#value">See where money leaks <svg width="14" height="14"><use href="#arr"/></svg></a></div></article>
+      <article class="card"><div class="art"><img src="img/il2.jpg" alt="Finance director asking a question on a laptop"></div><div class="body"><span class="step">2 · The question</span><h3>Staff ask in plain English</h3><p>"If we fund ten rain gardens upstream, what happens to our flood costs and insurance next year?"</p><a class="go" href="#how">See how it's used <svg width="14" height="14"><use href="#arr"/></svg></a></div></article>
+      <article class="card"><div class="art"><img src="img/il3.jpg" alt="Council members reviewing a chart of rising savings"></div><div class="body"><span class="step">3 · The answer</span><h3>A sourced, one-page brief for council</h3><p>Savings range, cost and payback time, with every number linked to the city's own documents.</p><a class="go" href="#value">Try the calculator <svg width="14" height="14"><use href="#arr"/></svg></a></div></article>
+      <article class="card"><div class="art"><img src="img/il5.jpg" alt="City official and advisor shaking hands over a city map"></div><div class="body"><span class="step">4 · The partnership</span><h3>We shape it together with you</h3><p>A 12-week early project with one city. Your team decides the questions. Ours brings the expertise.</p><a class="go" href="#plan">See the 12 weeks <svg width="14" height="14"><use href="#arr"/></svg></a></div></article>
+    </div>
+    <div class="glance">
+      <div><b class="num">12 <small>weeks</small></b><span>from kickoff to a council-ready brief</span></div>
+      <div><b class="num">6</b><span>ecoheart specialists, plus 4 city contacts</span></div>
+      <div><b class="num">$150K</b><span>early partner project, one focus area</span></div>
+      <div><b class="num">2.5×</b><span>expected first-year return</span><i>Expected scenario in the calculator</i></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="team">
+  <div class="wrap">
+    <div class="split">
+      <div class="visual"><img src="img/il6.jpg" alt="A team of experts around a table with a city map and charts"></div>
+      <div class="copy">
+        <span class="label">1 · Who's involved</span>
+        <h2>A small senior team, working side by side with yours</h2>
+        <p class="lead">You won't be handed software and a manual. People who know city budgets, climate risk and responsible AI sit with your staff for twelve weeks.</p>
+        <ul class="ticks">
+          <li><span><b>Data and AI leadership</b> with 25+ years in government data systems</span></li>
+          <li><span><b>Climate finance analyst</b> who knows insurance, FEMA flood ratings and grant rules</span></li>
+          <li><span><b>Certified AI auditors</b> who check every claim before you see it</span></li>
+          <li><span><b>Engineering led by a NASA Gold Medal recipient</b>, plus economists and environmental scientists</span></li>
+        </ul>
+        <details class="more"><summary>See every role and how much time it takes</summary>
+          <div class="drawer">
+            <div class="team2">
+              <div class="side">
+                <h3><svg style="color:var(--teal-600)"><use href="#logo"/></svg>From ecoheart</h3>
+                <div id="ehRoles"></div>
+              </div>
+              <div class="side">
+                <h3><svg style="color:var(--slate-500)"><use href="#i-city"/></svg>From your city</h3>
+                <div id="cityRoles"></div>
+              </div>
+            </div>
+            <p class="note">Bars show each person's share of a working week during the 12 weeks. City contacts need about two hours a week, mostly in the first and last phases.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band warm" id="cost">
+  <div class="wrap">
+    <div class="shead">
+      <span class="pill">2 · What it costs</span>
+      <h2>Start small, prove it, then decide</h2>
+      <p>Three ways in. Most cities should start with the early partner project; the snapshot suits a city that wants proof on paper first.</p>
+    </div>
+    <div class="offers">
+      <div class="offer">
+        <h3>ROI Snapshot</h3>
+        <div class="price">$35K <small>one time</small></div>
+        <p class="when">6 weeks · analyst-led</p>
+        <ul><li>We gather your insurance, budget and storm-cost records</li><li>A sourced business case for one topic</li><li>A briefing for your leadership team</li></ul>
+        <p class="fit">Fits a city that needs numbers on paper before it commits.</p>
+      </div>
+      <div class="offer rec">
+        <span class="tag">Recommended</span>
+        <h3>Early partner project</h3>
+        <div class="price">$150K <small>12 weeks</small></div>
+        <p class="when">One focus area, such as flood and insurance</p>
+        <ul><li>Everything in the snapshot</li><li>The ROI Advisor set up for your city, for your staff to question</li><li>Calculator tuned to your own figures and approved by your finance team</li><li>Council brief and broker-ready evidence pack</li><li>Training for up to 15 staff</li></ul>
+        <p class="fit">Fits a city ready to use the numbers at its next insurance renewal or budget cycle.</p>
+      </div>
+      <div class="offer">
+        <h3>Ongoing service</h3>
+        <div class="price">$50–90K <small>per year</small></div>
+        <p class="when">After the project · priced by city size</p>
+        <ul><li>Unlimited staff questions</li><li>Quarterly refresh of budgets, claims and insurance terms</li><li>A public page so residents see the same numbers</li><li>New focus areas, such as heat or wildfire</li></ul>
+        <p class="fit">Fits a city that wants the advisor as part of every budget cycle.</p>
+      </div>
+    </div>
+    <div class="perks">
+      <h3>Founding partner cities</h3>
+      <ul><li>Shape the advisor around your priorities</li><li>Locked-in annual rate</li><li>Direct access to our senior team</li><li>Shared success story</li></ul>
+    </div>
+    <div class="wide-drawer">
+      <details class="more"><summary>What's included, and what your city provides</summary>
+        <div class="drawer">
+          <div class="trust">
+            <div><b>Included in the project fee</b><span>Our team's time, setup and hosting of the advisor for 12 weeks, AI usage, the calculator, council brief, evidence pack and staff training.</span></div>
+            <div><b>What your city provides</b><span>Access to existing documents (insurance schedule, self-insurance rules, budget, storm-cost records, grant awards) and about two hours a week from four contacts.</span></div>
+            <div><b>What we never need</b><span>Residents' personal data. The advisor works from the city's published and internal financial records only.</span></div>
+            <div><b>How it can be funded</b><span>Resilience grants, emergency-management or hazard-mitigation budgets. The snapshot often fits within a department's discretionary spend.</span></div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="how">
+  <div class="wrap">
+    <div class="shead">
+      <span class="pill">3 · How a city uses it</span>
+      <h2>Ask a question, get an answer you can defend</h2>
+      <p>The advisor works like a knowledgeable colleague who has read every city document and checks the math in the open.</p>
+    </div>
+    <div class="flow">
+      <div class="fstep"><div class="art chips"><span>Insurance schedule</span><span>Self-insurance rules</span><span>Adopted budget</span><span>Storm-cost records</span><span>Stormwater plan</span><span>Grant awards</span><span>FEMA flood rating</span></div><div class="tx"><h3>It reads your records</h3><p>The city's own documents, plus public rates and grant programs.</p></div></div>
+      <div class="farrow"><svg><use href="#arr"/></svg></div>
+      <div class="fstep"><div class="art"><img src="img/il2.jpg" alt=""></div><div class="tx"><h3>Staff ask in plain English</h3><p>No dashboards to learn. Ask the way you would ask a colleague.</p></div></div>
+      <div class="farrow"><svg><use href="#arr"/></svg></div>
+      <div class="fstep"><div class="art"><img src="img/il3.jpg" alt=""></div><div class="tx"><h3>Leaders get a brief</h3><p>A one-page answer for council, the broker or a grant application.</p></div></div>
+    </div>
+    <div class="chatwrap">
+      <div class="copy">
+        <span class="label">What an answer looks like</span>
+        <h2 style="font-size:clamp(1.7rem,3.4vw,2.4rem)">Ranges, not magic numbers. Sources, not guesses.</h2>
+        <ul class="ticks">
+          <li><span><b>Every figure links to its page</b> in the city's own documents.</span></li>
+          <li><span><b>Low, expected and high results</b>, with the assumption that matters most called out.</span></li>
+          <li><span><b>A person signs off</b> before any number leaves the building.</span></li>
+        </ul>
+        <details class="more"><summary>Who uses it, and what they ask</summary>
+          <div class="drawer">
+            <div class="trust">
+              <div><b>Finance director</b><span>"Can we show our broker enough proof to earn a premium credit at renewal?"</span></div>
+              <div><b>Resilience officer</b><span>"Which neighborhoods give the most flood savings per grant dollar?"</span></div>
+              <div><b>City manager</b><span>"Give me a one-page case for the stormwater line in next year's budget."</span></div>
+              <div><b>Council member</b><span>"What would residents save on flood insurance if our flood rating improves?"</span></div>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="chat" aria-label="Example conversation with the ROI Advisor">
+        <div class="top"><svg aria-hidden="true"><use href="#logo"/></svg>ROI Advisor · Hollywood, FL<span>Example</span></div>
+        <div class="msgs">
+          <div class="msg u">If we fund 10 rain-garden grants upstream of Lift Station N-07, what does it do to our flood costs next year?</div>
+          <div class="msg a">
+            <p>Ten grants cost <b>$100,000</b>. Based on your recent storm costs and insurance terms, I expect <b>$250K to $420K</b> in avoided costs next year. The grants pay for themselves in about <b>3 months</b>.</p>
+            <div class="mini">
+              <div class="r"><span>Smaller flood claims</span><div class="t"><i style="width:62%"></i></div><b>$152K</b></div>
+              <div class="r"><span>Fewer deductible hits</span><div class="t"><i style="width:45%"></i></div><b>$110K</b></div>
+              <div class="r"><span>Less emergency overtime</span><div class="t"><i style="width:32%"></i></div><b>$77K</b></div>
+              <div class="r"><span>Staff time on insurer reports</span><div class="t"><i style="width:12%"></i></div><b>$26K</b></div>
+            </div>
+            <div class="src"><span>Self-Insurance Guidelines</span><span>Resolution R-2025-315</span><span>Stormwater Master Plan</span><span>FY25 budget</span></div>
+            <p class="conf"><b>Confidence: medium.</b> Assumes two storms a year below the deductible, as in recent years. Change it if you expect fewer.</p>
+            <div class="acts"><span>Change assumptions</span><span>Show on map</span><span>Export council brief</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band tint" id="value">
+  <div class="wrap">
+    <div class="split flip" style="margin-bottom:48px">
+      <div class="visual"><img src="img/il4.jpg" alt="A neighborhood where rain flows into a rain garden instead of flooding the street"></div>
+      <div class="copy">
+        <span class="label">4 · The value to your city</span>
+        <h2>Spend a little upstream, save a lot downstream</h2>
+        <p class="lead">Small neighborhood projects like rain gardens soak up water before it reaches city pipes and streets. The advisor shows how that turns into lower insurance costs, fewer claims and less overtime, using the city's real figures.</p>
+        <p class="note">The calculator below uses the Hollywood, FL draft business case as its starting point. In the project, your own figures replace these.</p>
+      </div>
+    </div>
+
+    <div class="calc" id="calc">
+      <div class="calc-top">
+        <div class="seg" role="group" aria-label="Scenario">
+          <button type="button" id="p-cons" data-p="cons">Cautious</button>
+          <button type="button" id="p-exp" data-p="exp" aria-pressed="true">Expected</button>
+          <button type="button" id="p-case" data-p="case">Business case</button>
+        </div>
+        <p id="scNote"></p>
+      </div>
+      <div class="calc-main">
+        <div class="res">
+          <div class="hero-num"><b id="kNet" class="num">$0</b><span>net savings in the first year</span></div>
+          <div class="kp">
+            <div><b id="kRet" class="num">0×</b><span>back for every $1 spent</span></div>
+            <div><b id="kPay" class="num">0 mo</b><span>to pay for itself</span></div>
+          </div>
+          <p class="note">"Spent" means the ecoheart fee plus the neighborhood grants. Staff time saved on reporting is counted at $65 an hour.</p>
+        </div>
+        <div class="compare">
+          <h4>What storms and insurance cost the city each year</h4>
+          <div class="cbar"><div class="lab"><span>Today</span><b id="tToday">$0</b></div><div class="stack" id="sToday"></div></div>
+          <div class="cbar"><div class="lab"><span>With the ROI Advisor</span><b id="tWith">$0</b></div><div class="stack" id="sWith"></div></div>
+          <div class="keys">
+            <span style="--c:#1E3A5F">Insurance premium</span><span style="--c:#0D9488">Small claims</span><span style="--c:#5EEAD4">Deductibles</span><span style="--c:#94A3B8">Overtime</span><span style="--c:#B45309">ecoheart fee</span><span style="--c:#F59E0B">Grants</span>
+          </div>
+          <p class="saveline">Plus <b id="tHrs">0 hours</b> of staff time back on insurer and grant reports.</p>
+        </div>
+      </div>
+      <div class="adjust">
+        <details class="more"><summary>Change the assumptions</summary>
+          <div class="grid" id="fields"></div>
+        </details>
+      </div>
+    </div>
+
+    <div class="levers">
+      <div class="lever"><div class="ic"><svg><use href="#i-shield"/></svg></div><h3>Lower insurance premiums</h3><p>Block-level proof of reduced risk gives the broker a reason to offer a premium credit at renewal.</p><span class="src2">Hollywood P&amp;C renewal: $2.7M a year</span></div>
+      <div class="lever"><div class="ic"><svg><use href="#i-drop"/></svg></div><h3>Fewer small claims</h3><p>The city pays the first $400,000 of each claim itself. Water absorbed upstream means fewer of those claims.</p><span class="src2">City Self-Insurance Program Guidelines</span></div>
+      <div class="lever"><div class="ic"><svg><use href="#i-wind"/></svg></div><h3>Fewer deductible hits</h3><p>Wind and water deductibles of $250K–$500K hit city assets directly. Less flooding means fewer hits.</p><span class="src2">City property insurance terms</span></div>
+      <div class="lever"><div class="ic"><svg><use href="#i-truck"/></svg></div><h3>Less emergency overtime</h3><p>Fewer emergency callouts for crews, pumping and debris removal after each storm.</p><span class="src2">Public works storm-response costs</span></div>
+      <div class="lever"><div class="ic"><svg><use href="#i-clock"/></svg></div><h3>Less time on reports</h3><p>Insurer questionnaires and grant reports are drafted from the same evidence, with sources attached.</p><span class="src2">Idea from our business analysis team</span></div>
+      <div class="lever"><div class="ic"><svg><use href="#i-home"/></svg></div><h3>Residents save too</h3><p>A better FEMA flood rating cuts flood insurance for eligible homes by 5% to 45%. Not counted in city savings.</p><span class="src2">FEMA Community Rating System</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="plan">
+  <div class="wrap">
+    <div class="shead">
+      <span class="pill">5 · The early partner project</span>
+      <h2>Twelve weeks, three checkpoints</h2>
+      <p>Each phase ends with something your leaders can see and react to. You can stop after any checkpoint.</p>
+    </div>
+    <div class="tl">
+      <div class="ph"><span class="wk"><i>1</i>Weeks 1–3</span><h3>Discover</h3><ul><li>Agree the three questions that matter most</li><li>Gather insurance, budget and storm-cost records</li><li>Map where flooding costs the city most</li></ul><p class="you">From you: kickoff workshop and document access.</p><p class="get"><b>You get</b>A baseline of what storms cost you today</p></div>
+      <div class="ph"><span class="wk"><i>2</i>Weeks 4–8</span><h3>Set up and test</h3><ul><li>Tune the calculator to your figures</li><li>Staff start asking the advisor real questions</li><li>Your finance team checks every formula</li></ul><p class="you">From you: weekly 1-hour review.</p><p class="get"><b>You get</b>A working advisor your staff can question</p></div>
+      <div class="ph"><span class="wk"><i>3</i>Weeks 9–12</span><h3>Prove it</h3><ul><li>Review the evidence with your insurance broker</li><li>Produce the council brief</li><li>Train staff and agree next steps</li></ul><p class="you">From you: broker meeting and a council slot.</p><p class="get"><b>You get</b>A signed-off brief and a decision on what's next</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band cta" id="partner">
+  <div class="wrap">
+    <span class="pill" style="background:rgba(45,212,191,.12);border-color:rgba(45,212,191,.3);color:var(--teal-400)">Founding partner cities</span>
+    <h2>Be the city that shows <em>what resilience returns</em></h2>
+    <p>We're looking for a small number of partner cities to shape the ROI Advisor with us. Human-first, transparent, and built around your own numbers.</p>
+    <span class="contact">ecoheart.ai · Marcia Drake, Founder &amp; CEO</span>
+  </div>
+</section>
+
+<section class="internal" id="internal">
+  <div class="wrap">
+    <details>
+      <summary><span class="tagi">Internal</span>For the ecoheart team: delivery cost and pricing-model notes <span class="hint">Remove before sharing with a city</span></summary>
+      <div class="igrid">
+        <div class="ibox"><h3>Our delivery cost for the 12-week project</h3><div class="scroll"><table id="costTable"></table></div><p class="note" id="costNote"></p></div>
+        <div class="ibox"><h3>Running cost per month</h3><div class="scroll"><table id="runTable"></table></div><p class="note">Always-on hosting avoids the 50-second cold start of the free demo tier.</p></div>
+        <div class="ibox"><h3>Fix in the pricing model</h3><ul id="ap1"></ul></div>
+        <div class="ibox"><h3>Reconcile with what we've shown</h3><ul id="ap2"></ul></div>
+        <div class="ibox"><h3>Services to add</h3><ul id="ap3"></ul></div>
+        <div class="ibox"><h3>Technical wording</h3><ul id="ap4"></ul></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<footer><div class="wrap"><a class="logo" href="#top"><svg aria-hidden="true"><use href="#logo"/></svg>ecoheart</a><span>AI for a Human-First Future · Proposal draft, October 2026 · Figures are illustrative until confirmed with the partner city</span></div></footer>
+
+<script>
+const fmt=n=>{const a=Math.abs(n),s=n<0?'−':'';return a>=1e6?s+'$'+(a/1e6).toFixed(2).replace(/\.?0+$/,'')+'M':a>=1e3?s+'$'+Math.round(a/1e3)+'K':s+'$'+Math.round(a)};
+const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+
+/* Roles */
+const EH=[
+  ['Engagement lead &amp; solution architect','Runs the project with your team; designs the advisor',20,96],
+  ['AI engineer','Sets up the advisor, calculator and council brief',75,360],
+  ['Data engineer','Organizes your records into one checked fact pack',40,192],
+  ['Climate finance analyst','Builds the formulas: insurance, flood ratings, grants',50,240],
+  ['AI ethics &amp; governance lead','Reviews every claim, range and source',10,48],
+  ['Designer &amp; city success lead','Makes answers easy to read; trains your staff',20,96],
+];
+const CT=[
+  ['Finance director or risk manager','Insurance terms, claims history, budget',5],
+  ['Public works or stormwater lead','Storm response costs, problem areas',5],
+  ['Resilience or sustainability officer','Grants, neighborhood priorities',5],
+  ['City manager\'s office','Questions that matter, council timing',3],
+];
+document.getElementById('ehRoles').innerHTML=EH.map(r=>`<div class="loadrow"><div class="role"><b>${r[0]}</b><span>${r[1]}</span></div><div class="tr"><i style="width:${r[2]}%"></i></div><em>${r[2]}%</em></div>`).join('');
+document.getElementById('cityRoles').innerHTML=CT.map(r=>`<div class="loadrow"><div class="role"><b>${r[0]}</b><span>${r[1]}</span></div><div class="tr c"><i style="width:${r[2]}%"></i></div><em>~2 h/wk</em></div>`).join('');
+
+/* Internal cost */
+const RATE=200, tot=EH.reduce((s,r)=>s+r[3]*RATE,0), hrs=EH.reduce((s,r)=>s+r[3],0);
+document.getElementById('costTable').innerHTML=`<thead><tr><th>Role</th><th class="r">Hours</th><th class="r">At $200/h</th></tr></thead><tbody>${EH.map(r=>`<tr><td>${r[0]}</td><td class="r">${r[3]}</td><td class="r">${money(r[3]*RATE)}</td></tr>`).join('')}<tr class="tot"><td>Total</td><td class="r">${hrs}</td><td class="r">${money(tot)}</td></tr></tbody>`;
+document.getElementById('costNote').textContent=`At the $200 list rate in Sandrine's model this is ${fmt(tot)}, so the $150K project price is a founding-partner discount of about ${Math.round((1-150000/tot)*100)}%. Internal cost is lower than list rate, but the model has no internal rates yet, so margin still needs to be set.`;
+const RUN=[['Always-on hosting',85],['Database and document storage',50],['AI usage, about 2,000 conversations',600],['Web search and map data',100],['Monitoring and backups',40]];
+document.getElementById('runTable').innerHTML=`<tbody>${RUN.map(r=>`<tr><td>${r[0]}</td><td class="r">${money(r[1])}</td></tr>`).join('')}<tr class="tot"><td>Total per month</td><td class="r">${money(RUN.reduce((s,r)=>s+r[1],0))}</td></tr></tbody>`;
+const AP={
+ ap1:['<b>The Florida file is the Flagstaff file.</b> Both are set to Arizona and Flagstaff and give the same $884,333 three-year total. There is no Florida price yet.',
+      '<b>The state tab is broken.</b> Totals, ARR and MRR show #VALUE!. Tab "4. State &amp; Cities" is empty, so the small-city count reads 45,672 and one row shows about $2 billion.',
+      '<b>Years 2 and 3 re-bill Year 1.</b> One-time setup rolls into later years. Flagstaff Year 2 shows $294K when the recurring lines add up to about $78K.',
+      '<b>Settings disagree.</b> The escalator is 1.5% on the city tab and 3.5% on the state tab. Discounts are typed in as 5/3/0/0% while the discount table rises with city size.',
+      '<b>Data storage at $0.08 per GB</b> comes to $8 a year for a mid-size city. It is probably a unit slip.',
+      '<b>One flat $200 rate with no roles or internal cost</b>, so margin can\'t be checked yet.'],
+ ap2:['<b>Website and CitySense sheet:</b> $150K–$300K starter engagement, and $750K–$1.2M for a full implementation over about a year.',
+      '<b>Pricing model:</b> Flagstaff Year 1 is $212K, and three years is $884K. The full implementation price is about four times the model\'s first year, so we need one story.',
+      '<b>Jerid\'s business case</b> assumes a $150K a year fee. The model has no license line, and its recurring part for a mid-size city is $78K. This page uses $150K for the project so the numbers line up.',
+      '<b>Compliance packages</b> are 28% of Flagstaff\'s Year 1. We should present them as responsible AI assurance, as a strength rather than overhead.'],
+ ap3:['<b>AI Readiness assessment:</b> not in the catalog. It is a natural paid first step.',
+      '<b>Data quality and governance:</b> appears only inside the ESG module. The FDEM brief already describes this work in detail.',
+      '<b>Metadata management as a service:</b> today it is only a per-GB console line.',
+      '<b>Strategic planning and KPI framework:</b> the catalog lists dashboards with KPIs, but no service to define them.',
+      '<b>ROI and business case analysis:</b> add it as the $35K ROI Snapshot.'],
+ ap4:['<b>Group the climate add-ons</b> (Climate Risk Engine, Flood/Wildfire/Hazard, Carbon Credit, Adaptation Simulation) under "Climate services" so buyers see them.',
+      '<b>Name rows by outcome.</b> Several rows share generic labels such as "Module" and "Engine". Better names would read like "Flood and storm cost forecasting".',
+      '<b>Show hourly modules as setup of a capability</b> with a fixed price. That also answers how to represent service hours.'],
+};
+for(const k in AP)document.getElementById(k).innerHTML=AP[k].map(i=>`<li>${i}</li>`).join('');
+
+/* Calculator */
+const F=[
+ {g:'Insurance'},
+ {id:'prem',l:'Property insurance premium',min:500000,max:5000000,step:50000,k:'$',h:'Hollywood: $2.7M a year'},
+ {id:'credit',l:'Premium credit at renewal',min:0,max:15,step:0.5,k:'%',h:'Negotiated with the broker'},
+ {id:'hrs',l:'Staff hours saved on reports',min:0,max:2000,step:50,k:'h',h:'Insurer and grant reporting, at $65/hour'},
+ {g:'Storm costs the city pays itself'},
+ {id:'claims',l:'Small claims under the deductible',min:0,max:1000000,step:10000,k:'$',h:'Hollywood: $380K a year'},
+ {id:'claimsCut',l:'Share avoided',min:0,max:100,step:5,k:'%'},
+ {id:'ded',l:'Wind and water deductibles',min:0,max:1500000,step:25000,k:'$',h:'Hollywood: $500K a year'},
+ {id:'dedCut',l:'Share avoided',min:0,max:100,step:5,k:'%'},
+ {id:'ot',l:'Emergency overtime and pumping',min:0,max:800000,step:10000,k:'$',h:'Hollywood: $220K a year'},
+ {id:'otCut',l:'Share avoided',min:0,max:100,step:5,k:'%'},
+ {g:'What the city spends'},
+ {id:'fee',l:'ecoheart fee',min:25000,max:300000,step:5000,k:'$'},
+ {id:'grants',l:'Neighborhood grants at $10K each',min:0,max:40,step:1,k:'n'},
+];
+const P={
+ cons:{prem:2700000,credit:2,hrs:300,claims:380000,claimsCut:20,ded:500000,dedCut:20,ot:220000,otCut:15,fee:150000,grants:5},
+ exp:{prem:2700000,credit:5,hrs:600,claims:380000,claimsCut:40,ded:500000,dedCut:45,ot:220000,otCut:35,fee:150000,grants:10},
+ case:{prem:2700000,credit:12.5,hrs:0,claims:380000,claimsCut:100,ded:500000,dedCut:90,ot:220000,otCut:80,fee:150000,grants:15},
+};
+const N={cons:'Small premium credit and modest storm savings.',exp:'What we would show a city before the broker confirms a credit.',case:'Reproduces the Hollywood draft business case. Treat it as the upside.'};
+const groups=[];let cur=null;
+F.forEach(f=>{if(f.g){cur={g:f.g,items:[]};groups.push(cur)}else cur.items.push(f)});
+const fieldHTML=f=>`<div class="f"><label for="f-${f.id}"><span>${f.l}</span><output id="o-${f.id}" for="f-${f.id}"></output></label><input type="range" id="f-${f.id}" min="${f.min}" max="${f.max}" step="${f.step}">${f.h?`<small>${f.h}</small>`:''}</div>`;
+const g0=groups[0],g1=groups[1],g2=groups[2];
+document.getElementById('fields').innerHTML=`<div class="grp"><h4>${g1.g}</h4>${g1.items.map(fieldHTML).join('')}</div><div class="grp"><h4>${g0.g}</h4>${g0.items.map(fieldHTML).join('')}<h4 style="margin-top:8px">${g2.g}</h4>${g2.items.map(fieldHTML).join('')}</div>`;
+const v=id=>+document.getElementById('f-'+id).value;
+const show=(f,x)=>f.k==='$'?fmt(x):f.k==='%'?x+'%':f.k==='h'?x.toLocaleString()+' hrs':x;
+function stack(el,parts,max){el.innerHTML=parts.map(([c,x])=>`<i class="${c}" style="width:${(x/max*100).toFixed(2)}%"></i>`).join('')}
+function calc(){
+  F.filter(f=>f.id).forEach(f=>document.getElementById('o-'+f.id).textContent=show(f,v(f.id)));
+  const pr=v('prem'),cl=v('claims'),de=v('ded'),ot=v('ot');
+  const pr2=pr*(1-v('credit')/100),cl2=cl*(1-v('claimsCut')/100),de2=de*(1-v('dedCut')/100),ot2=ot*(1-v('otCut')/100);
+  const fee=v('fee'),gr=v('grants')*10000,lab=v('hrs')*65;
+  const today=pr+cl+de+ot,withA=pr2+cl2+de2+ot2+fee+gr;
+  const net=today-withA+lab,spent=fee+gr,saved=net+spent;
+  const max=Math.max(today,withA);
+  stack(document.getElementById('sToday'),[['k-prem',pr],['k-claims',cl],['k-ded',de],['k-ot',ot]],max);
+  stack(document.getElementById('sWith'),[['k-prem',pr2],['k-claims',cl2],['k-ded',de2],['k-ot',ot2],['k-fee',fee],['k-gr',gr]],max);
+  document.getElementById('tToday').textContent=fmt(today);
+  document.getElementById('tWith').textContent=fmt(withA);
+  document.getElementById('tHrs').textContent=v('hrs').toLocaleString()+' hours';
+  document.getElementById('kNet').textContent=fmt(net);
+  document.getElementById('kRet').textContent=spent?(saved/spent).toFixed(1)+'×':'–';
+  document.getElementById('kPay').textContent=saved>0?Math.max(1,Math.round(spent/(saved/12)))+' mo':'–';
+}
+function preset(p){Object.entries(P[p]).forEach(([k,x])=>document.getElementById('f-'+k).value=x);document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===p));document.getElementById('scNote').textContent=N[p];calc()}
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>preset(b.dataset.p)));
+document.getElementById('fields').addEventListener('input',()=>{document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed','false'));document.getElementById('scNote').textContent='Your own scenario.';calc()});
+preset('exp');
+</script>
+
+</body>
+</html>
