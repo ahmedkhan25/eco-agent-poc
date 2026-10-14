@@ -408,17 +408,38 @@ export function RoiAgent() {
       { name: "field", type: "string", description: "roles: hours, listRate, internalRate. run: monthly. offers: price, weeks, notes", required: true },
       { name: "value", type: "string", description: "New value; numbers as plain digits", required: true },
     ],
-    handler: async ({ table, item, field, value }) => {
+    handler: async ({ table: rawTable, item, field: rawField, value }) => {
       const st = useRoiStore.getState();
-      const norm = (x: string) => x.toLowerCase().replace(/[^a-z0-9]/g, "");
-      const numeric = !["weeks", "notes"].includes(field);
-      const v = numeric ? Number(value) : value;
-      if (numeric && !Number.isFinite(v as number)) return "Value must be a number";
-      const list = table === "roles" ? st.roles.map((r) => r.role) : table === "run" ? st.run.map((r) => r.item) : st.offers.map((o) => o.name);
-      const i = list.findIndex((n) => norm(n).includes(norm(item)) || norm(item).includes(norm(n)));
-      if (i < 0) return `No ${table} item matching "${item}". Items: ${list.join(", ")}`;
+      const norm = (x: unknown) => String(x ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const names = {
+        roles: st.roles.map((r) => r.role),
+        run: st.run.map((r) => r.item),
+        offers: st.offers.map((o) => o.name),
+      };
+      type Table = keyof typeof names;
+      const find = (tb: Table) => names[tb].findIndex((n) => norm(n).includes(norm(item)) || norm(item).includes(norm(n)));
+      // Be forgiving: the model may say "running costs" or pick the wrong table.
+      const tn = norm(rawTable);
+      let table: Table = tn.includes("role") || tn.includes("team") ? "roles" : tn.includes("run") || tn.includes("month") || tn.includes("hosting") ? "run" : tn.includes("offer") || tn.includes("price") ? "offers" : "run";
+      let i = find(table);
+      if (i < 0) {
+        const other = (["roles", "run", "offers"] as Table[]).find((tb) => find(tb) >= 0);
+        if (other) {
+          table = other;
+          i = find(other);
+        }
+      }
+      const list = names[table];
+      if (i < 0) return `No item matching "${item}". Roles: ${names.roles.join(", ")}. Running costs: ${names.run.join(", ")}. Offers: ${names.offers.join(", ")}`;
       const allowed = table === "roles" ? ["hours", "listRate", "internalRate"] : table === "run" ? ["monthly"] : ["price", "weeks", "notes"];
-      if (!allowed.includes(field)) return `Field must be one of ${allowed.join(", ")}`;
+      const fn = norm(rawField);
+      const field =
+        allowed.find((f) => norm(f) === fn) ??
+        (table === "run" ? "monthly" : table === "offers" ? (fn.includes("week") || fn.includes("length") ? "weeks" : fn.includes("note") ? "notes" : "price") : fn.includes("hour") && !fn.includes("rate") ? "hours" : fn.includes("list") ? "listRate" : fn.includes("rate") || fn.includes("internal") || fn.includes("our") ? "internalRate" : "");
+      if (!field) return `Field must be one of ${allowed.join(", ")}`;
+      const numeric = !["weeks", "notes"].includes(field);
+      const v = numeric ? Number(String(value).replace(/[$,\s]/g, "")) : value;
+      if (numeric && !Number.isFinite(v as number)) return "Value must be a number";
       const rows: Record<string, unknown>[] = (table === "roles" ? st.roles : table === "run" ? st.run : st.offers) as never;
       const origRows: Record<string, unknown>[] = (table === "roles" ? DEFAULT_ROLES : table === "run" ? DEFAULT_RUN : DEFAULT_OFFERS) as never;
       const before = rows[i]?.[field];
@@ -436,7 +457,7 @@ export function RoiAgent() {
       try { margin = JSON.parse(String(result)).margin ?? ""; } catch {}
       return (
         <div className="my-2 rounded-lg border border-teal-200 bg-teal-50/60 px-3 py-2 text-xs text-teal-900">
-          Cost model updated: <b>{args.item}</b> {args.field} is now <b>{String(args.value)}</b>.{margin && <> Margin on the partner project: <b>{margin}</b>.</>}{" "}
+          Cost model updated: <b>{args.item}</b> is now <b>{String(args.value)}</b>.{margin && <> Margin on the partner project: <b>{margin}</b>.</>}{" "}
           <Link href="/roi/model" className="underline">See the model</Link>
         </div>
       );
