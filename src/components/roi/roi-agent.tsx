@@ -10,7 +10,8 @@ import Link from "next/link";
 import { FileText } from "lucide-react";
 import { fmtMoney, type InputKey, type RoiInputs } from "@/lib/roi/engine";
 import { BASIS_LABEL, type Basis } from "@/lib/roi/defaults";
-import { costTotals, scenarioResult, useRoiStore } from "@/lib/roi/store";
+import { changesFromOriginal, costTotals, scenarioResult, useRoiStore } from "@/lib/roi/store";
+import { DEFAULT_ASSUMPTIONS, DEFAULT_OFFERS, DEFAULT_ROLES, DEFAULT_RUN } from "@/lib/roi/defaults";
 import { RESOURCES } from "@/lib/roi/about";
 import { ROI_AGENT_INSTRUCTIONS } from "@/lib/roi/prompt";
 import { SITE_GUIDE } from "@/lib/roi/guide";
@@ -111,6 +112,18 @@ export function RoiAgent() {
   });
 
   useCopilotReadable({
+    description:
+      "Original starting values (from Jerid's Hollywood business case and our first cost model), and every value that has been changed since. Use this to say what something was before, or to put it back.",
+    value: {
+      changedSinceOriginal: changesFromOriginal(store),
+      originalAssumptions: DEFAULT_ASSUMPTIONS.map((a) => ({ key: a.key, cautious: a.low, expected: a.expected, businessCase: a.high, confidence: a.confidence, source: a.source })),
+      originalRoles: DEFAULT_ROLES,
+      originalRunCosts: DEFAULT_RUN,
+      originalOffers: DEFAULT_OFFERS,
+    },
+  });
+
+  useCopilotReadable({
     description: "Scenarios on the canvas with their calculated results (from the calculator, not estimates)",
     value: store.scenarios.map((s) => summarize(s.id)),
   });
@@ -131,7 +144,9 @@ export function RoiAgent() {
         runCostPerMonth: `$${t.runMonthly}`,
         partnerProjectPrice: fmtMoney(t.partnerPrice),
         marginOnPartnerProject: `${fmtMoney(t.margin)} (${Math.round(t.marginPct * 100)}%)`,
-        offers: store.offers.map((o) => `${o.name}: ${fmtMoney(o.price)} (${o.weeks})`),
+        roles: store.roles,
+        runCostsPerMonth: store.run,
+        offers: store.offers,
       };
     })(),
   });
@@ -275,7 +290,8 @@ export function RoiAgent() {
       if (numeric && !Number.isFinite(v as number)) return `Value must be a number`;
       const before = a[field as keyof typeof a];
       st.setAssumption(key as InputKey, field as "low", v as number);
-      return JSON.stringify({ changed: a.label, field, from: before, to: v, scenarios: st.scenarios.map((s) => summarize(s.id)) });
+      const original = DEFAULT_ASSUMPTIONS.find((x) => x.key === key)?.[field as keyof typeof a];
+      return JSON.stringify({ changed: a.label, field, from: before, to: v, original, scenarios: st.scenarios.map((s) => summarize(s.id)) });
     },
     render: ({ status, args }) => {
       if (status !== "complete") return <Working text="Updating the assumption library..." />;
@@ -354,6 +370,85 @@ export function RoiAgent() {
     parameters: [],
     handler: async () => "Guide shown as a card. Add one short line pointing to the step that fits their question.",
     render: ({ status }) => (status === "inProgress" ? <Working text="Opening the guide..." /> : <GuideCard steps={SITE_GUIDE} />),
+  });
+
+  useCopilotAction({
+    name: "updateCostModel",
+    description:
+      "Change our internal cost model: a role's hours, list rate or internal rate; a monthly running cost; or an offer's price, length or notes. Match the item by its name.",
+    parameters: [
+      { name: "table", type: "string", enum: ["roles", "run", "offers"], required: true },
+      { name: "item", type: "string", description: "Role, run-cost item or offer name (as listed in the cost model)", required: true },
+      { name: "field", type: "string", description: "roles: hours, listRate, internalRate. run: monthly. offers: price, weeks, notes", required: true },
+      { name: "value", type: "string", description: "New value; numbers as plain digits", required: true },
+    ],
+    handler: async ({ table, item, field, value }) => {
+      const st = useRoiStore.getState();
+      const norm = (x: string) => x.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const numeric = !["weeks", "notes"].includes(field);
+      const v = numeric ? Number(value) : value;
+      if (numeric && !Number.isFinite(v as number)) return "Value must be a number";
+      const list = table === "roles" ? st.roles.map((r) => r.role) : table === "run" ? st.run.map((r) => r.item) : st.offers.map((o) => o.name);
+      const i = list.findIndex((n) => norm(n).includes(norm(item)) || norm(item).includes(norm(n)));
+      if (i < 0) return `No ${table} item matching "${item}". Items: ${list.join(", ")}`;
+      const allowed = table === "roles" ? ["hours", "listRate", "internalRate"] : table === "run" ? ["monthly"] : ["price", "weeks", "notes"];
+      if (!allowed.includes(field)) return `Field must be one of ${allowed.join(", ")}`;
+      const rows: Record<string, unknown>[] = (table === "roles" ? st.roles : table === "run" ? st.run : st.offers) as never;
+      const origRows: Record<string, unknown>[] = (table === "roles" ? DEFAULT_ROLES : table === "run" ? DEFAULT_RUN : DEFAULT_OFFERS) as never;
+      const before = rows[i]?.[field];
+      const original = origRows[i]?.[field];
+      if (table === "roles") st.setRole(i, { [field]: v });
+      else if (table === "run") st.setRun(i, { [field]: v });
+      else st.setOffer(i, { [field]: v });
+      const after = useRoiStore.getState();
+      const t = costTotals(after.roles, after.run, after.offers);
+      return JSON.stringify({ changed: `${list[i]} ${field}`, from: before, to: v, original, teamCost: fmtMoney(t.teamCost), runPerMonth: t.runMonthly, margin: `${fmtMoney(t.margin)} (${Math.round(t.marginPct * 100)}%)` });
+    },
+    render: ({ status, args, result }) => {
+      if (status !== "complete") return <Working text="Updating the cost model..." />;
+      let margin = "";
+      try { margin = JSON.parse(String(result)).margin ?? ""; } catch {}
+      return (
+        <div className="my-2 rounded-lg border border-teal-200 bg-teal-50/60 px-3 py-2 text-xs text-teal-900">
+          Cost model updated: <b>{args.item}</b> {args.field} is now <b>{String(args.value)}</b>.{margin && <> Margin on the partner project: <b>{margin}</b>.</>}{" "}
+          <Link href="/roi/model" className="underline">See the model</Link>
+        </div>
+      );
+    },
+  });
+
+  useCopilotAction({
+    name: "resetToOriginal",
+    description:
+      "Put values back to their original starting values: one assumption (give key), all assumptions, the whole cost model, or one scenario's own overrides (give scenarioId).",
+    parameters: [
+      { name: "target", type: "string", enum: ["assumption", "allAssumptions", "costModel", "scenario"], required: true },
+      { name: "key", type: "string", description: "Assumption key when target is assumption", required: false },
+      { name: "scenarioId", type: "string", description: "Scenario id when target is scenario", required: false },
+    ],
+    handler: async ({ target, key, scenarioId }) => {
+      const st = useRoiStore.getState();
+      if (target === "assumption") {
+        if (!key || !st.assumptions.some((a) => a.key === key)) return `Give a valid assumption key`;
+        st.resetAssumption(key as InputKey);
+      } else if (target === "allAssumptions") st.resetAssumptions();
+      else if (target === "costModel") st.resetCosts();
+      else if (target === "scenario") {
+        if (!scenarioId || !st.scenarios.some((s) => s.id === scenarioId)) return `Give a valid scenario id`;
+        st.updateScenario(scenarioId, { overrides: {} });
+      }
+      return JSON.stringify({ reset: target, key, scenarioId, stillChanged: changesFromOriginal(useRoiStore.getState()).length });
+    },
+    render: ({ status, args }) => {
+      if (status !== "complete") return <Working text="Putting the original values back..." />;
+      const what =
+        args.target === "assumption" ? `${args.key}` : args.target === "allAssumptions" ? "all assumptions" : args.target === "costModel" ? "the cost model" : "this scenario's own changes";
+      return (
+        <div className="my-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700">
+          Back to the original values for <b>{what}</b>.
+        </div>
+      );
+    },
   });
 
   return null;

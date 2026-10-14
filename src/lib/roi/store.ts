@@ -62,6 +62,7 @@ interface RoiState {
   setReport: (r: ReportDraft | null) => void;
   setAssumption: <F extends keyof Assumption>(key: InputKey, field: F, value: Assumption[F]) => void;
   resetAssumptions: () => void;
+  resetAssumption: (key: InputKey) => void;
   setRole: (i: number, patch: Partial<RoleCost>) => void;
   setRun: (i: number, patch: Partial<RunCost>) => void;
   setOffer: (i: number, patch: Partial<Offer>) => void;
@@ -131,6 +132,10 @@ export const useRoiStore = create<RoiState>()(
       setAssumption: (key, field, value) =>
         set({ assumptions: get().assumptions.map((a) => (a.key === key ? { ...a, [field]: value } : a)) }),
       resetAssumptions: () => set({ assumptions: DEFAULT_ASSUMPTIONS }),
+      resetAssumption: (key) =>
+        set({
+          assumptions: get().assumptions.map((a) => (a.key === key ? DEFAULT_ASSUMPTIONS.find((d) => d.key === key) ?? a : a)),
+        }),
       setRole: (i, patch) => set({ roles: get().roles.map((r, j) => (j === i ? { ...r, ...patch } : r)) }),
       setRun: (i, patch) => set({ run: get().run.map((r, j) => (j === i ? { ...r, ...patch } : r)) }),
       setOffer: (i, patch) => set({ offers: get().offers.map((o, j) => (j === i ? { ...o, ...patch } : o)) }),
@@ -169,4 +174,31 @@ export function costTotals(roles: RoleCost[], run: RunCost[], offers: Offer[]) {
     margin,
     marginPct: partner && partner.price > 0 ? margin / partner.price : 0,
   };
+}
+
+/** Original value of one assumption field, or undefined. */
+export function originalAssumption(key: InputKey) {
+  return DEFAULT_ASSUMPTIONS.find((a) => a.key === key);
+}
+
+/** Every library and cost-model value that differs from the starting values. */
+export function changesFromOriginal(state: Pick<RoiState, "assumptions" | "roles" | "run" | "offers">) {
+  const out: { where: string; item: string; field: string; original: unknown; current: unknown }[] = [];
+  for (const a of state.assumptions) {
+    const d = DEFAULT_ASSUMPTIONS.find((x) => x.key === a.key);
+    if (!d) continue;
+    for (const f of ["low", "expected", "high", "source", "confidence", "owner"] as const)
+      if (a[f] !== d[f]) out.push({ where: "assumption", item: `${a.key} (${a.label})`, field: f, original: d[f], current: a[f] });
+  }
+  const diff = <T extends object>(where: string, cur: T[], orig: T[], name: (x: T) => string) =>
+    cur.forEach((c, i) => {
+      const o = orig[i];
+      if (!o) return;
+      for (const f of Object.keys(c) as (keyof T)[])
+        if (c[f] !== o[f]) out.push({ where, item: name(o), field: String(f), original: o[f], current: c[f] });
+    });
+  diff("role", state.roles, DEFAULT_ROLES, (r) => r.role);
+  diff("run cost", state.run, DEFAULT_RUN, (r) => r.item);
+  diff("offer", state.offers, DEFAULT_OFFERS, (o) => o.name);
+  return out;
 }

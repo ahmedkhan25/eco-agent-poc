@@ -142,11 +142,13 @@ The browser registers the agent's tools in `roi-agent.tsx` with `useCopilotActio
 | `updateAssumption(key, field, value)` | Edits the shared library (`low`, `expected`, `high`, `source`, `confidence`, `owner`) |
 | `createReport(scenarioId, audience, summary, nextSteps[])` | Saves the agent's summary and opens `/roi/report` |
 | `shareLinks(ids[], note?)` | Shows link cards with the ecoheart logo (website, services, story and team, contact, explainer, proposal, model, report, other site sections) |
+| `updateCostModel(table, item, field, value)` | Edits our cost model: role hours or rates, monthly running costs, offer price, length or notes. Returns before, after, original and the new margin. |
+| `resetToOriginal(target, key?, scenarioId?)` | Puts back the original values for one assumption, all assumptions, the cost model, or one scenario's overrides |
 | `showGuide()` | Shows the step-by-step "how to use this site" card |
 
 Suggestion buttons under the chat come from `suggestionsFor(pathname, scenarioCount)` in `guide.ts`. They are fixed lists (no AI call), change by tab, and always include "How do I use this site?" and "What can you do?".
 
-Readables (what the agent sees): the current page, the assumption library, every scenario with its calculated results, which scenario is active and which are compared, and the internal cost model.
+Readables (what the agent sees): its own instructions and ecoheart background, the original starting values plus every value changed since (`changesFromOriginal()` in `store.ts`), the current page, the assumption library, every scenario with its calculated results, which scenario is active and which are compared, and the internal cost model.
 
 Rules in `prompt.ts`, which you must keep:
 
@@ -229,7 +231,7 @@ curl -s -X POST -H "Authorization: Bearer $K" -H "Content-Type: application/json
 3. **Chat cards silently missing with Claude.** CopilotKit 1.53 runs Anthropic through its AI SDK agent. It turns Claude's thinking into an empty "reasoning" message, and the client then drops the tool call that follows: no card and no reply, with no error shown. Opus 5.5 rejects `thinking: disabled`. The fix is in `route.ts`: a custom `fetch` on the Anthropic client removes `thinking` and `redacted_thinking` blocks from the response stream. Keep it unless a CopilotKit upgrade fixes this; after any upgrade, re-run check 4 in section 7.
 4. **The adapter's own settings are mostly ignored.** The runtime builds its own model from the adapter's `getLanguageModel()` (model name plus the client's fetch). Overriding `process()` or `max_tokens` on the adapter has no effect.
 5. **CopilotKit inspector popup.** It is hidden with `showDevConsole={false} enableInspector={false}` on `<CopilotKit>`.
-6. **Saved state is per browser.** There is no shared storage yet (Supabase tables `roi_assumption_sets` and `roi_scenarios` are planned). Clearing site data resets everything.
+6. **Saved state is per browser.** The original values always come from the code (`defaults.ts`). Edits live in the browser (localStorage key `ecoheart-roi-v1`), so the agent and the Model tab can always compare current values with the originals (teal fields, hover for the original, reset arrows). There is no shared storage yet (Supabase tables `roi_assumption_sets` and `roi_scenarios` are planned). Clearing site data resets everything.
 7. **The chat's `instructions` never reach the model.** CopilotKit 1.53's built-in agent drops system messages, which is how `<CopilotChat instructions>` is sent. The Advisor's role, rules, ecoheart background and how-to guide are passed as a `useCopilotReadable` in `roi-agent.tsx` instead. Put new behavior rules in `prompt.ts`, `about.ts` or `guide.ts`, and they flow through that readable.
 8. **Login must not start the chat.** `RoiShell` skips CopilotKit on `/roi/login`, because the API is behind the gate.
 

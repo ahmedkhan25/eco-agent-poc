@@ -3,7 +3,8 @@
 import { RotateCcw } from "lucide-react";
 import { fmtMoney } from "@/lib/roi/engine";
 import type { Confidence } from "@/lib/roi/defaults";
-import { costTotals, useRoiStore } from "@/lib/roi/store";
+import { changesFromOriginal, costTotals, originalAssumption, useRoiStore } from "@/lib/roi/store";
+import { DEFAULT_OFFERS, DEFAULT_ROLES, DEFAULT_RUN } from "@/lib/roi/defaults";
 import { NumberField, Stat, ink } from "@/components/roi/ui";
 
 const CONF: Confidence[] = ["low", "medium", "high"];
@@ -17,6 +18,7 @@ export default function RoiModel() {
   const st = useRoiStore();
   const groups = Array.from(new Set(st.assumptions.map((a) => a.group)));
   const t = costTotals(st.roles, st.run, st.offers);
+  const changes = changesFromOriginal(st).length;
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-6 md:px-8">
@@ -26,8 +28,14 @@ export default function RoiModel() {
             <h1 className={`font-serif text-3xl italic ${ink}`}>Model & assumptions</h1>
             <p className="mt-1 max-w-2xl text-sm text-slate-600">
               The shared library every scenario starts from. Edit a value and every scenario that uses it updates. Low
-              confidence means an estimate to confirm with the city, broker or insurer.
+              confidence means an estimate to confirm with the city, broker or insurer. Teal fields differ from the
+              original starting values (hover to see the original).
             </p>
+            {changes > 0 && (
+              <p className="mt-1 text-xs font-medium text-teal-700">
+                {changes} value{changes === 1 ? "" : "s"} changed from the original
+              </p>
+            )}
           </div>
           <button
             onClick={st.resetAssumptions}
@@ -61,10 +69,29 @@ export default function RoiModel() {
                   .filter((a) => a.group === g)
                   .map((a) => (
                     <tr key={a.key} className="border-t border-slate-100 align-middle">
-                      <td className="px-4 py-2 text-slate-700">{a.label}</td>
+                      <td className="px-4 py-2 text-slate-700">
+                        {a.label}
+                        {JSON.stringify(a) !== JSON.stringify(originalAssumption(a.key)) && (
+                          <button
+                            onClick={() => st.resetAssumption(a.key)}
+                            title="Back to the original values"
+                            className="ml-1.5 inline-flex align-middle text-teal-600 hover:text-teal-800"
+                          >
+                            <RotateCcw className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </td>
                       {(["low", "expected", "high"] as const).map((f) => (
                         <td key={f} className="px-2 py-2">
-                          <NumberField className="ml-auto w-28" unit={a.unit} value={a[f]} onChange={(v) => st.setAssumption(a.key, f, v)} />
+                          <div title={`Original: ${originalAssumption(a.key)?.[f]}`}>
+                            <NumberField
+                              className="ml-auto w-28"
+                              unit={a.unit}
+                              value={a[f]}
+                              changed={originalAssumption(a.key)?.[f] !== a[f]}
+                              onChange={(v) => st.setAssumption(a.key, f, v)}
+                            />
+                          </div>
                         </td>
                       ))}
                       <td className="px-2 py-2">
@@ -145,13 +172,13 @@ export default function RoiModel() {
                   <tr key={i} className="border-t border-slate-100">
                     <td className="px-4 py-2 text-slate-700">{r.role}</td>
                     <td className="px-2 py-2">
-                      <NumberField className="ml-auto w-20" unit="hours" value={r.hours} onChange={(v) => st.setRole(i, { hours: v || 0 })} />
+                      <NumberField className="ml-auto w-20" unit="hours" value={r.hours} changed={DEFAULT_ROLES[i]?.hours !== r.hours} onChange={(v) => st.setRole(i, { hours: v || 0 })} />
                     </td>
                     <td className="px-2 py-2">
-                      <NumberField className="ml-auto w-20" unit="$" value={r.listRate} onChange={(v) => st.setRole(i, { listRate: v || 0 })} />
+                      <NumberField className="ml-auto w-20" unit="$" value={r.listRate} changed={DEFAULT_ROLES[i]?.listRate !== r.listRate} onChange={(v) => st.setRole(i, { listRate: v || 0 })} />
                     </td>
                     <td className="px-2 py-2">
-                      <NumberField className="ml-auto w-20" unit="$" value={r.internalRate} onChange={(v) => st.setRole(i, { internalRate: v || 0 })} />
+                      <NumberField className="ml-auto w-20" unit="$" value={r.internalRate} changed={DEFAULT_ROLES[i]?.internalRate !== r.internalRate} onChange={(v) => st.setRole(i, { internalRate: v || 0 })} />
                     </td>
                     <td className={`px-4 py-2 text-right tabular-nums ${ink}`}>{fmtMoney(r.hours * r.internalRate)}</td>
                   </tr>
@@ -168,7 +195,7 @@ export default function RoiModel() {
               {st.run.map((r, i) => (
                 <div key={i} className="flex items-center justify-between gap-3 border-t border-slate-100 px-4 py-1.5 first:border-0">
                   <span className="text-sm text-slate-700">{r.item}</span>
-                  <NumberField className="w-24" unit="$" value={r.monthly} onChange={(v) => st.setRun(i, { monthly: v || 0 })} />
+                  <NumberField className="w-24" unit="$" value={r.monthly} changed={DEFAULT_RUN[i]?.monthly !== r.monthly} onChange={(v) => st.setRun(i, { monthly: v || 0 })} />
                 </div>
               ))}
             </div>
@@ -184,7 +211,7 @@ export default function RoiModel() {
                       {o.weeks} · {o.notes}
                     </div>
                   </div>
-                  <NumberField className="w-28 flex-none" unit="$" value={o.price} onChange={(v) => st.setOffer(i, { price: v || 0 })} />
+                  <NumberField className="w-28 flex-none" unit="$" value={o.price} changed={DEFAULT_OFFERS[i]?.price !== o.price} onChange={(v) => st.setOffer(i, { price: v || 0 })} />
                 </div>
               ))}
             </div>
