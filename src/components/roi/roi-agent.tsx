@@ -62,6 +62,20 @@ function clean(o: unknown, top?: Record<string, unknown>): Partial<RoiInputs> {
   return out;
 }
 
+// Claude sometimes sends a list param as a JSON string or a comma list.
+function strList(v: unknown): string[] {
+  if (typeof v === "string") {
+    const raw = v;
+    try {
+      v = JSON.parse(raw);
+    } catch {
+      v = raw.split(",");
+    }
+  }
+  if (typeof v === "string") v = [v];
+  return Array.isArray(v) ? v.map((x) => String(x).trim()).filter(Boolean) : [];
+}
+
 const asBasis = (b: unknown): Basis => (b === "low" || b === "high" ? b : "expected");
 
 function summarize(id: string) {
@@ -212,7 +226,7 @@ export function RoiAgent() {
       const s = st.scenarios.find((x) => x.id === id);
       if (!s) return `No scenario with id ${id}. Existing ids: ${st.scenarios.map((x) => x.id).join(", ")}`;
       const merged = { ...s.overrides, ...clean(overrides, args as Record<string, unknown>) };
-      for (const k of (resetKeys as string[] | undefined) ?? []) delete merged[k as InputKey];
+      for (const k of strList(resetKeys)) delete merged[k as InputKey];
       st.updateScenario(id, {
         ...(name ? { name } : {}),
         ...(basis ? { basis: asBasis(basis) } : {}),
@@ -245,7 +259,7 @@ export function RoiAgent() {
     parameters: [{ name: "ids", type: "string[]", description: "Scenario ids to compare", required: true }],
     handler: async ({ ids }) => {
       const st = useRoiStore.getState();
-      const valid = (ids as string[]).filter((i) => st.scenarios.some((s) => s.id === i));
+      const valid = strList(ids).filter((i) => st.scenarios.some((s) => s.id === i));
       st.setCompare(valid);
       goCanvas();
       return JSON.stringify(valid.map(summarize));
@@ -253,7 +267,7 @@ export function RoiAgent() {
     render: ({ status, args }) => {
       if (status !== "complete") return <Working text="Lining them up..." />;
       const { scenarios, assumptions } = useRoiStore.getState();
-      const rows = ((args.ids as string[]) ?? [])
+      const rows = strList(args.ids)
         .map((i) => scenarios.find((s) => s.id === i))
         .filter(Boolean)
         .map((s) => ({ s: s!, h: headline(scenarioResult(s!, assumptions)) }));
@@ -332,7 +346,7 @@ export function RoiAgent() {
     handler: async ({ scenarioId, audience, summary, nextSteps }) => {
       const st = useRoiStore.getState();
       if (!st.scenarios.some((s) => s.id === scenarioId)) return `No scenario with id ${scenarioId}`;
-      st.setReport({ scenarioId, audience, summary, nextSteps: (nextSteps as string[]) ?? [], createdAt: Date.now() });
+      st.setReport({ scenarioId, audience, summary, nextSteps: strList(nextSteps), createdAt: Date.now() });
       st.setActive(scenarioId);
       router.push("/roi/report");
       return "Report opened. The person can print it or save it as PDF.";
@@ -366,12 +380,12 @@ export function RoiAgent() {
       { name: "note", type: "string", description: "Optional one-line lead-in", required: false },
     ],
     handler: async ({ ids }) => {
-      const found = RESOURCES.filter((r) => (ids as string[]).includes(r.id));
+      const found = RESOURCES.filter((r) => strList(ids).includes(r.id));
       return JSON.stringify(found.map((r) => ({ id: r.id, title: r.title, link: r.href, comingSoon: r.ready === false })));
     },
     render: ({ status, args }) => {
       if (status === "inProgress") return <Working text="Finding the links..." />;
-      const items = RESOURCES.filter((r) => ((args.ids as string[]) ?? []).includes(r.id));
+      const items = RESOURCES.filter((r) => strList(args.ids).includes(r.id));
       return <LinkCards items={items} note={args.note} />;
     },
   });

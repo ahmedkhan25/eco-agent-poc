@@ -33,7 +33,7 @@ export default function RoiReport() {
   const summary =
     draft?.summary ||
     `For ${scenario.city}, the ${BASIS_LABEL[scenario.basis].toLowerCase()} case shows about ${h.net} in net value in the first year, or ${h.perDollar} back for every dollar spent, paying back in ${h.payback}. The biggest driver is ${r.drivers[0]?.label.toLowerCase()}. The least certain numbers are marked below and should be confirmed with the city before this is shared.`;
-  const nextSteps = draft?.nextSteps?.length
+  const nextSteps = Array.isArray(draft?.nextSteps) && draft.nextSteps.length
     ? draft.nextSteps
     : ["Confirm the premium, claims and deductible figures with the city's risk manager", "Check the premium credit with the city's broker", "Agree the focus area and success measures for an early partner project"];
 
