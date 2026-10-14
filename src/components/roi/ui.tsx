@@ -1,5 +1,9 @@
 "use client";
 
+import { ArrowRight, ExternalLink } from "lucide-react";
+import { EcoheartLogo } from "@/components/ecoheart-logo";
+import type { Resource } from "@/lib/roi/about";
+import type { GuideStep } from "@/lib/roi/guide";
 import { fmtMoney, type RoiResult } from "@/lib/roi/engine";
 import { BASIS_LABEL, type Basis } from "@/lib/roi/defaults";
 
@@ -148,6 +152,79 @@ export function NumberField({
       />
       {unit === "%" && <span className="text-xs text-slate-400">%</span>}
       {unit === "hours" && <span className="ml-1 text-xs text-slate-400">h</span>}
+    </div>
+  );
+}
+
+/** Link cards the agent shares in the chat, with the ecoheart mark. */
+export function LinkCards({ items, note }: { items: Resource[]; note?: string }) {
+  return (
+    <div className="my-2 space-y-2">
+      {note && <div className="text-xs text-slate-500">{note}</div>}
+      {items.map((r) => {
+        const body = (
+          <>
+            <EcoheartLogo className="h-6 w-6 flex-none" />
+            <div className="min-w-0 flex-1">
+              <div className={`text-sm font-semibold ${ink}`}>{r.title}</div>
+              <div className="text-xs text-slate-500">{r.description}</div>
+            </div>
+            {r.ready === false ? (
+              <span className="flex-none rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-800 ring-1 ring-amber-200">
+                Coming soon
+              </span>
+            ) : r.external ? (
+              <ExternalLink className="h-4 w-4 flex-none text-slate-400" />
+            ) : (
+              <ArrowRight className="h-4 w-4 flex-none text-slate-400" />
+            )}
+          </>
+        );
+        const cls = "flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm";
+        if (r.ready === false) return <div key={r.id} className={cls}>{body}</div>;
+        return (
+          <a
+            key={r.id}
+            href={r.href}
+            target={r.external ? "_blank" : undefined}
+            rel={r.external ? "noopener noreferrer" : undefined}
+            className={`${cls} transition hover:border-teal-400`}
+          >
+            {body}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Step-by-step how-to card the agent shows in the chat. */
+export function GuideCard({ steps }: { steps: GuideStep[] }) {
+  return (
+    <div className="my-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+      <div className="mb-2 flex items-center gap-2">
+        <EcoheartLogo className="h-5 w-5" />
+        <div className={`text-sm font-semibold ${ink}`}>
+          How to use the <span className="font-serif italic text-teal-700">ROI Advisor</span>
+        </div>
+      </div>
+      <ol className="space-y-2">
+        {steps.map((s, i) => (
+          <li key={s.title} className="flex gap-2.5">
+            <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-teal-600 text-[11px] font-semibold text-white">
+              {i + 1}
+            </span>
+            <div className="min-w-0 text-xs leading-relaxed text-slate-600">
+              <b className={`font-semibold ${ink}`}>{s.title}.</b> {s.body}
+              {s.href && (
+                <a href={s.href} className="ml-1 text-teal-700 hover:underline">
+                  Open
+                </a>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

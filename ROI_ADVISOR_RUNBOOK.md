@@ -37,7 +37,10 @@ The chat panel ("Ask the Advisor") sits on the right of every tab.
 | `src/app/roi/layout.tsx` | noindex metadata; wraps everything in `RoiShell` |
 | `src/components/roi/roi-shell.tsx` | Header tabs, chat panel, CopilotKit provider (`runtimeUrl="/api/roi/copilot"`), chat labels |
 | `src/components/roi/roi-agent.tsx` | **What the agent can see and do:** readables and actions, plus the generative-UI cards it draws in the chat |
-| `src/lib/roi/prompt.ts` | The agent's instructions (tone, rules, input keys) |
+| `src/lib/roi/prompt.ts` | The agent's instructions (tone, rules, input keys); includes `about.ts` and `guide.ts` |
+| `src/lib/roi/about.ts` | ecoheart background (website, services, team), the shareable links (`RESOURCES`), and `EXPLAINER_VIDEO` |
+| `src/lib/roi/guide.ts` | The how-to steps (`SITE_GUIDE`) and the page-aware suggestion buttons (`suggestionsFor`) |
+| `src/app/roi/explainer/page.tsx` | Explainer tab: plays the video, or shows "coming soon" |
 | `src/app/api/roi/copilot/route.ts` | Chat backend on Claude (falls back to OpenAI gpt-4o with no Anthropic key). Also strips thinking from the stream; see section 9. |
 | `src/lib/roi/engine.ts` | **The calculator.** `computeRoi(inputs)` and `fmtMoney()` |
 | `src/lib/roi/defaults.ts` | **Starting assumptions and cost model** (values, sources, confidence, owners, roles, run costs, offers) |
@@ -138,6 +141,10 @@ The browser registers the agent's tools in `roi-agent.tsx` with `useCopilotActio
 | `compareScenarios(ids[])` | Shows 2 to 4 scenarios side by side |
 | `updateAssumption(key, field, value)` | Edits the shared library (`low`, `expected`, `high`, `source`, `confidence`, `owner`) |
 | `createReport(scenarioId, audience, summary, nextSteps[])` | Saves the agent's summary and opens `/roi/report` |
+| `shareLinks(ids[], note?)` | Shows link cards with the ecoheart logo (website, services, story and team, contact, explainer, proposal, model, report, other site sections) |
+| `showGuide()` | Shows the step-by-step "how to use this site" card |
+
+Suggestion buttons under the chat come from `suggestionsFor(pathname, scenarioCount)` in `guide.ts`. They are fixed lists (no AI call), change by tab, and always include "How do I use this site?" and "What can you do?".
 
 Readables (what the agent sees): the current page, the assumption library, every scenario with its calculated results, which scenario is active and which are compared, and the internal cost model.
 
@@ -168,6 +175,10 @@ Rules in `prompt.ts`, which you must keep:
 **Change the model.** Set `CHAT_MODEL` on Render; this also changes the main chat agent. To change only the ROI chat, change `model:` in `src/app/api/roi/copilot/route.ts`.
 
 **Update the proposal page.** Replace `public/roi/proposal.html` (a full HTML document with noindex) and the images in `public/roi/img/`. Keep images small (well under 200 KB each, ideally); the free Render plan has 512 MB.
+
+**Publish the explainer video.** Put the MP4 at `public/roi/explainer.mp4` (keep it small: about 720p and under 20 MB, because the free plan has 512 MB of memory), then set `EXPLAINER_VIDEO.ready = true` in `src/lib/roi/about.ts`. The Explainer tab then plays it, and the Advisor's link card stops saying "coming soon". The file is password-protected like everything under `/roi`.
+
+**Update what the Advisor knows about ecoheart.** Edit `ECOHEART_CONTEXT` and `RESOURCES` in `src/lib/roi/about.ts`. Source: www.ecoheart.ai (home, /services, /story).
 
 **Add a tab.** Add the page under `src/app/roi/<name>/page.tsx` (a client component) and add it to `TABS` in `roi-shell.tsx`. It is password-protected automatically.
 
@@ -219,7 +230,8 @@ curl -s -X POST -H "Authorization: Bearer $K" -H "Content-Type: application/json
 4. **The adapter's own settings are mostly ignored.** The runtime builds its own model from the adapter's `getLanguageModel()` (model name plus the client's fetch). Overriding `process()` or `max_tokens` on the adapter has no effect.
 5. **CopilotKit inspector popup.** It is hidden with `showDevConsole={false} enableInspector={false}` on `<CopilotKit>`.
 6. **Saved state is per browser.** There is no shared storage yet (Supabase tables `roi_assumption_sets` and `roi_scenarios` are planned). Clearing site data resets everything.
-7. **Login must not start the chat.** `RoiShell` skips CopilotKit on `/roi/login`, because the API is behind the gate.
+7. **The chat's `instructions` never reach the model.** CopilotKit 1.53's built-in agent drops system messages, which is how `<CopilotChat instructions>` is sent. The Advisor's role, rules, ecoheart background and how-to guide are passed as a `useCopilotReadable` in `roi-agent.tsx` instead. Put new behavior rules in `prompt.ts`, `about.ts` or `guide.ts`, and they flow through that readable.
+8. **Login must not start the chat.** `RoiShell` skips CopilotKit on `/roi/login`, because the API is behind the gate.
 
 ## 10. Messaging rules (for anything the agent or pages say)
 

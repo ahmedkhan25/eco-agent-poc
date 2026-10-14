@@ -11,7 +11,10 @@ import { FileText } from "lucide-react";
 import { fmtMoney, type InputKey, type RoiInputs } from "@/lib/roi/engine";
 import { BASIS_LABEL, type Basis } from "@/lib/roi/defaults";
 import { costTotals, scenarioResult, useRoiStore } from "@/lib/roi/store";
-import { MiniScenario, Working, headline, ink } from "./ui";
+import { RESOURCES } from "@/lib/roi/about";
+import { ROI_AGENT_INSTRUCTIONS } from "@/lib/roi/prompt";
+import { SITE_GUIDE } from "@/lib/roi/guide";
+import { GuideCard, LinkCards, MiniScenario, Working, headline, ink } from "./ui";
 
 const INPUT_KEYS: { name: InputKey; description: string }[] = [
   { name: "prem", description: "Annual property insurance premium, dollars" },
@@ -78,6 +81,14 @@ export function RoiAgent() {
   const goCanvas = () => {
     if (pathname !== "/roi") router.push("/roi");
   };
+
+  // CopilotKit 1.53's built-in agent drops the chat's `instructions` (a system
+  // message), so the Advisor's role, rules and ecoheart background ride along
+  // as context, which always reaches the model.
+  useCopilotReadable({
+    description: "Your role, rules, ecoheart background and how-to guide. Follow these instructions.",
+    value: ROI_AGENT_INSTRUCTIONS,
+  });
 
   useCopilotReadable({
     description: "The page of the ROI Advisor the person is looking at",
@@ -316,6 +327,33 @@ export function RoiAgent() {
         </Link>
       );
     },
+  });
+
+  useCopilotAction({
+    name: "shareLinks",
+    description:
+      "Show link cards for ecoheart resources: our website, services, story and team, contact, the explainer video, the proposal, the model, the report, and the other parts of this site. Use whenever someone asks where to find something.",
+    parameters: [
+      { name: "ids", type: "string[]", description: `Resource ids: ${RESOURCES.map((r) => r.id).join(", ")}`, required: true },
+      { name: "note", type: "string", description: "Optional one-line lead-in", required: false },
+    ],
+    handler: async ({ ids }) => {
+      const found = RESOURCES.filter((r) => (ids as string[]).includes(r.id));
+      return JSON.stringify(found.map((r) => ({ id: r.id, title: r.title, link: r.href, comingSoon: r.ready === false })));
+    },
+    render: ({ status, args }) => {
+      if (status === "inProgress") return <Working text="Finding the links..." />;
+      const items = RESOURCES.filter((r) => ((args.ids as string[]) ?? []).includes(r.id));
+      return <LinkCards items={items} note={args.note} />;
+    },
+  });
+
+  useCopilotAction({
+    name: "showGuide",
+    description: "Show the step-by-step guide to using this site as a card. Use when someone asks how to use the site, where to start, or what the tabs do.",
+    parameters: [],
+    handler: async () => "Guide shown as a card. Add one short line pointing to the step that fits their question.",
+    render: ({ status }) => (status === "inProgress" ? <Working text="Opening the guide..." /> : <GuideCard steps={SITE_GUIDE} />),
   });
 
   return null;

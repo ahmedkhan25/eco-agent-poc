@@ -14,6 +14,7 @@ const STARTERS = [
   "Compare a cautious and an expected case for Hollywood",
   "Build a case for a 60,000-person coastal city with a $1.5M premium",
   "Write a one-page report on the active scenario for a city manager",
+  "Who is ecoheart, and where can I watch the explainer?",
 ];
 
 export default function RoiWorkspace() {

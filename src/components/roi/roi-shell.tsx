@@ -10,6 +10,7 @@ import { LogOut, MessageSquare, PanelRightClose } from "lucide-react";
 import { EcoheartLogo } from "@/components/ecoheart-logo";
 import { ROI_AGENT_INSTRUCTIONS } from "@/lib/roi/prompt";
 import { useRoiStore } from "@/lib/roi/store";
+import { suggestionsFor } from "@/lib/roi/guide";
 import { RoiAgent } from "./roi-agent";
 
 const TABS = [
@@ -17,6 +18,7 @@ const TABS = [
   { label: "Model & assumptions", href: "/roi/model" },
   { label: "Report", href: "/roi/report" },
   { label: "Proposal", href: "/roi/proposal" },
+  { label: "Explainer", href: "/roi/explainer" },
 ];
 
 const chatTheme = {
@@ -45,6 +47,8 @@ function Workspace({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const chatOpen = useRoiStore((s) => s.chatOpen);
   const setChatOpen = useRoiStore((s) => s.setChatOpen);
+  const scenarioCount = useRoiStore((s) => s.scenarios.length);
+  const suggestions = suggestionsFor(pathname, scenarioCount);
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
 
@@ -106,8 +110,11 @@ function Workspace({ children }: { children: React.ReactNode }) {
           className={`${chatOpen ? "flex" : "hidden"} fixed inset-x-0 bottom-0 top-14 z-40 flex-col border-l border-slate-200 bg-white md:static md:w-[400px] md:flex-none print:hidden`}
         >
           <div className="flex h-11 flex-none items-center justify-between border-b border-slate-100 px-4">
-            <div className="text-sm font-semibold text-[#0F172A]">
-              Ask the <span className="font-serif italic text-teal-700">Advisor</span>
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#0F172A]">
+              <EcoheartLogo className="h-5 w-5" />
+              <span>
+                Ask the <span className="font-serif italic text-teal-700">Advisor</span>
+              </span>
             </div>
             <button onClick={() => setChatOpen(false)} title="Hide chat" className="rounded p-1 text-slate-400 hover:text-slate-700">
               <PanelRightClose className="h-4 w-4" />
@@ -116,10 +123,11 @@ function Workspace({ children }: { children: React.ReactNode }) {
           <div className="roi-chat min-h-0 flex-1">
             <CopilotChat
               instructions={ROI_AGENT_INSTRUCTIONS}
+              suggestions={suggestions}
               labels={{
                 title: "ROI Advisor",
                 initial:
-                  "Hi. Tell me about a city and a decision, and I'll build the ROI scenario on the canvas. For example: \"What does Flagstaff get back if the insurance credit is only 2%?\"",
+                  "Hi. Tell me about a city and a decision, and I'll build the ROI scenario on the canvas. For example: \"What does Flagstaff get back if the insurance credit is only 2%?\" You can also ask me about ecoheart, our team, or where to find the explainer video.",
                 placeholder: "Ask a what-if, compare options, or ask for a report...",
               }}
               className="h-full"
