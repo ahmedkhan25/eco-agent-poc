@@ -41,7 +41,17 @@ const overridesParam = {
   attributes: INPUT_KEYS.map((k) => ({ name: k.name, type: "number" as const, description: k.description, required: false })),
 };
 
-function clean(o: unknown): Partial<RoiInputs> {
+// Claude sometimes sends `overrides` as a JSON string, or puts the keys at the
+// top level of the call. Accept all three so a what-if never silently drops.
+function clean(o: unknown, top?: Record<string, unknown>): Partial<RoiInputs> {
+  if (typeof o === "string") {
+    try {
+      o = JSON.parse(o);
+    } catch {
+      o = {};
+    }
+  }
+  if (top) o = { ...top, ...(o && typeof o === "object" ? o : {}) };
   if (!o || typeof o !== "object") return {};
   const out: Partial<RoiInputs> = {};
   for (const k of INPUT_KEYS) {
@@ -163,13 +173,14 @@ export function RoiAgent() {
       overridesParam,
       { name: "notes", type: "string", description: "Where the overrides came from, or what to confirm", required: false },
     ],
-    handler: async ({ name, city, question, basis, overrides, notes }) => {
+    handler: async (args) => {
+      const { name, city, question, basis, overrides, notes } = args;
       const s = useRoiStore.getState().addScenario({
         name,
         city,
         question,
         basis: asBasis(basis),
-        overrides: clean(overrides),
+        overrides: clean(overrides, args as Record<string, unknown>),
         notes: notes ?? "",
         createdBy: "agent",
       });
@@ -178,7 +189,7 @@ export function RoiAgent() {
     },
     render: ({ status, args }) => {
       if (status === "inProgress") return <Working text="Setting up the scenario..." />;
-      const s = { basis: asBasis(args.basis), overrides: clean(args.overrides) };
+      const s = { basis: asBasis(args.basis), overrides: clean(args.overrides, args as Record<string, unknown>) };
       const r = scenarioResult(s, useRoiStore.getState().assumptions);
       return <MiniScenario name={args.name ?? "Scenario"} city={args.city} basis={s.basis} r={r} onOpen={goCanvas} />;
     },
@@ -195,11 +206,12 @@ export function RoiAgent() {
       { name: "resetKeys", type: "string[]", description: "Input keys to reset to the library value", required: false },
       { name: "notes", type: "string", required: false },
     ],
-    handler: async ({ id, name, basis, overrides, resetKeys, notes }) => {
+    handler: async (args) => {
+      const { id, name, basis, overrides, resetKeys, notes } = args;
       const st = useRoiStore.getState();
       const s = st.scenarios.find((x) => x.id === id);
       if (!s) return `No scenario with id ${id}. Existing ids: ${st.scenarios.map((x) => x.id).join(", ")}`;
-      const merged = { ...s.overrides, ...clean(overrides) };
+      const merged = { ...s.overrides, ...clean(overrides, args as Record<string, unknown>) };
       for (const k of (resetKeys as string[] | undefined) ?? []) delete merged[k as InputKey];
       st.updateScenario(id, {
         ...(name ? { name } : {}),
