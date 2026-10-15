@@ -126,7 +126,7 @@ Related context lives in the project's shared files, not in this repo:
 - The plan is a Claude Doc called "ROI Advisor internal view: plan".
 - Sandrine's pricing workbooks had known errors. The Florida file was a copy of Flagstaff, the state tab had #VALUE!, and Year 2 and Year 3 re-billed one-time items. Don't copy numbers from them without checking.
 
-**Password:** `eco` by default. Set `ROI_ACCESS_PASSWORD` on Render to change it; that also signs everyone out, because the cookie value is a hash of the password.
+**Password:** `eco` by default. Set `ROI_ACCESS_PASSWORD` on Render to change it; that also signs everyone out, because the cookie value is a hash of the password. A shareable link can carry the password: `/roi?key=eco` (or any `/roi/...` page with `?key=`) signs the visitor in for 30 days and removes the key from the address bar.
 
 ## 5. How the agent works
 
@@ -203,7 +203,7 @@ Then check all of these:
 5. Ask for a report for a city manager. The page should switch to `/roi/report` with the agent's summary.
 6. Images and the hero video load on the Proposal tab.
 
-Headless check on the Mac: playwright-core is installed in `/tmp/pwtest`, with Chromium at `~/Library/Caches/ms-playwright/chromium-1234/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`. Log in by filling `#roi-password`. Type into `.roi-chat textarea` and press Enter. Wait up to 60 seconds for `text=from chat`.
+Headless check on the Mac: playwright-core is installed in `/tmp/pwtest`, with Chromium at `~/Library/Caches/ms-playwright/chromium-1234/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`. Log in by filling `input[type=password]` (or open any page with `?key=eco`). Type into `.roi-chat textarea` and press Enter. Wait up to 60 seconds for `text=from chat`.
 
 ## 8. Deploy
 

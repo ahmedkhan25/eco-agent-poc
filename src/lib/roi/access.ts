@@ -30,6 +30,21 @@ export async function roiGate(request: NextRequest): Promise<NextResponse | null
   if (OPEN_PATHS.has(pathname)) return null;
   const cookie = request.cookies.get(ROI_COOKIE)?.value;
   if (cookie && cookie === (await roiToken())) return null;
+  // Shareable link: /roi?key=<password> signs the visitor in and drops the key from the URL.
+  const key = request.nextUrl.searchParams.get("key");
+  if (key && key === roiPassword() && !pathname.startsWith("/api/")) {
+    const clean = request.nextUrl.clone();
+    clean.searchParams.delete("key");
+    const res = NextResponse.redirect(clean);
+    res.cookies.set(ROI_COOKIE, await roiToken(), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: ROI_COOKIE_MAX_AGE,
+      path: "/",
+    });
+    return res;
+  }
   if (pathname.startsWith("/api/")) {
     return NextResponse.json({ error: "Password required" }, { status: 401 });
   }
