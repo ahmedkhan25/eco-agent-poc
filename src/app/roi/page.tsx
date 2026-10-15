@@ -63,7 +63,7 @@ export default function RoiWorkspace() {
           Pick a client and the use cases that fit, or ask the Advisor a what-if. Every number comes from one shared
           calculator, the client's own values and the assumption library, so you can check and change anything.{" "}
           <Link href="/roi/explainer" className="whitespace-nowrap font-medium text-teal-700 underline">
-            New here? Watch the 4-minute walkthrough
+            New here? Watch the 4½-minute walkthrough
           </Link>
         </p>
         <div className="mt-4 flex flex-wrap gap-2">

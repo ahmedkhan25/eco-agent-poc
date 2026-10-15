@@ -15,7 +15,7 @@ export const EXPLAINER_VIDEO = {
   src: "/roi/explainer.mp4",
   poster: "/roi/img/explainer-poster.jpg",
   ready: true,
-  length: "4 minutes",
+  length: "4½ minutes",
   // Start times in seconds, matching the chapter badge in the video.
   chapters: [
     { title: "What it is", at: 0 },
@@ -25,7 +25,7 @@ export const EXPLAINER_VIDEO = {
     { title: "The model and assumptions", at: 88 },
     { title: "Sharing: report and proposal", at: 146 },
     { title: "Modeling something new", at: 170 },
-    { title: "Tips by role", at: 200 },
+    { title: "Tips by role", at: 226 },
   ],
 };
 
@@ -34,7 +34,7 @@ export const RESOURCES: Resource[] = [
   { id: "services", title: "Our services", description: "Smart city data, AI, community projects and the team's expertise", href: "https://www.ecoheart.ai/services", external: true },
   { id: "story", title: "Our story and team", description: "Why ecoheart exists, our principles and our founders", href: "https://www.ecoheart.ai/story", external: true },
   { id: "contact", title: "Contact ecoheart", description: "How cities and partners reach us", href: "https://www.ecoheart.ai/contact", external: true },
-  { id: "explainer", title: "ROI Advisor explainer video", description: "A 4-minute walkthrough of every feature and how to model something new", href: "/roi/explainer", ready: EXPLAINER_VIDEO.ready },
+  { id: "explainer", title: "ROI Advisor explainer video", description: "A 4½-minute walkthrough of every feature and how to model something new", href: "/roi/explainer", ready: EXPLAINER_VIDEO.ready },
   { id: "proposal", title: "ROI Advisor proposal", description: "The visual proposal: team, cost, how cities use it and the value", href: "/roi/proposal" },
   { id: "model", title: "Model & assumptions", description: "Every assumption with its source, plus our internal cost model", href: "/roi/model" },
   { id: "report", title: "ROI report", description: "Printable one-page report for the active scenario", href: "/roi/report" },

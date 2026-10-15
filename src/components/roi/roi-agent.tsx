@@ -208,17 +208,53 @@ function result<T>(r: unknown): T | null {
 // A handler that refuses (bad or missing arguments) returns one of these
 // sentences. The model usually retries right away, so a card for the failed
 // call would show up as a second, half-empty copy. Show nothing for it.
-const FAILED = /^(No |Unknown |Missing |Search failed|block must|Value must|A use case with id|A client called|Nothing |Give a)/;
+const FAILED = /^(Failed: |No |Unknown |Missing |Search failed|block must|Value must|A use case with id|A client called|Nothing |Give a)/;
 const failed = (r: unknown) => typeof r === "string" && FAILED.test(r);
 
-/** useCopilotAction, but a refused call renders nothing in the chat. */
+// Claude sometimes renames an argument (clientId for client, scenarioId for
+// target). Map the usual variants back to the declared names.
+const ALIASES: Record<string, string[]> = {
+  target: ["scenarioId", "scenario", "clientId", "client", "useCaseId", "useCase", "modelId", "id"],
+  useCase: ["useCaseId", "modelId", "model"],
+  client: ["clientId", "clientName"],
+  scenarioId: ["scenario", "id", "scenarioName"],
+  id: ["scenarioId", "clientId"],
+};
+function withAliases(args: Record<string, unknown>, names: string[]) {
+  const out = { ...args };
+  for (const n of names) {
+    if (out[n] !== undefined && out[n] !== null && out[n] !== "") continue;
+    const alt = [...(ALIASES[n] ?? []), `${n}Id`, n.replace(/Id$/, "")].find((a) => a !== n && out[a] !== undefined && out[a] !== "");
+    if (alt) out[n] = out[alt];
+  }
+  return out;
+}
+
+/**
+ * useCopilotAction, plus: renamed arguments are mapped back, a handler that
+ * throws answers with an error instead of leaving the chat on "Working...",
+ * and a refused call renders nothing.
+ */
 function useAction<const T extends Parameter[] | [] = []>(def: FrontendAction<T>) {
   const render = def.render;
-  useCopilotAction<T>(
-    typeof render === "function"
-      ? ({ ...def, render: (p: { status: string; result?: unknown }) => (p.status === "complete" && failed(p.result) ? <></> : (render as (x: unknown) => ReactElement)(p)) } as unknown as FrontendAction<T>)
-      : def
-  );
+  const handler = def.handler as ((a: unknown) => unknown) | undefined;
+  const names = ((def.parameters ?? []) as { name: string }[]).map((p) => p.name);
+  useCopilotAction<T>({
+    ...def,
+    ...(handler && {
+      handler: async (args: unknown) => {
+        try {
+          return await handler(withAliases((args ?? {}) as Record<string, unknown>, names));
+        } catch (e) {
+          return `Failed: ${e instanceof Error ? e.message : String(e)}. Check the arguments and try again.`;
+        }
+      },
+    }),
+    ...(typeof render === "function" && {
+      render: (p: { status: string; result?: unknown; args?: Record<string, unknown> }) =>
+        p.status === "complete" && failed(p.result) ? <></> : (render as (x: unknown) => ReactElement)({ ...p, args: withAliases(p.args ?? {}, names) }),
+    }),
+  } as unknown as FrontendAction<T>);
 }
 
 // ---------------------------------------------------------------------------
