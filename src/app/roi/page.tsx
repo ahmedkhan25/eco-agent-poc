@@ -131,7 +131,20 @@ function ScenarioTile({ s, active }: { s: Scenario; active: boolean }) {
       <label className="mt-2 flex items-center gap-1.5 text-xs text-slate-500" onClick={(e) => e.stopPropagation()}>
         <input type="checkbox" checked={compare} onChange={() => st.toggleCompare(s.id)} className="accent-teal-600" />
         Compare
-        {s.createdBy === "agent" && <span className="ml-auto text-[10px] text-teal-700">from chat</span>}
+        <span className="ml-auto flex items-center gap-2">
+          {s.createdBy === "agent" && <span className="text-[10px] text-teal-700">from chat</span>}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (confirm(`Delete the scenario "${s.name}"? Its client and use cases stay.`)) st.removeScenario(s.id);
+            }}
+            title="Delete this scenario"
+            className="rounded p-0.5 text-slate-300 hover:bg-red-50 hover:text-red-600"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </span>
       </label>
     </div>
   );
@@ -313,7 +326,7 @@ function ActiveScenario({ s }: { s: Scenario }) {
             <ExportButtons get={() => scenarioWorkbook(s.id, useRoiStore.getState())} />
           </span>
           <button
-            onClick={() => st.removeScenario(s.id)}
+            onClick={() => confirm(`Delete the scenario "${s.name}"? Its client and use cases stay.`) && st.removeScenario(s.id)}
             className="ml-auto flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-slate-400 hover:bg-red-50 hover:text-red-600"
           >
             <Trash2 className="h-4 w-4" /> Delete

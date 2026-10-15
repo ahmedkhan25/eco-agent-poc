@@ -244,7 +244,10 @@ export const useRoiStore = create<RoiState>()(
 
         addClient: (c) => ws({ clients: [...get().clients.filter((x) => x.id !== c.id), c] }),
         updateClient: (id, patch) => mapClient(id, (c) => ({ ...c, ...patch })),
-        removeClient: (id) => ws({ clients: get().clients.filter((c) => c.id !== id) }),
+        removeClient: (id) => {
+          ws({ clients: get().clients.filter((c) => c.id !== id) });
+          for (const s of get().scenarios.filter((x) => x.clientId === id)) get().removeScenario(s.id);
+        },
         setLocal: (clientId, key, v) =>
           mapClient(clientId, (c) => {
             const local = { ...c.local };

@@ -104,7 +104,11 @@ function ClientDetail({ c }: { c: Client }) {
                 <RotateCcw className="h-4 w-4" />
               </button>
             ) : (
-              <button onClick={() => st.removeClient(c.id)} title="Delete this client" className="rounded-full p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600">
+              <button
+                onClick={() =>
+                  confirm(`Delete ${c.name} for the whole team? Its scenarios in this browser go too. Use cases and their values stay.`) && st.removeClient(c.id)
+                }
+                title="Delete this client" className="rounded-full p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600">
                 <Trash2 className="h-4 w-4" />
               </button>
             )}

@@ -14,7 +14,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, FileText, Search } from "lucide-react";
 import { BLOCK_KEYS, fmtMoney, SUPER_SYSTEMS, type Assumption, type Block, type Unit, type ValueLine } from "@/lib/roi/engine";
-import { BASIS_LABEL, DEFAULT_ASSUMPTIONS, templateFor, type Basis, type Confidence } from "@/lib/roi/defaults";
+import { BASIS_LABEL, DEFAULT_ASSUMPTIONS, DEFAULT_CLIENTS, templateFor, type Basis, type Confidence } from "@/lib/roi/defaults";
 import { bundleSummary, CLIENT_TYPES, SIZES, sizeFor, type Client, type ClientType, type CostLine, type Payer, type Size } from "@/lib/roi/pricing";
 import {
   changesFromOriginal,
@@ -465,6 +465,27 @@ export function RoiAgent() {
     },
   });
 
+  useAction({
+    name: "deleteScenario",
+    description: "Delete a scenario card the person asked to delete. Scenarios live only in this browser. The client and use cases stay.",
+    parameters: [{ name: "id", type: "string", description: "Scenario id or name", required: true }],
+    handler: async ({ id }) => {
+      const st = useRoiStore.getState();
+      const ref = String(id ?? "");
+      const s = st.scenarios.find((x) => x.id === ref) ?? st.scenarios.find((x) => key(x.name) === key(ref)) ?? st.scenarios.find((x) => key(ref) && key(x.name).includes(key(ref)));
+      if (!s) return `No scenario ${ref}. Existing: ${st.scenarios.map((x) => `${x.id} (${x.name})`).join(", ")}`;
+      st.removeScenario(s.id);
+      goto("/roi");
+      return JSON.stringify({ deleted: s.name, scenariosLeft: useRoiStore.getState().scenarios.length });
+    },
+    render: ({ status, result: res }) => {
+      if (status !== "complete") return <Working text="Deleting the scenario..." />;
+      const r = result<{ deleted?: string }>(res);
+      if (!r?.deleted) return <></>;
+      return <Note tone="slate">Deleted the scenario <b>{r.deleted}</b>.</Note>;
+    },
+  });
+
   // --- clients --------------------------------------------------------------
 
   useAction({
@@ -520,6 +541,33 @@ export function RoiAgent() {
         <Note>
           New client <b>{r.created.name}</b> ({r.created.type}, {r.created.size}) on {r.created.offer}, {r.created.yearOnePrice} in year one.{" "}
           <Link href="/roi/clients" className="underline">Open it</Link>
+        </Note>
+      );
+    },
+  });
+
+  useAction({
+    name: "deleteClient",
+    description: "Delete a client profile the person asked to delete. Clients are shared, so this removes it for the whole team, plus its scenarios in this browser. Use cases and their values stay. Starting example clients can't be deleted.",
+    parameters: [{ name: "client", type: "string", description: "Client id or name", required: true }],
+    handler: async ({ client: ref }) => {
+      const st = useRoiStore.getState();
+      const c = findClient(ref);
+      if (!c) return `No client called ${ref}. Clients: ${st.clients.map((x) => x.name).join(", ")}`;
+      if (DEFAULT_CLIENTS.some((d) => d.id === c.id)) return `Nothing deleted: ${c.name} is a starting example client. Use resetToOriginal to put it back to its starting profile.`;
+      const scenarios = st.scenarios.filter((s) => s.clientId === c.id).map((s) => s.name);
+      st.removeClient(c.id);
+      return JSON.stringify({ deleted: c.name, scenariosDeleted: scenarios, kept: "use cases and their values" });
+    },
+    render: ({ status, result: res }) => {
+      if (status !== "complete") return <Working text="Deleting the client..." />;
+      const r = result<{ deleted?: string; scenariosDeleted?: string[] }>(res);
+      if (!r?.deleted) return <></>;
+      const n = r.scenariosDeleted?.length ?? 0;
+      return (
+        <Note tone="slate">
+          Deleted the client <b>{r.deleted}</b>
+          {n ? ` and ${n} scenario${n > 1 ? "s" : ""}` : ""}. Use cases and their values are kept.
         </Note>
       );
     },
