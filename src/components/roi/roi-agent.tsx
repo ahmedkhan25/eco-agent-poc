@@ -76,6 +76,19 @@ function strList(v: unknown): string[] {
   return Array.isArray(v) ? v.map((x) => String(x).trim()).filter(Boolean) : [];
 }
 
+// Claude sometimes renames the list param or sends titles instead of ids; match loosely.
+function pickResources(args: Record<string, unknown>) {
+  const key = (x: string) => x.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const wanted = Object.entries(args ?? {})
+    .filter(([k]) => k !== "note")
+    .flatMap(([, v]) => strList(v))
+    .map(key)
+    .filter(Boolean);
+  return RESOURCES.filter((r) =>
+    wanted.some((w) => w === key(r.id) || w.startsWith(key(r.id)) || key(r.title).includes(w)),
+  );
+}
+
 const asBasis = (b: unknown): Basis => (b === "low" || b === "high" ? b : "expected");
 
 function summarize(id: string) {
@@ -379,13 +392,14 @@ export function RoiAgent() {
       { name: "ids", type: "string[]", description: `Resource ids: ${RESOURCES.map((r) => r.id).join(", ")}`, required: true },
       { name: "note", type: "string", description: "Optional one-line lead-in", required: false },
     ],
-    handler: async ({ ids }) => {
-      const found = RESOURCES.filter((r) => strList(ids).includes(r.id));
+    handler: async (args) => {
+      const found = pickResources(args as Record<string, unknown>);
+      if (!found.length) return `No matching links. Use ids from: ${RESOURCES.map((r) => r.id).join(", ")}`;
       return JSON.stringify(found.map((r) => ({ id: r.id, title: r.title, link: r.href, comingSoon: r.ready === false })));
     },
     render: ({ status, args }) => {
       if (status === "inProgress") return <Working text="Finding the links..." />;
-      const items = RESOURCES.filter((r) => strList(args.ids).includes(r.id));
+      const items = pickResources(args as Record<string, unknown>);
       return <LinkCards items={items} note={args.note} />;
     },
   });
