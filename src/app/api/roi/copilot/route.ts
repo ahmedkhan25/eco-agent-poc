@@ -16,22 +16,34 @@ export const maxDuration = 60;
 // chat then drops the tool call that follows (no scenario card, no reply).
 // Opus can't switch thinking off, so this strips thinking blocks from the
 // response stream. The runtime builds its model from this client's fetch.
+//
+// The AI SDK also names each text message after its content-block index, and
+// every request starts again at 0, so the replies to later questions were
+// merged into an earlier reply in the chat. Each response gets its own index
+// offset so every message id is unique.
 const THINKING = new Set(["thinking", "redacted_thinking"]);
 
 function dropThinking(body: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   const skip = new Set<number>();
+  const base = 1000 * (1 + Math.floor(Math.random() * 1_000_000));
   let buffer = "";
-  const keep = (event: string) => {
-    const data = event.split("\n").find((l) => l.startsWith("data: "));
-    if (!data) return true;
+  // Returns the event to forward (re-indexed), or null to drop it.
+  const rewrite = (event: string): string | null => {
+    const lines = event.split("\n");
+    const i = lines.findIndex((l) => l.startsWith("data: "));
+    if (i < 0) return event;
     try {
-      const json = JSON.parse(data.slice(6));
+      const json = JSON.parse(lines[i].slice(6));
       if (json.type === "content_block_start" && THINKING.has(json.content_block?.type)) skip.add(json.index);
-      return !(typeof json.index === "number" && skip.has(json.index));
+      if (typeof json.index !== "number") return event;
+      if (skip.has(json.index)) return null;
+      json.index += base;
+      lines[i] = "data: " + JSON.stringify(json);
+      return lines.join("\n");
     } catch {
-      return true;
+      return event;
     }
   };
   return body.pipeThrough(
@@ -40,11 +52,12 @@ function dropThinking(body: ReadableStream<Uint8Array>): ReadableStream<Uint8Arr
         buffer += decoder.decode(chunk, { stream: true });
         const events = buffer.split("\n\n");
         buffer = events.pop() ?? "";
-        const out = events.filter(keep);
+        const out = events.map(rewrite).filter((e): e is string => e !== null);
         if (out.length) controller.enqueue(encoder.encode(out.join("\n\n") + "\n\n"));
       },
       flush(controller) {
-        if (buffer && keep(buffer)) controller.enqueue(encoder.encode(buffer));
+        const last = buffer ? rewrite(buffer) : null;
+        if (last) controller.enqueue(encoder.encode(last));
       },
     })
   );

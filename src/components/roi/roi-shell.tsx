@@ -12,10 +12,13 @@ import { ROI_AGENT_INSTRUCTIONS } from "@/lib/roi/prompt";
 import { useRoiStore } from "@/lib/roi/store";
 import { suggestionsFor } from "@/lib/roi/guide";
 import { RoiAgent } from "./roi-agent";
+import { SyncBadge, useSharedWorkspace } from "./sync";
 
 const TABS = [
   { label: "Workspace", href: "/roi" },
-  { label: "Model & assumptions", href: "/roi/model" },
+  { label: "Clients", href: "/roi/clients" },
+  { label: "Use cases", href: "/roi/model" },
+  { label: "Pricing", href: "/roi/pricing" },
   { label: "Report", href: "/roi/report" },
   { label: "Proposal", href: "/roi/proposal" },
   { label: "Explainer", href: "/roi/explainer" },
@@ -49,6 +52,7 @@ function Workspace({ children }: { children: React.ReactNode }) {
   const setChatOpen = useRoiStore((s) => s.setChatOpen);
   const scenarioCount = useRoiStore((s) => s.scenarios.length);
   const suggestions = suggestionsFor(pathname, scenarioCount);
+  const sync = useSharedWorkspace();
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
 
@@ -81,6 +85,7 @@ function Workspace({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+        <SyncBadge status={sync} />
         <span className="hidden rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800 ring-1 ring-amber-200 lg:block">
           Internal
         </span>
@@ -127,7 +132,7 @@ function Workspace({ children }: { children: React.ReactNode }) {
               labels={{
                 title: "ROI Advisor",
                 initial:
-                  "Hi. Tell me about a city and a decision, and I'll build the ROI scenario on the canvas. For example: \"What does Flagstaff get back if the insurance credit is only 2%?\" New here? Ask me for the 4-minute walkthrough video, or about ecoheart and our team.",
+                  "Hi. Tell me about a client and a decision, and I'll build the ROI scenario on the canvas. I can mix use cases (storm and insurance, Grant Finder, hurricane after-action, 311 triage, or a new one), look up a client's own numbers, price the offer and check it all. For example: \"Build Olympia with storm and insurance plus Grant Finder.\" New here? Ask me for the walkthrough video.",
                 placeholder: "Ask a what-if, compare options, or ask for a report...",
               }}
               className="h-full"
