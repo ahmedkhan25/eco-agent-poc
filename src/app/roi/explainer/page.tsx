@@ -22,7 +22,7 @@ export default function RoiExplainer() {
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-8">
       <h1 className={`font-serif text-3xl italic ${ink}`}>How the ROI Advisor works</h1>
       <p className="mt-2 max-w-2xl text-sm text-slate-600">
-        A {EXPLAINER_VIDEO.length} walkthrough of every feature, made for anyone on the team: leaders, financial modelers,
+        A {EXPLAINER_VIDEO.length.replace(" minutes", "-minute")} walkthrough of every feature, made for anyone on the team: leaders, financial modelers,
         accountants and developers. It also shows how to model a new city, a new assumption or a new kind of saving.
       </p>
 
