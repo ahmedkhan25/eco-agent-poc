@@ -103,7 +103,44 @@ const withoutThinking: typeof fetch = async (input, init) => {
   return new Response(dropThinking(res.body), { status: res.status, statusText: res.statusText, headers: res.headers });
 };
 
-export const POST = async (req: Request) => {
+// If a browser step never sent its result back (a crash, a refresh or a lost
+// connection mid-step), the chat history keeps a tool call with no result, and
+// every later message fails with "Tool result is missing for tool call": the
+// chat is dead until a page refresh. Fill each missing result with a note so
+// the conversation carries on.
+type Msg = { id?: string; role?: string; toolCalls?: { id: string }[]; toolCallId?: string; content?: unknown };
+function repairHistory(messages: Msg[]): Msg[] {
+  const answered = new Set(messages.filter((m) => m.role === "tool" && m.toolCallId).map((m) => m.toolCallId));
+  const out: Msg[] = [];
+  for (const m of messages) {
+    out.push(m);
+    for (const call of m.role === "assistant" ? m.toolCalls ?? [] : []) {
+      if (answered.has(call.id)) continue;
+      console.log(`[roi-advisor] repaired missing result for ${call.id}`);
+      out.push({ id: crypto.randomUUID(), role: "tool", toolCallId: call.id, content: "This step did not finish and returned no result. Do not assume it ran; check the current state and try again if needed." });
+    }
+  }
+  return out;
+}
+
+async function withRepairedHistory(req: Request): Promise<Request> {
+  try {
+    const json = await req.clone().json();
+    const messages = json?.body?.messages;
+    if (!Array.isArray(messages)) return req;
+    const fixed = repairHistory(messages);
+    if (fixed.length === messages.length) return req;
+    json.body.messages = fixed;
+    const headers = new Headers(req.headers);
+    headers.delete("content-length");
+    return new Request(req.url, { method: req.method, headers, body: JSON.stringify(json) });
+  } catch {
+    return req;
+  }
+}
+
+export const POST = async (incoming: Request) => {
+  const req = await withRepairedHistory(incoming);
   const runtime = new CopilotRuntime();
   const serviceAdapter = hasAnthropicKey()
     ? new AnthropicAdapter({ anthropic: new Anthropic({ fetch: withoutThinking }), model: CLAUDE_MODEL })
