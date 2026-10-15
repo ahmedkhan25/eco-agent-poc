@@ -10,11 +10,23 @@ export interface Resource {
   ready?: boolean; // false shows "coming soon" instead of a link
 }
 
-// Flip `ready` to true once public/roi/explainer.mp4 is in place (see ROI_ADVISOR_RUNBOOK.md).
+// The walkthrough video lives in public/roi/ (see ROI_ADVISOR_RUNBOOK.md to replace it).
 export const EXPLAINER_VIDEO = {
   src: "/roi/explainer.mp4",
-  poster: "/roi/img/hero-city.jpg",
-  ready: false,
+  poster: "/roi/img/explainer-poster.jpg",
+  ready: true,
+  length: "4 minutes",
+  // Start times in seconds, matching the chapter badge in the video.
+  chapters: [
+    { title: "What it is", at: 0 },
+    { title: "Why it exists", at: 13 },
+    { title: "Getting around", at: 31 },
+    { title: "Asking questions", at: 45 },
+    { title: "The model and assumptions", at: 88 },
+    { title: "Sharing: report and proposal", at: 146 },
+    { title: "Modeling something new", at: 170 },
+    { title: "Tips by role", at: 200 },
+  ],
 };
 
 export const RESOURCES: Resource[] = [
@@ -22,7 +34,7 @@ export const RESOURCES: Resource[] = [
   { id: "services", title: "Our services", description: "Smart city data, AI, community projects and the team's expertise", href: "https://www.ecoheart.ai/services", external: true },
   { id: "story", title: "Our story and team", description: "Why ecoheart exists, our principles and our founders", href: "https://www.ecoheart.ai/story", external: true },
   { id: "contact", title: "Contact ecoheart", description: "How cities and partners reach us", href: "https://www.ecoheart.ai/contact", external: true },
-  { id: "explainer", title: "ROI Advisor explainer video", description: "How the Advisor works, how to use the calculator, and how the agent works out ROI", href: "/roi/explainer", ready: EXPLAINER_VIDEO.ready },
+  { id: "explainer", title: "ROI Advisor explainer video", description: "A 4-minute walkthrough of every feature and how to model something new", href: "/roi/explainer", ready: EXPLAINER_VIDEO.ready },
   { id: "proposal", title: "ROI Advisor proposal", description: "The visual proposal: team, cost, how cities use it and the value", href: "/roi/proposal" },
   { id: "model", title: "Model & assumptions", description: "Every assumption with its source, plus our internal cost model", href: "/roi/model" },
   { id: "report", title: "ROI report", description: "Printable one-page report for the active scenario", href: "/roi/report" },
@@ -40,4 +52,4 @@ export const ECOHEART_CONTEXT = `About ecoheart (use this when people ask who we
 - In anything meant for a city or the public, name only Marcia Drake, call ecoheart a platform, never claim existing pilots, and describe work as early partner projects shaped with the city.
 
 Links you can share (call shareLinks with these ids instead of typing URLs): ${RESOURCES.map((r) => `${r.id} (${r.title}${r.ready === false ? ", coming soon" : ""})`).join(", ")}.
-- If someone asks for the explainer video and it isn't ready yet, share it anyway: the card says it's coming soon. Offer the proposal in the meantime.`;
+- The explainer video is a ${EXPLAINER_VIDEO.length} walkthrough of every feature, for anyone new to the site (leaders, financial modelers, accountants, developers). When someone asks how to use the site, is new, or asks for the video, share the "explainer" link. Its chapters: ${EXPLAINER_VIDEO.chapters.map((c) => `${c.title} (${Math.floor(c.at / 60)}:${String(c.at % 60).padStart(2, "0")})`).join(", ")}.`;

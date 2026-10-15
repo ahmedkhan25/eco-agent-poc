@@ -40,7 +40,7 @@ The chat panel ("Ask the Advisor") sits on the right of every tab.
 | `src/lib/roi/prompt.ts` | The agent's instructions (tone, rules, input keys); includes `about.ts` and `guide.ts` |
 | `src/lib/roi/about.ts` | ecoheart background (website, services, team), the shareable links (`RESOURCES`), and `EXPLAINER_VIDEO` |
 | `src/lib/roi/guide.ts` | The how-to steps (`SITE_GUIDE`) and the page-aware suggestion buttons (`suggestionsFor`) |
-| `src/app/roi/explainer/page.tsx` | Explainer tab: plays the video, or shows "coming soon" |
+| `src/app/roi/explainer/page.tsx` | Explainer tab: plays the walkthrough video with clickable chapters |
 | `src/app/api/roi/copilot/route.ts` | Chat backend on Claude (falls back to OpenAI gpt-4o with no Anthropic key). Also strips thinking from the stream; see section 9. |
 | `src/lib/roi/engine.ts` | **The calculator.** `computeRoi(inputs)` and `fmtMoney()` |
 | `src/lib/roi/defaults.ts` | **Starting assumptions and cost model** (values, sources, confidence, owners, roles, run costs, offers) |
@@ -178,7 +178,7 @@ Rules in `prompt.ts`, which you must keep:
 
 **Update the proposal page.** Replace `public/roi/proposal.html` (a full HTML document with noindex) and the images in `public/roi/img/`. Keep images small (well under 200 KB each, ideally); the free Render plan has 512 MB.
 
-**Publish the explainer video.** Put the MP4 at `public/roi/explainer.mp4` (keep it small: about 720p and under 20 MB, because the free plan has 512 MB of memory), then set `EXPLAINER_VIDEO.ready = true` in `src/lib/roi/about.ts`. The Explainer tab then plays it, and the Advisor's link card stops saying "coming soon". The file is password-protected like everything under `/roi`.
+**Replace the explainer video.** The current walkthrough (about 4 minutes, Oct 2026) is `public/roi/explainer.mp4` with its poster `public/roi/img/explainer-poster.jpg`. Its script and captions are in the project files (`roi-advisor/explainer/`), and its narration (Higgsfield, narrator Julian) is in the Higgsfield "Ecoheart" project, folder `roi-explainer`. To replace it, keep the same file names, stay under about 20 MB (the free plan has 512 MB of memory), and update the chapter start times in `EXPLAINER_VIDEO.chapters` in `src/lib/roi/about.ts`; the Explainer tab and the Advisor both read them from there. The file is password-protected like everything under `/roi`.
 
 **Update what the Advisor knows about ecoheart.** Edit `ECOHEART_CONTEXT` and `RESOURCES` in `src/lib/roi/about.ts`. Source: www.ecoheart.ai (home, /services, /story).
 
@@ -247,6 +247,5 @@ curl -s -X POST -H "Authorization: Bearer $K" -H "Content-Type: application/json
 ## 11. Planned next steps
 
 - Shared storage in Supabase, so the team sees the same scenarios.
-- An explainer video for the internal team (Higgsfield, narrator Julian).
 - An evidence search action (find sources for an assumption) and a "what would change this" sensitivity view.
 - A city-facing version later, without the cost model tab.

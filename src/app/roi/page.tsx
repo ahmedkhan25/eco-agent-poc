@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCopilotChat } from "@copilotkit/react-core";
 import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
@@ -36,7 +37,10 @@ export default function RoiWorkspace() {
         <h1 className={`font-serif text-3xl italic md:text-4xl ${ink}`}>What does resilience pay back?</h1>
         <p className="mt-2 max-w-2xl text-sm text-slate-600">
           Ask the Advisor a what-if and it builds the scenario here. Every number comes from one shared calculator and the
-          assumption library, so you can check and change anything.
+          assumption library, so you can check and change anything.{" "}
+          <Link href="/roi/explainer" className="whitespace-nowrap font-medium text-teal-700 underline">
+            New here? Watch the 4-minute walkthrough
+          </Link>
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           {STARTERS.map((s) => (

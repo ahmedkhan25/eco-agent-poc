@@ -453,11 +453,14 @@ export function RoiAgent() {
     },
     render: ({ status, args, result }) => {
       if (status !== "complete") return <Working text="Updating the cost model..." />;
-      let margin = "";
-      try { margin = JSON.parse(String(result)).margin ?? ""; } catch {}
+      let r: { changed?: string; to?: unknown; margin?: string } = {};
+      try { r = JSON.parse(String(result)); } catch {}
+      // Only confirm when the handler actually changed something.
+      if (!r.changed) return <></>;
+      const margin = r.margin ?? "";
       return (
         <div className="my-2 rounded-lg border border-teal-200 bg-teal-50/60 px-3 py-2 text-xs text-teal-900">
-          Cost model updated: <b>{args.item}</b> is now <b>{String(args.value)}</b>.{margin && <> Margin on the partner project: <b>{margin}</b>.</>}{" "}
+          Cost model updated: <b>{String(args.item)}</b> is now <b>{String(r.to)}</b>.{margin && <> Margin on the partner project: <b>{margin}</b>.</>}{" "}
           <Link href="/roi/model" className="underline">See the model</Link>
         </div>
       );

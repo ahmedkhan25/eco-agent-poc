@@ -127,7 +127,7 @@ function Workspace({ children }: { children: React.ReactNode }) {
               labels={{
                 title: "ROI Advisor",
                 initial:
-                  "Hi. Tell me about a city and a decision, and I'll build the ROI scenario on the canvas. For example: \"What does Flagstaff get back if the insurance credit is only 2%?\" You can also ask me about ecoheart, our team, or where to find the explainer video.",
+                  "Hi. Tell me about a city and a decision, and I'll build the ROI scenario on the canvas. For example: \"What does Flagstaff get back if the insurance credit is only 2%?\" New here? Ask me for the 4-minute walkthrough video, or about ecoheart and our team.",
                 placeholder: "Ask a what-if, compare options, or ask for a report...",
               }}
               className="h-full"
