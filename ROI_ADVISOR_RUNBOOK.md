@@ -155,6 +155,7 @@ Every use-case card (Use cases tab), each client (Clients tab, "Cost model") and
 - Stored as one JSON file, `workspace.json`, in the private Supabase Storage bucket `roi-advisor` (created on first use), through `/api/roi/state` with `SUPABASE_SERVICE_ROLE_KEY` and `NEXT_PUBLIC_SUPABASE_URL`. No database tables.
 - Each save sends the version it started from; if a teammate saved first, the server answers 409 with their copy, the browser loads it and the badge says so. Last write wins otherwise.
 - The file is uploaded with `cacheControl: "0"` so reads are never served from Supabase's cache.
+- `ROI_WORKSPACE_FILE` overrides the file name (local tests use `workspace-test.json`).
 - Without the Supabase env vars the badge says "This browser only" and everything still works locally.
 - Check it: `curl -s -b <cookie> https://eco-agent-poc.onrender.com/api/roi/state | head -c 200` should show `"shared":true`.
 - To reset the team copy to the code defaults, delete `workspace.json` in the bucket; the next browser to load seeds it from its own copy (so clear that browser's site data first).
@@ -204,7 +205,7 @@ Checks:
    - "Export Olympia's cost model to Excel" → an `.xlsx` downloads; the Export buttons on each tab download CSV and Excel.
    - Ask for a report → `/roi/report` with the summary and no margin in it.
 
-The full chat run is scripted in `.tmp-roi/ai-test.js` (not committed; copy in the project files at `roi-advisor/mm-build/test/`). It waits on `data-copilotkit-in-progress`, logs each reply and the saved state, and saves screenshots and downloads to `/tmp/roi-ai-test`. Running it against a local server writes to the same Supabase file as production; reset it afterwards with `.tmp-roi/reset-shared.js`.
+The full chat run is scripted in `.tmp-roi/ai-test.js` (not committed; copy in the project files at `roi-advisor/mm-build/test/`). It waits on `data-copilotkit-in-progress`, logs each reply and the saved state, and saves screenshots and downloads to `/tmp/roi-ai-test`. Start the local server with `ROI_WORKSPACE_FILE=workspace-test.json npx next start -p 3123` so tests write to their own file in the bucket and never touch the team's `workspace.json`. Never run chat tests against the live site: they edit the team's shared workspace. `.tmp-roi/qa-prompts.json` holds a 10-ask QA set; pass it with `PROMPTS="$(cat .tmp-roi/qa-prompts.json)"`. The server log prints one `[roi-advisor] tool <name> args: <keys>` line per tool call, so a call with missing arguments shows up there.
 
 Headless check on the Mac: playwright-core in `/tmp/pwtest`, Chromium at `~/Library/Caches/ms-playwright/chromium-1234/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`. Open any page with `?key=eco`, type into `.roi-chat textarea`, press Enter, wait up to 90 s for the card.
 
@@ -237,6 +238,10 @@ curl -s -X POST -H "Authorization: Bearer $K" -H "Content-Type: application/json
 6. **Original vs current values.** The originals always come from the code (`defaults.ts`); the shared copy lives in Supabase and scenarios in the browser. That is how the Advisor and the tabs show what changed (teal fields, reset arrows) and undo it.
 7. **The chat's `instructions` never reach the model.** CopilotKit 1.53's built-in agent drops system messages, which is how `<CopilotChat instructions>` is sent. The Advisor's role, rules, ecoheart background and how-to guide are passed as a `useCopilotReadable` in `roi-agent.tsx` instead. Put new behavior rules in `prompt.ts`, `about.ts` or `guide.ts`, and they flow through that readable.
 8. **Login must not start the chat.** `RoiShell` skips CopilotKit on `/roi/login`, because the API is behind the gate.
+9. **Chat hangs on "Working..." after two steps at once.** When Claude called two browser actions in parallel, only one result came back, and the next request failed with `AI_MissingToolResultsError: Tool result is missing for tool call` (visible in the Render log). The copilot route now sets `disable_parallel_tool_use` on every request, so the Advisor runs one step at a time.
+10. **Doubled or half-empty cards.** A call with bad or missing arguments returns a refusal ("No scenario with id ...") and the model retries, so both calls drew a card. `useAction` in `roi-agent.tsx` wraps `useCopilotAction` and renders nothing when the result is a refusal (the `FAILED` pattern). Start new refusal messages with one of those words, and register new actions with `useAction`.
+11. **Message ids repeat across replies.** The stream's content-block indexes restart at 0 for every response, so later replies merged into earlier ones. The copilot route offsets each response's indexes.
+12. **Model renames arguments.** Handlers accept common aliases where it happened (`addValueLine`: useCaseId, name), and `createReport` falls back to the active scenario.
 
 ## 11. Messaging rules (for anything the agent or pages say)
 

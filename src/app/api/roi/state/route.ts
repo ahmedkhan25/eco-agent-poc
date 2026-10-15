@@ -6,7 +6,8 @@ import { createClient } from "@supabase/supabase-js";
 // Gated by src/middleware.ts.
 
 const BUCKET = "roi-advisor";
-const FILE = "workspace.json";
+// Local test servers set ROI_WORKSPACE_FILE so they never touch the team's file.
+const FILE = process.env.ROI_WORKSPACE_FILE || "workspace.json";
 
 function supabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

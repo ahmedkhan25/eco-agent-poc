@@ -7,6 +7,9 @@
 // gives names instead of ids, so every handler is lenient about its inputs.
 
 import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import type { ReactElement } from "react";
+import type { FrontendAction } from "@copilotkit/react-core";
+import type { Parameter } from "@copilotkit/shared";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, FileText, Search } from "lucide-react";
@@ -201,6 +204,23 @@ function result<T>(r: unknown): T | null {
   }
 }
 
+
+// A handler that refuses (bad or missing arguments) returns one of these
+// sentences. The model usually retries right away, so a card for the failed
+// call would show up as a second, half-empty copy. Show nothing for it.
+const FAILED = /^(No |Unknown |Missing |Search failed|block must|Value must|A use case with id|A client called|Nothing |Give a)/;
+const failed = (r: unknown) => typeof r === "string" && FAILED.test(r);
+
+/** useCopilotAction, but a refused call renders nothing in the chat. */
+function useAction<const T extends Parameter[] | [] = []>(def: FrontendAction<T>) {
+  const render = def.render;
+  useCopilotAction<T>(
+    typeof render === "function"
+      ? ({ ...def, render: (p: { status: string; result?: unknown }) => (p.status === "complete" && failed(p.result) ? <></> : (render as (x: unknown) => ReactElement)(p)) } as unknown as FrontendAction<T>)
+      : def
+  );
+}
+
 // ---------------------------------------------------------------------------
 
 export function RoiAgent() {
@@ -250,7 +270,7 @@ export function RoiAgent() {
 
   // --- skills ---------------------------------------------------------------
 
-  useCopilotAction({
+  useAction({
     name: "loadSkill",
     description: `Load the know-how for a kind of task before doing it. Skills: ${SKILLS.map((s) => s.id).join(", ")}.`,
     parameters: [{ name: "name", type: "string", description: "Skill id", required: true }],
@@ -271,7 +291,7 @@ export function RoiAgent() {
 
   // --- scenarios ------------------------------------------------------------
 
-  useCopilotAction({
+  useAction({
     name: "createScenario",
     description: "Create a new ROI scenario card for a client and calculate it. Use for every new what-if. Returns the calculated numbers to quote.",
     parameters: [
@@ -321,7 +341,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "updateScenario",
     description: "Change an existing scenario: rename, switch basis, client or use cases, or change overrides. Overrides are merged in; resetKeys go back to the client or library value.",
     parameters: [
@@ -364,7 +384,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "compareScenarios",
     description: "Show two to four scenarios side by side on the canvas.",
     parameters: [{ name: "ids", type: "string[]", description: "Scenario ids to compare", required: true }],
@@ -411,7 +431,7 @@ export function RoiAgent() {
 
   // --- clients --------------------------------------------------------------
 
-  useCopilotAction({
+  useAction({
     name: "createClient",
     description: "Create a client profile: a city, county, state agency, tribal nation or organization, nonprofit, utility or company. Load the client-profile skill first.",
     parameters: [
@@ -469,7 +489,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "updateClient",
     description: "Change a client profile: name, type, state, region, population, size, use cases, offer, ongoing offer (from year 2), contract years, escalator %, payments, notes, or resetCosts to reload the offer's team and running costs.",
     parameters: [
@@ -542,7 +562,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "fillAssumption",
     description:
       "Record a client's own value for an assumption, with its source. Saved as proposed (to confirm by a person). Give one value for all three columns, or cautious / expected / businessCase separately.",
@@ -593,7 +613,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "listGaps",
     description: "List the values a client still needs (placeholders, proposed or low confidence), most important first.",
     parameters: [
@@ -628,7 +648,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "searchCityDocs",
     description: "Search a client's indexed documents (Olympia today) for a number, and get quotes with document and page.",
     parameters: [
@@ -665,7 +685,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "lookupPublicData",
     description: "Population and size band for a US city or town (2025 estimates).",
     parameters: [
@@ -686,7 +706,7 @@ export function RoiAgent() {
 
   // --- use cases ------------------------------------------------------------
 
-  useCopilotAction({
+  useAction({
     name: "createUseCase",
     description: "Start a new use case (draft). Then add its savings with addValueLine. Load the value-modeling skill first.",
     parameters: [
@@ -705,7 +725,7 @@ export function RoiAgent() {
       status !== "complete" ? <Working text="Starting the use case..." /> : <Note>New draft use case <b>{String(args.name)}</b>. <Link href="/roi/model" className="underline">See use cases</Link></Note>,
   });
 
-  useCopilotAction({
+  useAction({
     name: "addValueLine",
     description:
       "Add one saving to a use case. Block: costAvoided (base $ x share %), eventsAvoided (count x unitCost $ x share %), timeSaved (hours x rate $), newMoney (amount $ x share %). For each input give an existing assumption key, or define a new one with label, unit, cautious, expected, businessCase, source, confidence, owner.",
@@ -735,10 +755,14 @@ export function RoiAgent() {
       { name: "overlap", type: "string", description: "Tag shared with a line in another use case that counts the same saving", required: false },
     ],
     handler: async (args) => {
-      const a = args as Record<string, unknown>;
+      const r0 = args as Record<string, unknown>;
+      // Models sometimes rename parameters; accept the common aliases.
+      const pick = (...ks: string[]) => ks.map((k) => r0[k]).find((v) => typeof v === "string" && v.trim()) as string | undefined;
+      const a: Record<string, unknown> & { useCase?: string; label?: string; driver?: string } = { ...r0, useCase: pick("useCase", "useCaseId", "modelId", "model", "id"), label: pick("label", "name", "title", "driver"), driver: pick("driver", "name", "title", "label") };
+      if (!a.label) return "Missing label: give the line a label and a driver (the saving's name), then call addValueLine again.";
       const st = useRoiStore.getState();
       const m = st.models.find((x) => x.id === a.useCase || key(x.name) === key(a.useCase));
-      if (!m) return `No use case ${a.useCase}. Create it with createUseCase.`;
+      if (!m) return `No use case ${a.useCase}. Pass the use-case id as useCase, or create it with createUseCase.`;
       const block = (["costAvoided", "eventsAvoided", "timeSaved", "newMoney"] as Block[]).find((b) => key(b) === key(a.block));
       if (!block) return "block must be costAvoided, eventsAvoided, timeSaved or newMoney";
       const raw = parse(a.inputs);
@@ -789,7 +813,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "updateAssumption",
     description: "Change the shared library (affects every client still using the library value). Field: low (cautious), expected, high (business case), source, confidence, owner, label.",
     parameters: [
@@ -825,7 +849,7 @@ export function RoiAgent() {
 
   // --- costs, pricing -------------------------------------------------------
 
-  useCopilotAction({
+  useAction({
     name: "addCostLine",
     description:
       "Add a cost line to a client: people (ecoheart team or SME: hours, costRate, optional chargeRate + addToPrice), service (amount one-time, or monthly x months, ongoing), or share (a partner or grant covering sharePct or shareAmount of our price). Payer: client, ecoheart, partner, grant.",
@@ -905,7 +929,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "updateCostLine",
     description: "Change one field of a client's cost line (match by id or label), or remove it with field 'remove'.",
     parameters: [
@@ -937,7 +961,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "addAdjustment",
     description: "Add a price adjustment to a client: a % or fixed $ off, for year one or every year, with a reason (founding-partner discount, nonprofit or tribal rate, grandfathered rate).",
     parameters: [
@@ -966,7 +990,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "listCatalog",
     description: "List Sandrine's catalog items with prices at one client size (one-time or yearly, region).",
     parameters: [{ name: "size", type: "string", enum: SIZES, required: false }],
@@ -979,7 +1003,7 @@ export function RoiAgent() {
     render: ({ status }) => (status !== "complete" ? <Working text="Reading the catalog..." /> : <></>),
   });
 
-  useCopilotAction({
+  useAction({
     name: "updateCatalogItem",
     description: "Change a catalog item: rate or qty for one size, yearly (true/false), region (US, EU, all), name or description.",
     parameters: [
@@ -1013,7 +1037,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "updateOffer",
     description: "Change an offer: oneTime price, yearly price, range low/high, use-case min/max, length, notes, or add/remove a catalog item (field addItem / removeItem with an item id).",
     parameters: [
@@ -1053,7 +1077,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "createBundle",
     description: "Price a state or regional bundle: every city in a US state (counted by size), or a list of client ids, on one offer, with volume discounts.",
     parameters: [
@@ -1085,7 +1109,7 @@ export function RoiAgent() {
 
   // --- validate -------------------------------------------------------------
 
-  useCopilotAction({
+  useAction({
     name: "validate",
     description: "Run the fixed checks on a scenario (id), a client (id or name), or a use case (id). Returns pass / warn / fail with fixes.",
     parameters: [{ name: "target", type: "string", description: "Scenario id, client id or name, or use-case id", required: true }],
@@ -1114,7 +1138,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "sensitivity",
     description: "For a scenario, the three inputs that move net value most, with net at cautious and business-case values and the break-even point.",
     parameters: [{ name: "scenarioId", type: "string", required: true }],
@@ -1147,7 +1171,7 @@ export function RoiAgent() {
 
   // --- reports, links, guide, undo -----------------------------------------
 
-  useCopilotAction({
+  useAction({
     name: "createReport",
     description: "Prepare the printable ROI report for one scenario and open it. Run validate first.",
     parameters: [
@@ -1156,8 +1180,9 @@ export function RoiAgent() {
       { name: "summary", type: "string", description: "Three to five plain sentences for that reader: the answer, why, and what is still uncertain", required: true },
       { name: "nextSteps", type: "string[]", description: "Three short next steps", required: true },
     ],
-    handler: async ({ scenarioId, audience, summary, nextSteps }) => {
+    handler: async ({ scenarioId: sid, audience = "city leadership", summary, nextSteps }) => {
       const st = useRoiStore.getState();
+      const scenarioId = sid || st.activeId || "";
       if (!st.scenarios.some((s) => s.id === scenarioId)) return `No scenario with id ${scenarioId}`;
       st.setReport({ scenarioId, audience, summary, nextSteps: strList(nextSteps), createdAt: Date.now() });
       st.setActive(scenarioId);
@@ -1166,14 +1191,15 @@ export function RoiAgent() {
     },
     render: ({ status, args }) => {
       if (status !== "complete") return <Working text="Writing the report..." />;
-      const s = useRoiStore.getState().scenarios.find((x) => x.id === args.scenarioId);
+      const st = useRoiStore.getState();
+      const s = st.scenarios.find((x) => x.id === (args.scenarioId || st.activeId));
       return (
         <Link href="/roi/report" className="my-2 flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm hover:border-teal-400">
           <FileText className="h-5 w-5 flex-none text-teal-600" />
           <div className="min-w-0">
             <div className={`text-sm font-semibold ${ink}`}>ROI report ready</div>
             <div className="truncate text-xs text-slate-500">
-              {s?.name} for {args.audience}
+              {s?.name} for {args.audience || "city leadership"}
             </div>
           </div>
         </Link>
@@ -1181,7 +1207,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "shareLinks",
     description: "Show link cards for ecoheart resources: website, services, story and team, contact, the explainer video, the proposal, the tabs of this site. Use whenever someone asks where to find something.",
     parameters: [
@@ -1199,7 +1225,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "exportData",
     description:
       "Download a use case (its value lines and assumptions, optionally with one client's values), a client's cost model (deal by year, cost lines, who pays; internal), or a scenario (summary, value, inputs) as CSV or Excel. Also shows download buttons in the chat.",
@@ -1227,7 +1253,7 @@ export function RoiAgent() {
     },
   });
 
-  useCopilotAction({
+  useAction({
     name: "showGuide",
     description: "Show the step-by-step guide to using this site as a card.",
     parameters: [],
@@ -1235,7 +1261,7 @@ export function RoiAgent() {
     render: ({ status }) => (status === "inProgress" ? <Working text="Opening the guide..." /> : <GuideCard steps={SITE_GUIDE} />),
   });
 
-  useCopilotAction({
+  useAction({
     name: "resetToOriginal",
     description: "Put values back: one library assumption (key), all assumptions, a client's own value (client + key), a whole client, all pricing, all use cases, or one scenario's overrides (scenarioId).",
     parameters: [

@@ -27,6 +27,7 @@ function dropThinking(body: ReadableStream<Uint8Array>): ReadableStream<Uint8Arr
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   const skip = new Set<number>();
+  const tools = new Map<number, { name: string; buf: string }>();
   const base = 1000 * (1 + Math.floor(Math.random() * 1_000_000));
   let buffer = "";
   // Returns the event to forward (re-indexed), or null to drop it.
@@ -37,6 +38,22 @@ function dropThinking(body: ReadableStream<Uint8Array>): ReadableStream<Uint8Arr
     try {
       const json = JSON.parse(lines[i].slice(6));
       if (json.type === "content_block_start" && THINKING.has(json.content_block?.type)) skip.add(json.index);
+      // Log which arguments each tool call carried (names only), to tell a
+      // model that leaves arguments out from a stream that loses them.
+      if (json.type === "content_block_start" && json.content_block?.type === "tool_use") tools.set(json.index, { name: json.content_block.name, buf: "" });
+      if (json.type === "content_block_delta" && json.delta?.type === "input_json_delta") {
+        const t = tools.get(json.index);
+        if (t) t.buf += json.delta.partial_json ?? "";
+      }
+      if (json.type === "content_block_stop" && tools.has(json.index)) {
+        const t = tools.get(json.index)!;
+        let keys = "unparsed";
+        try {
+          keys = Object.keys(JSON.parse(t.buf || "{}")).join(",") || "none";
+        } catch {}
+        console.log(`[roi-advisor] tool ${t.name} args: ${keys}`);
+        tools.delete(json.index);
+      }
       if (typeof json.index !== "number") return event;
       if (skip.has(json.index)) return null;
       json.index += base;
@@ -63,8 +80,24 @@ function dropThinking(body: ReadableStream<Uint8Array>): ReadableStream<Uint8Arr
   );
 }
 
+// One tool call at a time. When Claude calls two browser-side actions at once,
+// only one result comes back, the next request fails with "Tool result is
+// missing for tool call", and the chat hangs on "Working...".
+function oneToolAtATime(init?: RequestInit): RequestInit | undefined {
+  if (!init || typeof init.body !== "string") return init;
+  try {
+    const body = JSON.parse(init.body);
+    if (!Array.isArray(body.tools) || !body.tools.length) return init;
+    if (body.tool_choice?.type === "none") return init;
+    body.tool_choice = { type: "auto", ...body.tool_choice, disable_parallel_tool_use: true };
+    return { ...init, body: JSON.stringify(body) };
+  } catch {
+    return init;
+  }
+}
+
 const withoutThinking: typeof fetch = async (input, init) => {
-  const res = await fetch(input, init);
+  const res = await fetch(input, oneToolAtATime(init));
   const isStream = res.headers.get("content-type")?.includes("text/event-stream");
   if (!isStream || !res.body) return res;
   return new Response(dropThinking(res.body), { status: res.status, statusText: res.statusText, headers: res.headers });

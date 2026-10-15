@@ -55,6 +55,7 @@ function Workspace({ children }: { children: React.ReactNode }) {
   const sync = useSharedWorkspace();
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
+  const [chatW, setChatW] = useChatWidth();
 
   const signOut = async () => {
     await fetch("/api/roi/login", { method: "DELETE" });
@@ -111,9 +112,31 @@ function Workspace({ children }: { children: React.ReactNode }) {
         {ready && <RoiAgent />}
 
         <aside
-          style={chatTheme}
-          className={`${chatOpen ? "flex" : "hidden"} fixed inset-x-0 bottom-0 top-14 z-40 flex-col border-l border-slate-200 bg-white md:static md:w-[400px] md:flex-none print:hidden`}
+          style={{ ...chatTheme, ["--chat-w" as string]: `${chatW}px` }}
+          className={`${chatOpen ? "flex" : "hidden"} fixed inset-x-0 bottom-0 top-14 z-40 flex-col border-l border-slate-200 bg-white md:relative md:inset-auto md:top-auto md:w-[var(--chat-w)] md:flex-none print:hidden`}
         >
+          <div
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Drag to resize the chat"
+            title="Drag to resize. Double-click to reset."
+            onPointerDown={(e) => {
+              e.preventDefault();
+              const startX = e.clientX;
+              const startW = chatW;
+              const move = (ev: PointerEvent) => setChatW(startW + (startX - ev.clientX));
+              const up = () => {
+                window.removeEventListener("pointermove", move);
+                window.removeEventListener("pointerup", up);
+                document.body.style.userSelect = "";
+              };
+              document.body.style.userSelect = "none";
+              window.addEventListener("pointermove", move);
+              window.addEventListener("pointerup", up);
+            }}
+            onDoubleClick={() => setChatW(CHAT_DEFAULT)}
+            className="absolute inset-y-0 -left-1 z-10 hidden w-2 cursor-col-resize hover:bg-teal-400/40 md:block"
+          />
           <div className="flex h-11 flex-none items-center justify-between border-b border-slate-100 px-4">
             <div className="flex items-center gap-2 text-sm font-semibold text-[#0F172A]">
               <EcoheartLogo className="h-5 w-5" />
@@ -142,4 +165,27 @@ function Workspace({ children }: { children: React.ReactNode }) {
       </div>
     </div>
   );
+}
+
+const CHAT_DEFAULT = 460;
+const CHAT_KEY = "ecoheart-roi-chat-width";
+
+/** Chat pane width in px: draggable, kept per browser, never more than half the window. */
+function useChatWidth(): [number, (w: number) => void] {
+  const [w, setW] = useState(CHAT_DEFAULT);
+  const clampW = (x: number) => Math.round(Math.max(340, Math.min(x, Math.max(340, window.innerWidth * 0.5), 760)));
+  useEffect(() => {
+    try {
+      const saved = Number(localStorage.getItem(CHAT_KEY));
+      if (saved) setW(clampW(saved));
+    } catch {}
+  }, []);
+  const set = (x: number) => {
+    const v = clampW(x);
+    setW(v);
+    try {
+      localStorage.setItem(CHAT_KEY, String(v));
+    } catch {}
+  };
+  return [w, set];
 }
