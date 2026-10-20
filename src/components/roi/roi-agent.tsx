@@ -1167,7 +1167,7 @@ export function RoiAgent() {
     parameters: [
       { name: "name", type: "string", required: true },
       { name: "state", type: "string", description: "US state name for statewide", required: false },
-      { name: "clients", type: "string[]", description: "Client ids for a hand-picked group", required: false },
+      { name: "clients", type: "string[]", description: "Client ids for a hand-picked group (only when no state is given)", required: false },
       { name: "offer", type: "string", required: true },
       { name: "years", type: "number", required: false },
       { name: "escalatorPct", type: "number", required: false },
@@ -1177,11 +1177,11 @@ export function RoiAgent() {
       const st = useRoiStore.getState();
       const offerId = st.offers.find((o) => o.id === a.offer || key(o.name).includes(key(a.offer)))?.id ?? "supported-pilot";
       const clientIds = strList(a.clients).map((x) => findClient(x)?.id).filter(Boolean) as string[];
-      const b = { id: newId(), name: String(a.name), state: a.state ? String(a.state) : undefined, clientIds, offerId, years: num(a.years) ?? 3, escalatorPct: num(a.escalatorPct) ?? 1.5 };
+      const b = { id: newId(), name: String(a.name), state: a.state ? String(a.state) : undefined, clientIds, offerId, years: num(a.years) ?? 3, escalatorPct: (num(a.years) ?? 3) > 1 ? (num(a.escalatorPct) ?? 1.5) : 0 };
       st.addBundle(b);
       const s = bundleSummary(b, st.clients, st.offers, st.catalog, st.discounts, st.sizeBands);
       goto("/roi/pricing");
-      return JSON.stringify({ bundle: b.name, cities: s.cities, counts: s.counts, yearOne: fmtMoney(s.years[0].total), contractTotal: fmtMoney(s.total), arr: fmtMoney(s.arr), mrr: fmtMoney(s.mrr), quarterlyYearOne: fmtMoney(s.quarterly), note: "A statewide count of every city is a planning ceiling, not a likely deal." });
+      return JSON.stringify({ bundle: b.name, cities: s.cities, counts: s.counts, yearOne: fmtMoney(s.years[0].total), byYear: s.years.map((y) => ({ year: y.year, oneTime: fmtMoney(y.oneTime), yearly: fmtMoney(y.recurring), total: fmtMoney(y.total) })), contractTotal: fmtMoney(s.total), arr: fmtMoney(s.arr), mrr: fmtMoney(s.mrr), quarterlyYearOne: fmtMoney(s.quarterly), leftOut: s.ignored, note: "A statewide count of every city is a planning ceiling, not a likely deal. Quarterly is the billing schedule, not revenue recognition." });
     },
     render: ({ status, result: res }) => {
       if (status !== "complete") return <Working text="Pricing the bundle..." />;

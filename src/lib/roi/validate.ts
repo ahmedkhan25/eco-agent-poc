@@ -6,6 +6,8 @@ import { BLOCK_KEYS, fmtMoney, keysFor, type Basis, type UseCaseModel } from "./
 import { clientNoun, type Client } from "./pricing";
 import { clientDeal, modelsFor, resolveKey, scenarioInputs, scenarioResult, type Scenario, type Workspace } from "./store";
 
+const n0 = (v: number | undefined) => (typeof v === "number" && Number.isFinite(v) ? v : 0);
+
 export type Level = "pass" | "warn" | "fail";
 
 export interface Check {
@@ -169,6 +171,12 @@ export function validateClient(c: Client, st: Workspace, useCaseCount = c.modelI
     if (useCaseCount < a || useCaseCount > b)
       out.push({ id: "use-cases", level: "warn", title: `${useCaseCount} use case${useCaseCount === 1 ? "" : "s"} picked; ${offer.name} covers ${a}${a === b ? "" : `–${b}`}`, detail: "", fix: "Change the use cases or the offer." });
   }
+
+  const discounts = (c.adjustments ?? []).filter((a) => n0(a.value) > 0);
+  if (discounts.length > 1)
+    out.push({ id: "stacked-discounts", level: "warn", title: `${discounts.length} discounts are stacked on this client`, detail: discounts.map((a) => `${a.label} (${a.kind === "pct" ? `${a.value}%` : fmtMoney(a.value)}, ${a.appliesTo === "year1" ? "year one" : "every year"})`).join("; "), fix: "Keep the one discount that applies, unless someone agreed to combine them." });
+  if (offer?.kind === "catalog" && deal.listYearly > 0 && deal.ongoing)
+    out.push({ id: "ongoing-overlap", level: "warn", title: `From year two this client pays for both the ${offer.name}'s yearly items and the ${deal.ongoing.name}`, detail: `Yearly catalog items: ${deal.items.filter((x) => x.item.recurring).map((x) => x.item.name).join(", ")}.`, fix: "Check the ongoing service does not cover the same items, or remove one." });
 
   const floor = st.marginFloorPct ?? 20;
   const pct = deal.total.marginPct * 100;

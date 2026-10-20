@@ -6,7 +6,7 @@
 
 import { BASIS_LABEL } from "./defaults";
 import { BLOCK_LABEL, formulaText, keysFor, lineValue, type Basis } from "./engine";
-import { PAYER_LABEL, type CostLine } from "./pricing";
+import { bundleSummary, itemPrice, offerCostYear1, offersWithItem, offerYears, PAYER_LABEL, SIZES, type CostLine } from "./pricing";
 import { clientDeal, modelsFor, resolveKey, scenarioInputs, scenarioResult, type Workspace, type Scenario } from "./store";
 
 export type Cell = string | number | boolean | null | undefined;
@@ -127,8 +127,8 @@ export function clientWorkbook(clientId: string, st: St): Workbook | null {
     ["", "Internal: contains our costs and margin. Do not send to the client."],
   ];
   const years: Cell[][] = [
-    ["Year", "Price", "Partners and grants", "Client pays ecoheart", "Client's own services", "Our cost", "Margin", "Recurring part"],
-    ...deal.years.map((y) => [y.year, round(y.price), round(y.shares.reduce((s, x) => s + x.amount, 0)), round(y.clientPaysEcoheart), round(y.clientDirect), round(y.ourCost), round(y.margin), round(y.recurring)]),
+    ["Year", "Price", "Partners and grants", "Client pays ecoheart", "Client's own services", "Our cost", "Margin", "One-time part (list)", "Recurring part (list)"],
+    ...deal.years.map((y) => [y.year, round(y.price), round(y.shares.reduce((s, x) => s + x.amount, 0)), round(y.clientPaysEcoheart), round(y.clientDirect), round(y.ourCost), round(y.margin), round(y.oneTime), round(y.recurring)]),
   ];
   const costs: Cell[][] = [
     ["Kind", "Label", "Paid by", "Partner", "Hours yr 1", "Hours / yr after", "Cost $/h", "Bill $/h", "Billed on top", "One-time $", "Monthly $", "Months yr 1", "Keeps running", "Share %", "Share $", "Every year", "Year-one cost", "Note"],
@@ -154,6 +154,62 @@ export function clientWorkbook(clientId: string, st: St): Workbook | null {
       rows: [["Item", "Category", "Billed", "Price at " + deal.size], ...deal.items.map((x) => [x.item.name, x.item.category, x.item.recurring ? "yearly" : "once", round(x.price)])],
     });
   return { title: `ecoheart cost model - ${c.name}`, sheets };
+}
+
+/**
+ * The whole price list, for Finance and auditors: every catalog line at every size, what each offer is made of,
+ * each offer's year-by-year billing, discounts, size bands and bundles. Same calculator as the Pricing tab.
+ */
+export function pricingWorkbook(st: St, escalatorPct = 3, years = 3): Workbook {
+  const catalog: Cell[][] = [
+    ["Item id", "Category", "Item", "Description", "Unit", "Billed", "Where", "Size", "Quantity", "Rate $", "Price $ (quantity x rate)", "In offers"],
+    ...st.catalog.flatMap((it) =>
+      SIZES.map((z) => [it.id, it.category, it.name, it.description, it.unit, it.recurring ? "yearly" : "once", it.region === "all" ? "US and EU" : it.region, z, it.bySize[z].qty, it.bySize[z].rate, round(itemPrice(it, z)), offersWithItem(it.id, st.offers).map((o) => o.name).join(", ")]),
+    ),
+  ];
+  const contents: Cell[][] = [["Offer", "Size", "Item id", "Item", "Billed", "Price $"]];
+  const byYear: Cell[][] = [
+    ["Offer", "Size", "How priced", "One-time $", "Yearly $", ...Array.from({ length: years }, (_, i) => `Year ${i + 1} $`), `${years}-year total $`, `Yearly increase ${escalatorPct}% from year 2 on yearly items`, "Public range $", "Our year-one cost $ (internal)", "Year-one margin % (internal)"],
+  ];
+  for (const o of st.offers)
+    for (const z of SIZES) {
+      const ys = offerYears(o, z, "US", st.catalog, years, escalatorPct);
+      const cost = offerCostYear1(o);
+      const y1 = ys[0].total;
+      byYear.push([o.name, z, o.kind === "catalog" ? "sum of catalog items" : "fixed price", round(ys[0].oneTime), round(ys[0].yearly), ...ys.map((y) => round(y.total)), round(ys.reduce((s, y) => s + y.total, 0)), "", o.range ? `${o.range[0]}-${o.range[1]}` : "", round(cost), y1 > 0 ? round(((y1 - cost) / y1) * 100) : ""]);
+      if (o.kind === "catalog")
+        for (const id of o.itemIds) {
+          const it = st.catalog.find((c) => c.id === id);
+          if (it && it.region !== "EU") contents.push([o.name, z, it.id, it.name, it.recurring ? "yearly" : "once", round(itemPrice(it, z))]);
+        }
+    }
+  const discounts: Cell[][] = [["Places in bundle from", "to", ...SIZES.map((z) => `${z} %`), "Allowed"], ...st.discounts.map((r) => [r.from, r.to, ...SIZES.map((z) => r.pct[z]), r.allowed ? "yes" : "no"])];
+  const bands: Cell[][] = [
+    ["Size", "People served"],
+    ["Small", `below ${st.sizeBands.smallBelow}`],
+    ["Mid-size", `${st.sizeBands.smallBelow} to below ${st.sizeBands.midBelow}`],
+    ["Large", `${st.sizeBands.midBelow} to below ${st.sizeBands.largeBelow}`],
+    ["Major", `${st.sizeBands.largeBelow} and above`],
+    ["Margin floor %", st.marginFloorPct],
+  ];
+  const bundles: Cell[][] = [["Bundle", "State", "Offer", "Places", "Year", "One-time $", "Yearly $", "Total $"]];
+  for (const b of st.bundles) {
+    const s = bundleSummary(b, st.clients, st.offers, st.catalog, st.discounts, st.sizeBands);
+    const offer = st.offers.find((o) => o.id === b.offerId)?.name ?? b.offerId;
+    for (const y of s.years) bundles.push([b.name, b.state ?? "", offer, s.cities, y.year, round(y.oneTime), round(y.recurring), round(y.total)]);
+  }
+  return {
+    title: "ecoheart price list",
+    sheets: [
+      { name: "Catalog", rows: catalog },
+      { name: "Offer contents", rows: contents },
+      { name: "Offers by year", rows: byYear },
+      { name: "Discounts", rows: discounts },
+      { name: "Size bands", rows: bands },
+      { name: "Bundles", rows: bundles },
+      { name: "About", rows: [["Note"], [`Exported ${new Date().toISOString()} from the ROI Advisor Pricing tab (current shared values).`], ["One-time items bill in year one only. Yearly items bill every year; the yearly increase applies to them from year two."], ["Offer contents list US pricing; EU-only items (GDPR, EU AI Act) replace US-only items (HIPAA, CCPA) for EU clients."], ["Internal: contains our costs and margin. Do not send to a client."]] },
+    ],
+  };
 }
 
 /** A scenario: headline, value by line, and every input with where it came from. */

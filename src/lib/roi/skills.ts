@@ -56,7 +56,10 @@ Rules:
 - Catalog items are Sandrine's 22 products, priced by client size, each one-time or yearly. Call listCatalog to see them. One-time work is billed once; the yearly escalator applies to yearly items only.
 - The Early partner project price is below the catalog list price for a Mid-size client; describe it as a founding-partner price, not a discount on a finished product.
 - Price adjustments (addAdjustment): a percentage or fixed amount with a reason, for year one or every year. Examples: founding-partner discount, nonprofit or tribal rate, grandfathered rate.
-- Contracts: years, escalator %, payments (annual, quarterly, monthly). An ongoing offer can follow the main offer from year 2.
+- A client buys one offer, plus optionally the Ongoing service from year 2. Year 1 bills one-time items plus the first year of yearly items; years 2 and 3 bill yearly items only (with the increase). The Pricing tab shows Year 1, 2, 3 and the 3-year total for every offer.
+- Only one discount should apply. validate warns when a client has more than one adjustment stacked, and when catalog yearly items and the Ongoing service both bill from year 2.
+- Contracts: years, escalator %, payments (annual, quarterly, monthly). Payments are the billing schedule, not revenue recognition.
+- The "CitySense published range" is the price band printed in the CitySense pilot brochure.
 - Open question for Ahmed and Marcia: the public CitySense ranges and the catalog prices disagree for some sizes. Report the gap; don't pick a winner.
 - Never present ecoheart as having a finished platform or existing pilots; we offer early partner projects shaped with the client.`,
   },
@@ -84,8 +87,9 @@ Rules:
     id: "state-bundles",
     title: "State and regional bundles",
     when: "pricing a state, county group, tribal consortium or region",
-    body: `- createBundle with a US state (cities are counted by size from the workbook's city list) or a list of client ids, plus an offer.
-- Volume discounts come from the discount table on the Pricing tab (by number of cities; the 751–1,100 band is switched off).
+    body: `- createBundle with a US state (every city in it is counted by size from the workbook's city list) or, with no state, a list of client ids, plus an offer. A statewide bundle ignores hand-picked clients, so no city is counted twice and no city from another state gets in.
+- Volume discounts come from the discount table on the Pricing tab: one row applies, picked by the number of places, and the % depends on each place's size. Rows can be switched off.
+- On a one-year bundle there is no yearly increase.
 - Results: year-one total, contract total, ARR (yearly part), MRR and quarterly payments. A statewide bundle of every city is a planning ceiling, not a likely deal; say so.
 - Open question (ChaiJen): is a state one subscription with many cities, or one per city? The bundle prices one per city.`,
   },

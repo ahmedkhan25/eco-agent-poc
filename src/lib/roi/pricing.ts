@@ -193,6 +193,29 @@ export function offerPrice(o: Offer | undefined, size: Size, region: Region, cat
   };
 }
 
+/** Year by year billing of one offer on its own: one-time items in year one only, yearly items every year with the increase from year two. */
+export function offerYears(o: Offer | undefined, size: Size, region: Region, catalog: CatalogItem[], years = 3, escalatorPct = 0) {
+  const p = offerPrice(o, size, region, catalog);
+  const esc = n(escalatorPct) / 100;
+  return Array.from({ length: Math.max(1, years) }, (_, i) => {
+    const oneTime = i === 0 ? p.oneTime : 0;
+    const yearly = p.yearly * Math.pow(1 + esc, i);
+    return { year: i + 1, oneTime, yearly, total: oneTime + yearly };
+  });
+}
+
+/** What delivering an offer's first year costs us: the ecoheart-paid lines of its cost template (internal). */
+export function offerCostYear1(o: Offer | undefined) {
+  return (o?.costTemplate ?? [])
+    .filter((l) => l.payer === "ecoheart")
+    .reduce((s, l) => s + (l.kind === "people" ? n(l.hours) * n(l.costRate) : l.kind === "service" ? n(l.amount) + n(l.monthly) * n(l.months) : 0), 0);
+}
+
+/** Offers that include a catalog item (catalog-priced offers only). */
+export function offersWithItem(itemId: string, offers: Offer[]) {
+  return offers.filter((o) => o.kind === "catalog" && o.itemIds.includes(itemId));
+}
+
 export interface DealYear {
   year: number;
   price: number; // what ecoheart charges (after adjustments)
@@ -202,6 +225,7 @@ export interface DealYear {
   ourCost: number;
   margin: number;
   recurring: number; // yearly part of the price
+  oneTime: number; // one-time part of the price (year one only)
 }
 
 export interface DealSummary {
@@ -268,7 +292,7 @@ export function dealSummary(c: Client, offers: Offer[], catalog: CatalogItem[], 
     const clientDirect =
       lines.filter((l) => l.kind === "service" && l.payer === "client").reduce((s, l) => s + svc(l), 0) +
       lines.filter((l) => l.kind === "people" && l.payer === "client").reduce((s, l) => s + ppl(l), 0);
-    years.push({ year: y, price, shares, clientPaysEcoheart: price - covered, clientDirect, ourCost, margin: price - ourCost, recurring });
+    years.push({ year: y, price, shares, clientPaysEcoheart: price - covered, clientDirect, ourCost, margin: price - ourCost, recurring, oneTime });
   }
   const sum = (f: (y: DealYear) => number) => years.reduce((s, y) => s + f(y), 0);
   const price = sum((y) => y.price);
@@ -321,8 +345,12 @@ export function bundleDiscount(table: DiscountRow[], cities: number, size: Size)
 export interface BundleSummary {
   counts: Record<Size, number>;
   cities: number;
-  bySize: { size: Size; count: number; each: number; discountPct: number; year1: number }[];
-  years: { year: number; total: number }[];
+  /** Hand-picked clients left out because the bundle already counts every city in its state. */
+  ignored: string[];
+  /** The one discount row used (by number of places), or -1 when none applies. */
+  discountRow: number;
+  bySize: { size: Size; count: number; each: number; oneTimeEach: number; yearlyEach: number; discountPct: number; year1: number }[];
+  years: { year: number; oneTime: number; recurring: number; total: number }[];
   total: number;
   arr: number;
   mrr: number;
@@ -338,10 +366,15 @@ export function bundleSummary(
   bands: SizeBands = DEFAULT_SIZE_BANDS,
 ): BundleSummary {
   const counts: Record<Size, number> = { Small: 0, "Mid-size": 0, Large: 0, Major: 0 };
-  if (b.state && STATE_CITY_COUNTS[b.state]) Object.assign(counts, STATE_CITY_COUNTS[b.state]);
+  const statewide = !!(b.state && STATE_CITY_COUNTS[b.state]);
+  if (statewide) Object.assign(counts, STATE_CITY_COUNTS[b.state!]);
+  const ignored: string[] = [];
   for (const id of b.clientIds ?? []) {
     const c = clients.find((x) => x.id === id);
-    if (c) counts[sizeFor(c, bands)] += 1;
+    if (!c) continue;
+    // A statewide bundle already counts every city in the state; clients elsewhere don't belong in it.
+    if (statewide) ignored.push(c.name);
+    else counts[sizeFor(c, bands)] += 1;
   }
   const cities = SIZES.reduce((s, z) => s + counts[z], 0);
   const offer = offers.find((o) => o.id === b.offerId);
@@ -349,22 +382,25 @@ export function bundleSummary(
   const bySize = SIZES.map((size) => {
     const p = offerPrice(offer, size, "US", catalog);
     const discountPct = bundleDiscount(discounts, cities, size);
-    const each = (p.oneTime + p.yearly) * (1 - discountPct / 100);
-    return { size, count: counts[size], each, discountPct, year1: each * counts[size], yearlyEach: p.yearly * (1 - discountPct / 100) };
+    const keep = 1 - discountPct / 100;
+    const each = (p.oneTime + p.yearly) * keep;
+    return { size, count: counts[size], each, oneTimeEach: p.oneTime * keep, yearlyEach: p.yearly * keep, discountPct, year1: each * counts[size] };
   });
   const yearsN = Math.max(1, Math.round(n(b.years) || 1));
-  const years = Array.from({ length: yearsN }, (_, i) => ({
-    year: i + 1,
-    total:
-      i === 0
-        ? bySize.reduce((s, x) => s + x.year1, 0)
-        : bySize.reduce((s, x) => s + x.yearlyEach * x.count, 0) * Math.pow(1 + esc, i),
-  }));
+  const oneTime1 = bySize.reduce((s, x) => s + x.oneTimeEach * x.count, 0);
   const arr = bySize.reduce((s, x) => s + x.yearlyEach * x.count, 0);
+  const years = Array.from({ length: yearsN }, (_, i) => {
+    const oneTime = i === 0 ? oneTime1 : 0;
+    const recurring = arr * Math.pow(1 + esc, i);
+    return { year: i + 1, oneTime, recurring, total: oneTime + recurring };
+  });
+  const discountRow = discounts.findIndex((r) => cities >= r.from && cities <= r.to && r.allowed);
   return {
     counts,
     cities,
-    bySize: bySize.map(({ size, count, each, discountPct, year1 }) => ({ size, count, each, discountPct, year1 })),
+    ignored,
+    discountRow,
+    bySize,
     years,
     total: years.reduce((s, y) => s + y.total, 0),
     arr,
