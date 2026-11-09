@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ecoheart × City of Logan</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="A walkthrough of one early partner project for the City of Logan: flood and infrastructure planning on public data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* Layout: a click-through stage. Navy header band like ecoheart.ai, slate-50 stage,
+   left column tells the story, right column animates the picture, "Details" drawer drills in. */
+:root{
+  --navy:#0F172A; --navy-2:#1E3A5F; --teal:#0D9488; --teal-h:#0F766E; --teal-l:#2DD4BF; --teal-soft:#F0FDFA;
+  --ink:#0F172A; --body:#475569; --muted:#64748B; --subtle:#94A3B8; --line:#E2E8F0;
+  --bg:#F8FAFC; --card:#FFFFFF; --indigo:#4F46E5; --water:#38BDF8; --water-d:#0369A1; --warn:#B45309;
+  --serif:"Playfair Display", Georgia, "Times New Roman", serif;
+  --sans:"DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--body);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow-x:hidden}
+.topbar{background:var(--navy);color:#CBD5E1;border-top:2px solid var(--indigo);padding:12px max(20px,env(safe-area-inset-right,0px)) 12px max(20px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.lockup{display:inline-flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:600;font-size:19px;letter-spacing:-.01em}
+.lockup svg{width:32px;height:32px}
+.lockup .x{color:var(--teal-l);font-weight:400;margin:0 2px}
+.lockup .city{font-weight:500;color:#E2E8F0}
+.topbar .spacer{flex:1}
+.chapters{display:flex;gap:6px;flex-wrap:wrap}
+.chapters button{all:unset;cursor:pointer;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600;color:#94A3B8;border:1px solid #334155;font-variant-numeric:tabular-nums;transition:.25s}
+.chapters button:hover{border-color:var(--teal-l);color:#fff}
+.chapters button[aria-current="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+.chapters button:focus-visible{outline:2px solid var(--teal-l);outline-offset:2px}
+
+main{flex:1;position:relative;min-height:0}
+.scene{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:48px;align-items:center;padding:32px max(40px,env(safe-area-inset-right,0px)) 32px max(40px,env(safe-area-inset-left,0px));max-width:1400px;margin:0 auto;opacity:0;visibility:hidden;transition:opacity .5s ease, visibility 0s linear .5s;overflow-y:auto}
+.scene.on{opacity:1;visibility:visible;transition:opacity .5s ease}
+.copy{min-width:0;max-width:560px}
+.label{color:var(--teal);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin:0 0 14px}
+h1,h2{font-family:var(--serif);color:var(--ink);font-weight:400;line-height:1.12;margin:0 0 18px;text-wrap:balance}
+h1{font-size:clamp(34px,4.6vw,60px);font-weight:500}
+h2{font-size:clamp(30px,3.6vw,48px)}
+h1 em,h2 em{font-style:italic;color:var(--teal)}
+.lede{font-size:clamp(17px,1.35vw,20px);line-height:1.6;margin:0 0 22px;color:var(--body)}
+.points{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:10px}
+.points li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
+.points li::before{content:"";width:10px;height:10px;border-radius:50%;margin-top:8px;background:var(--teal);box-shadow:0 0 0 4px var(--teal-soft)}
+.points b{color:var(--ink);font-weight:600}
+.btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;padding:10px 18px;border-radius:12px;border:2px solid var(--teal);color:var(--teal);transition:.2s}
+.btn:hover{background:var(--teal-soft)}
+.btn:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+.btn.solid{background:var(--teal);color:#fff}
+.btn.solid:hover{background:var(--teal-h);border-color:var(--teal-h)}
+.note{font-size:13px;color:var(--muted);margin-top:14px}
+.visual{min-width:0;position:relative;display:flex;justify-content:center}
+.visual svg{width:100%;height:auto;max-height:calc(100vh - 170px)}
+
+/* drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--card);box-shadow:-20px 0 60px rgba(15,23,42,.18);transform:translateX(105%);transition:transform .45s cubic-bezier(.2,.8,.2,1);z-index:20;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.drawer header{background:var(--navy);color:#fff;padding:18px 22px;display:flex;align-items:center;gap:12px}
+.drawer header h3{font-family:var(--serif);font-weight:400;font-size:22px;margin:0;flex:1}
+.drawer header button{all:unset;cursor:pointer;color:#CBD5E1;font-size:26px;line-height:1;padding:4px 8px;border-radius:8px}
+.drawer header button:focus-visible{outline:2px solid var(--teal-l)}
+.drawer .body{padding:20px 22px 40px;overflow-y:auto}
+.drawer h4{color:var(--ink);font-size:15px;margin:20px 0 6px}
+.drawer h4:first-child{margin-top:0}
+.drawer p,.drawer li{font-size:15px}
+.drawer ul{padding-left:18px;margin:6px 0}
+.drawer .src{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:22px;padding-top:12px}
+.drawer a{color:var(--teal)}
+.scrim{position:fixed;inset:0;background:rgba(15,23,42,.35);opacity:0;pointer-events:none;transition:.3s;z-index:19}
+.scrim.open{opacity:1;pointer-events:auto}
+
+/* footer nav */
+.nav{display:flex;align-items:center;gap:14px;padding:10px max(20px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);background:var(--card)}
+.nav .bar{flex:1;height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.nav .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-l));width:0;transition:width .5s}
+.nav .count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:52px;text-align:center}
+.nav button{all:unset;cursor:pointer;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line);color:var(--ink);font-size:18px}
+.nav button:hover{border-color:var(--teal);color:var(--teal)}
+.nav button:focus-visible{outline:2px solid var(--teal)}
+.nav .hint{font-size:12px;color:var(--subtle)}
+
+/* svg text + shared visual styles */
+.v-t{font-family:var(--sans);fill:var(--muted);font-size:13px}
+.v-tb{font-family:var(--sans);fill:var(--ink);font-size:14px;font-weight:600}
+.v-serif{font-family:var(--serif);fill:var(--ink)}
+.v-num{font-family:var(--serif);fill:var(--ink);font-variant-numeric:tabular-nums}
+.draw{stroke-dasharray:var(--len,1200);stroke-dashoffset:0}
+.scene.on .draw{animation:draw 2.4s ease forwards}
+@keyframes draw{from{stroke-dashoffset:var(--len,1200)}to{stroke-dashoffset:0}}
+.rise{opacity:1}
+.scene.on .rise{animation:rise .7s ease both;animation-delay:calc(var(--d,0) * 1s)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.pulse{transform-box:fill-box;transform-origin:center}
+.scene.on .pulse{animation:pulse 2.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.5);opacity:.35}}
+.flow{stroke-dasharray:6 10}
+.scene.on .flow{animation:flow 1.6s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-32}}
+
+/* cards used inside some scenes (HTML visuals) */
+.grid{display:grid;gap:14px;width:100%}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;box-shadow:0 4px 14px rgba(15,23,42,.06);min-width:0}
+.card h5{margin:0 0 6px;color:var(--ink);font-size:15.5px;font-weight:600;line-height:1.3}
+.card p{margin:0;font-size:14px;line-height:1.5}
+.card .tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);background:var(--teal-soft);padding:3px 8px;border-radius:999px;margin-bottom:8px}
+button.card{all:unset;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 4px 14px rgba(15,23,42,.06);cursor:pointer;transition:.25s;min-width:0}
+button.card:hover{border-color:var(--teal-l);box-shadow:0 10px 24px rgba(15,23,42,.10);transform:translateY(-2px)}
+button.card:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.col h6{margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+.col .card + .card{margin-top:10px}
+.col.c1 h6{color:var(--teal)} .col.c2 h6{color:var(--navy-2)} .col.c3 h6{color:var(--warn)}
+.col.c1 .card{border-top:3px solid var(--teal)} .col.c2 .card{border-top:3px solid var(--navy-2)} .col.c3 .card{border-top:3px solid #F59E0B}
+
+/* timeline */
+.tl{position:relative;width:100%;display:grid;gap:14px}
+.step{display:grid;grid-template-columns:112px 1fr;gap:44px;align-items:start}
+.step .when{font-family:var(--serif);font-style:italic;color:var(--teal);font-size:20px;text-align:right;padding-top:12px;white-space:nowrap}
+.step .card{position:relative}
+.step .card::before{content:"";position:absolute;left:-28px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 5px var(--teal-soft)}
+.step.gate .card::before{background:#F59E0B;box-shadow:0 0 0 5px #FEF3C7}
+.tl::before{content:"";position:absolute;left:133px;top:20px;bottom:20px;width:2px;background:linear-gradient(var(--teal),var(--line))}
+
+/* hero scene */
+.scene.hero{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.stat{display:flex;gap:28px;flex-wrap:wrap;margin:6px 0 24px}
+.stat div{min-width:0}
+.stat b{display:block;font-family:var(--serif);font-size:clamp(30px,3vw,42px);color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted)}
+
+
+.plate{position:relative;margin:0;width:100%;border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(15,23,42,.18);background:var(--navy)}
+.plate.tall{aspect-ratio:16/11;max-width:100%}
+.plate.short{aspect-ratio:21/8;max-width:100%}
+.plate video,.plate img{display:block;width:100%;height:100%;object-fit:cover}
+.scene.on .plate img{animation:kb 14s ease-out both}
+@keyframes kb{from{transform:scale(1.08)}to{transform:scale(1)}}
+.plate figcaption{position:absolute;left:0;right:0;bottom:0;padding:48px 18px 16px;display:flex;flex-wrap:wrap;gap:8px;background:linear-gradient(to top,rgba(15,23,42,.82),rgba(15,23,42,0))}
+.plate .chip{display:inline-flex;align-items:center;gap:8px;background:rgba(15,23,42,.72);backdrop-filter:blur(6px);color:#fff;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid rgba(45,212,191,.45)}
+.plate .chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.plate .pills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-top:70px}
+.plate .pills .chip{justify-content:center}
+.plate .credit{position:absolute;top:12px;right:12px;font-size:11px;color:#E2E8F0;background:rgba(15,23,42,.55);padding:4px 10px;border-radius:999px}
+.visual.stack{flex-direction:column;gap:14px}
+.visual.stack svg.chart{max-height:calc(100vh - 470px);min-height:200px}
+.dmap{background:var(--bg);border-radius:12px;padding:8px;margin-bottom:12px}
+.dmap svg{width:100%;height:auto}
+@media (max-width: 900px){
+  .scene{grid-template-columns:1fr !important;gap:22px;align-items:start;padding-top:22px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .visual svg{max-height:none}
+  .g3{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
+  .step{grid-template-columns:64px 1fr;gap:36px}
+  .step .when{font-size:15px;white-space:normal}
+  .tl::before{left:81px}
+  .step .card::before{left:-24px}
+  .nav .hint,.chapters{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="lockup" href="https://www.ecoheart.ai" target="_blank" rel="noopener" aria-label="ecoheart">
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 42L6 24C2 20 2 14 6 10C10 6 16 6 20 10L24 14L28 10C32 6 38 6 42 10C46 14 46 20 42 24L24 42Z" fill="url(#hg)" stroke="#14B8A6" stroke-width="1.5"/><circle cx="12" cy="16" r="2" fill="#14B8A6"/><circle cx="24" cy="20" r="2.5" fill="#14B8A6"/><circle cx="36" cy="16" r="2" fill="#14B8A6"/><circle cx="18" cy="26" r="1.5" fill="#14B8A6"/><circle cx="30" cy="26" r="1.5" fill="#14B8A6"/><circle cx="24" cy="32" r="2" fill="#14B8A6"/><path d="M12 16L24 20L36 16M18 26L24 20L30 26M24 20V32M18 26L24 32L30 26" stroke="#14B8A6" stroke-width="1" opacity="0.6"/><defs><linearGradient id="hg" x1="6" y1="10" x2="42" y2="42" gradientUnits="userSpaceOnUse"><stop stop-color="#1E3A5F"/><stop offset="1" stop-color="#0F172A"/></linearGradient></defs></svg>
+    ecoheart <span class="x">×</span> <span class="city">City of Logan</span>
+  </a>
+  <span class="spacer"></span>
+  <nav class="chapters" aria-label="Chapters"></nav>
+</div>
+
+<main id="stage">
+
+<!-- 1 -->
+<section class="scene hero" data-title="Logan at a glance" id="s1">
+  <div class="copy">
+    <p class="label">An early partner project · City of Logan, Queensland</p>
+    <h1>A fast-growing city, <em>shaped by water</em></h1>
+    <p class="lede">Logan sits between Brisbane and the Gold Coast. It is one of Queensland's fastest-growing cities, and two rivers and around 90 creeks run through it. Every growth decision is also a water decision.</p>
+    <div class="stat">
+      <div><b data-count="345098">345,098</b><span>residents, 2021 Census</span></div>
+      <div><b data-count="403515">403,515</b><span>residents, June 2025</span></div>
+      <div><b data-count="500000" data-prefix="~">~500,000</b><span>expected by 2036</span></div>
+    </div>
+    <button class="btn" data-detail="d1">Details ↗</button>
+  </div>
+  <div class="visual">
+    <figure class="plate tall rise" style="--d:.1">
+      <video src="/logan/hero.mp4" poster="/logan/hero.jpg" autoplay muted loop playsinline preload="auto" aria-label="Aerial view of a growing river city in South-East Queensland"></video>
+      <figcaption>
+        <span class="chip"><i style="background:#0369A1"></i>Logan River</span>
+        <span class="chip"><i style="background:#38BDF8"></i>Albert River</span>
+        <span class="chip"><i style="background:#7DD3FC"></i>~90 creeks</span>
+        <span class="chip"><i style="background:#2DD4BF"></i>New estates</span>
+      </figcaption>
+      <span class="credit">Illustrative aerial, not Logan footage</span>
+    </figure>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="scene" data-title="Water history" id="s2">
+  <div class="copy">
+    <p class="label">The context</p>
+    <h2>Floods are part of <em>Logan's story</em></h2>
+    <p class="lede">The Logan and Albert rivers have flooded many times in living memory. Council already runs strong tools for this: a Disaster Dashboard, early warning alerts, and a property-level Flood Portal.</p>
+    <ul class="points">
+      <li><span><b>2022</b> was the most significant Logan River flood since 1974.</span></li>
+      <li><span><b>2025</b> brought moderate to major flooding from ex-Tropical Cyclone Alfred.</span></li>
+      <li><span>Council's mapping uses the <b>1-in-100 year (1% AEP)</b> event. Anything we show follows that framing.</span></li>
+    </ul>
+    <button class="btn" data-detail="d2">Details ↗</button>
+  </div>
+  <div class="visual stack" aria-hidden="true">
+    <figure class="plate short rise" style="--d:0"><img src="/logan/flood.jpg" alt=""><span class="credit">Illustrative image</span></figure>
+    
+    <svg viewBox="0 30 600 390" class="chart">
+      <line x1="40" y1="330" x2="570" y2="330" stroke="#CBD5E1" stroke-width="2"/>
+      <path d="M40 330 C80 322 100 334 140 326 C180 318 200 334 240 326 C280 318 300 334 340 326 C380 318 400 334 440 326 C480 318 500 334 570 326" fill="none" stroke="#38BDF8" stroke-width="2" class="flow"/>
+      <g font-family="DM Sans, sans-serif">
+        <!-- bars: relative significance, illustrative heights -->
+        <g class="rise" style="--d:.1"><rect x="52" y="250" width="30" height="80" rx="6" fill="#BAE6FD"/><text class="v-tb" x="67" y="356" text-anchor="middle">1887</text></g>
+        <g class="rise" style="--d:.25"><rect x="122" y="270" width="30" height="60" rx="6" fill="#BAE6FD"/><text class="v-tb" x="137" y="356" text-anchor="middle">1947</text></g>
+        <g class="rise" style="--d:.4"><rect x="192" y="160" width="30" height="170" rx="6" fill="#38BDF8"/><text class="v-tb" x="207" y="356" text-anchor="middle">1974</text></g>
+        <g class="rise" style="--d:.55"><rect x="262" y="262" width="30" height="68" rx="6" fill="#BAE6FD"/><text class="v-tb" x="277" y="356" text-anchor="middle">2013</text></g>
+        <g class="rise" style="--d:.7"><rect x="332" y="220" width="30" height="110" rx="6" fill="#7DD3FC"/><text class="v-tb" x="347" y="356" text-anchor="middle">2017</text></g>
+        <g class="rise" style="--d:.85"><rect x="402" y="150" width="30" height="180" rx="6" fill="#0369A1"/><text class="v-tb" x="417" y="356" text-anchor="middle">2022</text></g>
+        <g class="rise" style="--d:1"><rect x="472" y="236" width="30" height="94" rx="6" fill="#7DD3FC"/><text class="v-tb" x="487" y="356" text-anchor="middle">2025</text></g>
+      </g>
+      <g class="rise" style="--d:1.3">
+        <path d="M417 140 L417 96" stroke="#0369A1" stroke-dasharray="2 3"/>
+        <rect x="330" y="46" width="230" height="52" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+        <text class="v-tb" x="344" y="68">Feb–Mar 2022</text>
+        <text class="v-t" x="344" y="87">Biggest Logan River flood since 1974</text>
+        <path d="M207 150 L207 120" stroke="#0369A1" stroke-dasharray="2 3"/>
+        <rect x="80" y="76" width="200" height="44" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+        <text class="v-tb" x="94" y="103">1974 · the benchmark flood</text>
+      </g>
+      <text class="v-t" x="40" y="400" font-size="12">Significant floods on the Logan and Albert rivers. Bar heights are illustrative only.</text>
+    </svg>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="scene" data-title="Decisions on the table" id="s3">
+  <div class="copy">
+    <p class="label">The problem we can help with</p>
+    <h2>Big decisions, <em>scattered evidence</em></h2>
+    <p class="lede">Council is planning for about 100,000 more residents. The evidence for each choice lives in different places: flood studies, census data, river gauges, asset plans, and community feedback.</p>
+    <ul class="points">
+      <li><span><b>Community Infrastructure Plan 2024–2041:</b> where do new libraries, centres and pools go?</span></li>
+      <li><span><b>Corporate Plan 2026–2031:</b> drainage, overland flow, asset management, growth.</span></li>
+      <li><span><b>Disaster and climate plans:</b> flood, bushfire, heatwave and storms.</span></li>
+    </ul>
+    <button class="btn" data-detail="d3">Details ↗</button>
+  </div>
+  <div class="visual" aria-hidden="true">
+    <svg viewBox="0 0 580 460">
+      <g class="rise" style="--d:.1">
+        <circle cx="290" cy="230" r="78" fill="#0F172A"/>
+        <text x="290" y="222" text-anchor="middle" class="v-serif" font-size="19" fill="#FFFFFF" style="fill:#fff" font-style="italic">One decision</text>
+        <text x="290" y="248" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="13" fill="#2DD4BF">needs all of these</text>
+      </g>
+      <g font-family="DM Sans, sans-serif">
+        <g class="rise" style="--d:.4"><line x1="290" y1="230" x2="100" y2="80" stroke="#94A3B8" class="flow"/><rect x="20" y="52" width="170" height="52" rx="12" fill="#fff" stroke="#E2E8F0"/><text class="v-tb" x="36" y="75">Flood studies</text><text class="v-t" x="36" y="93">Logan & Albert 2023</text></g>
+        <g class="rise" style="--d:.55"><line x1="290" y1="230" x2="480" y2="80" stroke="#94A3B8" class="flow"/><rect x="392" y="52" width="170" height="52" rx="12" fill="#fff" stroke="#E2E8F0"/><text class="v-tb" x="408" y="75">Census & growth</text><text class="v-t" x="408" y="93">ABS, Queensland forecasts</text></g>
+        <g class="rise" style="--d:.7"><line x1="290" y1="230" x2="96" y2="230" stroke="#94A3B8" class="flow"/><rect x="10" y="204" width="160" height="52" rx="12" fill="#fff" stroke="#E2E8F0"/><text class="v-tb" x="26" y="227">River gauges</text><text class="v-t" x="26" y="245">Bureau of Meteorology</text></g>
+        <g class="rise" style="--d:.85"><line x1="290" y1="230" x2="486" y2="230" stroke="#94A3B8" class="flow"/><rect x="408" y="204" width="160" height="52" rx="12" fill="#fff" stroke="#E2E8F0"/><text class="v-tb" x="424" y="227">Asset plans</text><text class="v-t" x="424" y="245">Drainage, roads, parks</text></g>
+        <g class="rise" style="--d:1"><line x1="290" y1="230" x2="110" y2="384" stroke="#94A3B8" class="flow"/><rect x="20" y="358" width="180" height="52" rx="12" fill="#fff" stroke="#E2E8F0"/><text class="v-tb" x="36" y="381">Community voice</text><text class="v-t" x="36" y="399">4,000+ Logan Plan submissions</text></g>
+        <g class="rise" style="--d:1.15"><line x1="290" y1="230" x2="470" y2="384" stroke="#94A3B8" class="flow"/><rect x="382" y="358" width="180" height="52" rx="12" fill="#fff" stroke="#E2E8F0"/><text class="v-tb" x="398" y="381">Plans & policy</text><text class="v-t" x="398" y="399">Logan Plan, CIP 2024–2041</text></g>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="scene" data-title="How ecoheart fits" id="s4">
+  <div class="copy">
+    <p class="label">Where ecoheart fits</p>
+    <h2>We add to Council's tools. <em>We don't replace them.</em></h2>
+    <p class="lede">ecoheart is a decision layer that sits on top of the mapping and data Council already trusts. It brings the evidence together, answers plain-language questions with sources, and lets staff test "what if" options. People make the decisions.</p>
+    <ul class="points">
+      <li><span><b>Human-first:</b> AI speeds up the analysis; staff stay in charge.</span></li>
+      <li><span><b>Explainable:</b> every answer shows where it came from.</span></li>
+      <li><span><b>Consistent:</b> uses Council's own flood framing and versions.</span></li>
+    </ul>
+    <button class="btn" data-detail="d4">Details ↗</button>
+  </div>
+  <div class="visual" aria-hidden="true">
+    <svg viewBox="0 0 560 470">
+      <g font-family="DM Sans, sans-serif">
+        <g class="rise" style="--d:1.1">
+          <rect x="60" y="20" width="440" height="78" rx="16" fill="#F0FDFA" stroke="#2DD4BF"/>
+          <text class="v-serif" x="84" y="54" font-size="20" font-style="italic">People decide</text>
+          <text class="v-t" x="84" y="78">Planners, disaster management, asset teams, councillors</text>
+        </g>
+        <g class="rise" style="--d:.6">
+          <rect x="40" y="132" width="480" height="150" rx="18" fill="#0F172A"/>
+          <text x="66" y="166" font-size="13" font-weight="700" letter-spacing="1.5" fill="#2DD4BF">ECOHEART DECISION LAYER</text>
+          <g>
+            <rect x="64" y="184" width="104" height="72" rx="12" fill="#1E3A5F"/><text x="116" y="216" text-anchor="middle" font-size="14" font-weight="600" fill="#fff">Combine</text><text x="116" y="236" text-anchor="middle" font-size="12" fill="#CBD5E1">the evidence</text>
+            <rect x="178" y="184" width="104" height="72" rx="12" fill="#1E3A5F"/><text x="230" y="216" text-anchor="middle" font-size="14" font-weight="600" fill="#fff">Ask</text><text x="230" y="236" text-anchor="middle" font-size="12" fill="#CBD5E1">in plain words</text>
+            <rect x="292" y="184" width="104" height="72" rx="12" fill="#1E3A5F"/><text x="344" y="216" text-anchor="middle" font-size="14" font-weight="600" fill="#fff">Test</text><text x="344" y="236" text-anchor="middle" font-size="12" fill="#CBD5E1">what-if options</text>
+            <rect x="406" y="184" width="90" height="72" rx="12" fill="#1E3A5F"/><text x="451" y="216" text-anchor="middle" font-size="14" font-weight="600" fill="#fff">Explain</text><text x="451" y="236" text-anchor="middle" font-size="12" fill="#CBD5E1">with sources</text>
+          </g>
+        </g>
+        <g class="rise" style="--d:.1">
+          <rect x="20" y="318" width="520" height="132" rx="18" fill="#FFFFFF" stroke="#E2E8F0"/>
+          <text x="44" y="348" font-size="13" font-weight="700" letter-spacing="1.5" fill="#64748B">COUNCIL & PUBLIC DATA, UNCHANGED</text>
+          <rect x="44" y="364" width="112" height="64" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/><text x="100" y="392" text-anchor="middle" class="v-tb" font-size="13">Flood Portal</text><text x="100" y="411" text-anchor="middle" class="v-t" font-size="11.5">1% AEP mapping</text>
+            <rect x="166" y="364" width="112" height="64" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/><text x="222" y="392" text-anchor="middle" class="v-tb" font-size="13">Disaster</text><text x="222" y="411" text-anchor="middle" class="v-t" font-size="11.5">Dashboard</text>
+          <rect x="288" y="364" width="112" height="64" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/><text x="344" y="392" text-anchor="middle" class="v-tb" font-size="13">Open Data</text><text x="344" y="411" text-anchor="middle" class="v-t" font-size="11.5">& PD Hub</text>
+          <rect x="410" y="364" width="108" height="64" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/><text x="464" y="392" text-anchor="middle" class="v-tb" font-size="13">BoM, ABS</text><text x="464" y="411" text-anchor="middle" class="v-t" font-size="11.5">& Queensland</text>
+        </g>
+        <path d="M280 316 L280 286" stroke="#0D9488" stroke-width="2" class="flow"/>
+        <path d="M280 130 L280 100" stroke="#0D9488" stroke-width="2" class="flow"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="scene" data-title="One catchment, one question" id="s5">
+  <div class="copy">
+    <p class="label">The first use case</p>
+    <h2>One catchment, <em>one clear question</em></h2>
+    <p class="lede">We'd start small: flood and infrastructure planning in one catchment, such as the lower Logan River around Eagleby and Beenleigh. The goal is to answer one real planning question well.</p>
+    <ul class="points">
+      <li><span><b>Example question:</b> "Which community facilities planned for this area sit inside the 1% AEP flood extent, and how many residents rely on them?"</span></li>
+      <li><span>Answer on a map, with a short summary and every source listed.</span></li>
+      <li><span>Staff review, adjust and decide.</span></li>
+    </ul>
+    <p class="note">Illustrative example. The question would be agreed with Council.</p>
+    <button class="btn" data-detail="d5">Details ↗</button>
+  </div>
+  <div class="visual" aria-hidden="true">
+    <svg viewBox="0 0 580 480">
+      <rect x="10" y="10" width="560" height="460" rx="18" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <rect x="10" y="10" width="560" height="44" rx="18" fill="#0F172A"/><rect x="10" y="36" width="560" height="18" fill="#0F172A"/>
+      <circle cx="34" cy="32" r="5" fill="#334155"/><circle cx="52" cy="32" r="5" fill="#334155"/><circle cx="70" cy="32" r="5" fill="#334155"/>
+      <text x="96" y="37" font-family="DM Sans, sans-serif" font-size="13" fill="#CBD5E1">Lower Logan River · public data · illustrative</text>
+      <!-- map -->
+      <rect x="28" y="70" width="330" height="380" rx="12" fill="#F8FAFC"/>
+      <path class="rise" style="--d:.5" d="M40 300 C90 270 120 300 170 260 C210 228 260 250 300 200 C330 164 350 170 358 150 L358 250 C320 270 300 310 250 320 C200 330 160 360 110 360 C80 362 56 350 40 346Z" fill="#38BDF8" opacity=".28"/>
+      <path class="draw" style="--len:500" d="M40 322 C90 292 120 318 170 284 C210 254 260 272 300 226 C330 192 344 190 358 176" fill="none" stroke="#0369A1" stroke-width="4" stroke-linecap="round"/>
+      <g stroke="#CBD5E1" stroke-width="1"><path d="M60 90 L120 440"/><path d="M190 80 L230 440"/><path d="M40 160 L358 120"/><path d="M40 400 L358 380"/></g>
+      <g class="rise" style="--d:1.1">
+        <rect x="150" y="270" width="16" height="16" rx="3" fill="#F59E0B"/>
+        <rect x="262" y="236" width="16" height="16" rx="3" fill="#F59E0B"/>
+        <rect x="96" y="160" width="16" height="16" rx="3" fill="#0D9488"/>
+        <rect x="236" y="140" width="16" height="16" rx="3" fill="#0D9488"/>
+        <rect x="300" y="350" width="16" height="16" rx="3" fill="#0D9488"/>
+        <circle class="pulse" cx="158" cy="278" r="14" fill="none" stroke="#F59E0B" stroke-width="2"/>
+        <circle class="pulse" cx="270" cy="244" r="14" fill="none" stroke="#F59E0B" stroke-width="2"/>
+      </g>
+      <g font-family="DM Sans, sans-serif" font-size="11.5">
+        <rect x="40" y="410" width="12" height="12" fill="#38BDF8" opacity=".5"/><text x="58" y="420" fill="#64748B">1% AEP extent</text>
+        <rect x="150" y="410" width="12" height="12" rx="2" fill="#F59E0B"/><text x="168" y="420" fill="#64748B">In extent</text>
+        <rect x="236" y="410" width="12" height="12" rx="2" fill="#0D9488"/><text x="254" y="420" fill="#64748B">Clear</text>
+      </g>
+      <!-- chat -->
+      <g font-family="DM Sans, sans-serif">
+        <g class="rise" style="--d:.2"><rect x="372" y="72" width="182" height="96" rx="12" fill="#F0FDFA" stroke="#99F6E4"/>
+          <text x="384" y="94" font-size="11" font-weight="700" fill="#0D9488" letter-spacing="1">PLANNER ASKS</text>
+          <text x="384" y="114" font-size="12.5" fill="#0F172A">Which planned facilities</text><text x="384" y="131" font-size="12.5" fill="#0F172A">sit in the 1% AEP extent,</text><text x="384" y="148" font-size="12.5" fill="#0F172A">and who relies on them?</text></g>
+        <g class="rise" style="--d:1.4"><rect x="372" y="180" width="182" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+          <text x="384" y="202" font-size="11" font-weight="700" fill="#64748B" letter-spacing="1">ECOHEART SUMMARY</text>
+          <text x="384" y="224" font-size="12.5" fill="#0F172A">2 of 5 sites fall inside</text><text x="384" y="241" font-size="12.5" fill="#0F172A">the extent. Nearby areas</text><text x="384" y="258" font-size="12.5" fill="#0F172A">are young and growing.</text>
+          <text x="384" y="284" font-size="11" fill="#64748B">Sources</text>
+          <text x="384" y="301" font-size="11" fill="#0D9488">① Flood Study 2023</text><text x="384" y="317" font-size="11" fill="#0D9488">② ABS Census 2021</text><text x="384" y="333" font-size="11" fill="#0D9488">③ CIP 2024–2041</text></g>
+        <g class="rise" style="--d:1.9"><rect x="372" y="352" width="182" height="90" rx="12" fill="#0F172A"/>
+          <text x="384" y="376" font-size="11" font-weight="700" fill="#2DD4BF" letter-spacing="1">STAFF DECIDE</text>
+          <text x="384" y="398" font-size="12.5" fill="#fff">Review, adjust the</text><text x="384" y="415" font-size="12.5" fill="#fff">options, and record why.</text></g>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="scene" data-title="Public data first" id="s6">
+  <div class="copy">
+    <p class="label">The data</p>
+    <h2>Start with <em>public data</em> only</h2>
+    <p class="lede">The first stage uses only published Australian data. It needs no personal information and no connection to Council systems. Tap a card for what each source gives us.</p>
+    <p class="note">FloodCheck is regional modelled mapping, not live floodwater. Only Council's Flood Portal is property-level.</p>
+  </div>
+  <div class="visual">
+    <div class="grid g2">
+      <button class="card rise" style="--d:.1" data-detail="ds1"><span class="tag">Council</span><h5>Logan Flood Portal & Open Data</h5><p>Flood Study 2023 results, planning maps, development data.</p></button>
+      <button class="card rise" style="--d:.2" data-detail="ds2"><span class="tag">ABS</span><h5>2021 Census, Logan LGA</h5><p>Population, age and households by small area.</p></button>
+      <button class="card rise" style="--d:.3" data-detail="ds3"><span class="tag">Queensland</span><h5>FloodCheck & Queensland Globe</h5><p>Floodplain extents and historic flood lines.</p></button>
+      <button class="card rise" style="--d:.4" data-detail="ds4"><span class="tag">BoM</span><h5>River heights & warnings</h5><p>Logan and Albert gauge history and flood warnings.</p></button>
+      <button class="card rise" style="--d:.5" data-detail="ds5"><span class="tag">Geoscience Australia</span><h5>ELVIS elevation (LiDAR)</h5><p>Ground height for terrain and overland flow views.</p></button>
+      <button class="card rise" style="--d:.6" data-detail="ds6"><span class="tag">Geoscape</span><h5>G-NAF addresses</h5><p>Australia's official address file for place lookups.</p></button>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="scene" data-title="Show, configure, build" id="s7">
+  <div class="copy">
+    <p class="label">Being clear about readiness</p>
+    <h2>What we can show, configure, <em>and build together</em></h2>
+    <p class="lede">Some pieces work today in demos for other regions. Some need setting up for Logan. The rest would be built with Council in a funded phase. We keep these three separate so nobody is surprised.</p>
+    <button class="btn" data-detail="d7">Details ↗</button>
+  </div>
+  <div class="visual">
+    <div class="grid g3">
+      <div class="col c1 rise" style="--d:.1"><h6>Show now</h6>
+        <div class="card"><h5>Document Q&A with sources</h5><p>Plain-language answers over plans and studies.</p></div>
+        <div class="card"><h5>Systems modeler</h5><p>Maps how growth, drainage and flooding affect each other.</p></div>
+        <div class="card"><h5>Map and scenario demos</h5><p>Stormwater, risk report and triage examples from US cities.</p></div>
+      </div>
+      <div class="col c2 rise" style="--d:.35"><h6>Configure for Logan</h6>
+        <div class="card"><h5>Logan map layers</h5><p>Flood extents, census areas, elevation, addresses.</p></div>
+        <div class="card"><h5>Logan document library</h5><p>Flood studies, CIP, Logan Plan, disaster plans.</p></div>
+        <div class="card"><h5>Australian hosting</h5><p>Data held in Australia, local datum and place names.</p></div>
+      </div>
+      <div class="col c3 rise" style="--d:.6"><h6>Build together</h6>
+        <div class="card"><h5>Council data links</h5><p>Only after data agreements and security review.</p></div>
+        <div class="card"><h5>Live gauge feeds</h5><p>Time-series river data for scenario testing.</p></div>
+        <div class="card"><h5>More catchments</h5><p>Logan and Albert first, then 2–3 creek systems.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="scene" data-title="A realistic path" id="s8">
+  <div class="copy">
+    <p class="label">Timeline</p>
+    <h2>A realistic path, <em>with a check at each step</em></h2>
+    <p class="lede">A public-data demo in the first month is realistic. Working with Council-held data takes longer, because of procurement, privacy and security review, and staff time. We plan for one to three months and agree each step in writing.</p>
+    <p class="note">Not in scope for any early stage: live emergency operations or automated alerts.</p>
+    <button class="btn" data-detail="d8">Details ↗</button>
+  </div>
+  <div class="visual">
+    <div class="tl">
+      <div class="step rise" style="--d:.1"><div class="when">Week 1</div><div class="card"><h5>Agree a one-page charter</h5><p>One question, one catchment, data list, a named Council contact, success measures.</p></div></div>
+      <div class="step rise" style="--d:.3"><div class="when">Weeks 2–3</div><div class="card"><h5>Set up the public-data demo</h5><p>Logan layers, document library and one guided question, hosted in Australia.</p></div></div>
+      <div class="step rise" style="--d:.5"><div class="when">Week 4</div><div class="card"><h5>Walk through it with staff</h5><p>IT, Disaster Management and City Planning. Written findings follow.</p></div></div>
+      <div class="step gate rise" style="--d:.7"><div class="when">Dec 15</div><div class="card"><h5>First milestone: decide together</h5><p>Continue, change, or stop. No commitment before this point.</p></div></div>
+      <div class="step rise" style="--d:.9"><div class="when">1–3 mo</div><div class="card"><h5>Early partner project</h5><p>Council data, more catchments, testing with 5–10 staff, a procurement-ready options paper.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="scene" data-title="Trust and next steps" id="s9">
+  <div class="copy">
+    <p class="label">Trust, then partnership</p>
+    <h2>Ethical by design. <em>Let's start with one question.</em></h2>
+    <p class="lede">We'd like to partner with the City of Logan on one early project: co-designed with Council staff, built on public data first, and judged on whether it helps real decisions.</p>
+    <ul class="points">
+      <li><span><b>Next:</b> name a Council contact and agree the first question.</span></li>
+      <li><span><b>Then:</b> confirm the catchment, data list and hosting plan.</span></li>
+      <li><span><b>Led by</b> Marcia Drake, with our team of planning, data, security and government specialists.</span></li>
+    </ul>
+    <button class="btn solid" data-detail="d9">How we protect data ↗</button>
+  </div>
+  <div class="visual">
+    <figure class="plate tall rise" style="--d:.1">
+      <img src="/logan/community.jpg" alt="Illustrative community centre above a riverside park at sunrise">
+      <figcaption class="pills">
+        <span class="chip rise" style="--d:.5">Data stays in Australia</span>
+        <span class="chip rise" style="--d:.65">No personal data</span>
+        <span class="chip rise" style="--d:.8">People decide</span>
+        <span class="chip rise" style="--d:.95">Sources shown</span>
+        <span class="chip rise" style="--d:1.1">Security review first</span>
+        <span class="chip rise" style="--d:1.25">Local support in AEST</span>
+      </figcaption>
+      <span class="credit">Illustrative image</span>
+    </figure>
+  </div>
+</section>
+
+</main>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous">←</button>
+  <span class="count" id="count">1 / 9</span>
+  <button id="next" aria-label="Next">→</button>
+  <div class="bar"><i id="bar"></i></div>
+  <span class="hint">Use ← → keys · D for details</span>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-labelledby="dtitle">
+  <header><h3 id="dtitle">Details</h3><button id="dclose" aria-label="Close details">×</button></header>
+  <div class="body" id="dbody"></div>
+</aside>
+
+<template id="d1"><div class="dmap"><svg viewBox="0 0 560 520">
+      <defs>
+        <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#2DD4BF" stop-opacity=".22"/><stop offset="1" stop-color="#2DD4BF" stop-opacity="0"/></radialGradient>
+        <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#CBD5E1"/></pattern>
+      </defs>
+      <rect x="0" y="0" width="560" height="520" rx="18" fill="url(#dots)" opacity=".6"/>
+      <!-- coast -->
+      <path d="M470 20 C455 110 488 170 462 250 C440 320 470 380 452 500" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="3 5"/>
+      <text class="v-t" x="478" y="140" font-style="italic">Coral Sea</text>
+      <!-- Logan boundary (schematic) -->
+      <path class="" style="--d:.1" d="M140 120 C190 92 300 96 360 120 C420 146 430 210 412 262 C396 312 360 352 300 372 C236 394 160 380 124 330 C92 282 96 168 140 120Z" fill="#FFFFFF" stroke="#0D9488" stroke-width="2"/>
+      <circle cx="270" cy="245" r="190" fill="url(#glow)"/>
+      <!-- rivers -->
+      <path class="" style="--len:620" d="M110 360 C170 340 200 300 238 284 C282 266 300 230 336 214 C372 198 400 200 440 176 C455 168 462 160 468 150" fill="none" stroke="#0369A1" stroke-width="4" stroke-linecap="round"/>
+      <path class="" style="--len:360" d="M250 470 C262 430 286 400 306 370 C322 340 330 300 338 262 C342 240 338 226 336 214" fill="none" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+      <!-- creeks -->
+      <g stroke="#7DD3FC" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".9">
+        <path class="" style="--len:120" d="M180 300 C190 270 176 240 190 210"/>
+        <path class="" style="--len:120" d="M220 288 C232 260 226 220 244 190"/>
+        <path class="" style="--len:120" d="M290 250 C300 220 296 180 312 150"/>
+        <path class="" style="--len:120" d="M362 205 C370 180 378 160 372 132"/>
+        <path class="" style="--len:120" d="M200 300 C214 320 210 350 226 372"/>
+        <path class="" style="--len:120" d="M372 200 C392 220 398 250 392 280"/>
+      </g>
+      <!-- places -->
+      <g class="" style="--d:.9">
+        <circle cx="250" cy="40" r="6" fill="#0F172A"/><text class="v-tb" x="262" y="45">Brisbane</text>
+        <path d="M250 50 L252 112" stroke="#CBD5E1" stroke-dasharray="2 4"/>
+        <circle cx="440" cy="470" r="6" fill="#0F172A"/><text class="v-tb" x="350" y="500">Gold Coast</text>
+      </g>
+      <g class="" style="--d:1.3">
+        <circle cx="236" cy="200" r="5" fill="#0D9488"/><text class="v-t" x="164" y="196">Logan Central</text>
+        <circle cx="388" cy="196" r="5" fill="#0D9488"/><text class="v-t" x="396" y="222">Beenleigh</text>
+        <circle cx="420" cy="166" r="5" fill="#0D9488"/><text class="v-t" x="400" y="150">Eagleby</text>
+        <circle cx="200" cy="340" r="5" fill="#0D9488"/><text class="v-t" x="150" y="330">Jimboomba</text>
+        <circle cx="300" cy="140" r="5" fill="#0D9488"/><text class="v-t" x="306" y="134">Springwood</text>
+      </g>
+      <g class="" style="--d:1.7">
+        <circle class="" cx="270" cy="330" r="9" fill="#2DD4BF" opacity=".8"/><text class="v-t" x="284" y="334">Growth fronts</text>
+        <circle class="" cx="160" cy="250" r="9" fill="#2DD4BF" opacity=".8"/>
+      </g>
+      <text class="v-t" x="214" y="440" font-style="italic" fill="#0369A1">Albert River</text>
+      <text class="v-t" x="96" y="384" font-style="italic" fill="#0369A1">Logan River</text>
+      <text class="v-t" x="18" y="508" font-size="11">Schematic, not to scale</text>
+    </svg></div><h4>The City of Logan</h4><ul><li>About 958 km², 70 suburbs and 12 divisions.</li><li>Residents: 345,098 at the 2021 Census and 403,515 at 30 June 2025, up 3.1% in one year. It is the second-fastest-growing council area in Queensland.</li><li>About half of residents are 34 or younger.</li><li>Council expects about 500,000 residents by 2036. The Queensland Government's medium series projects 585,060 by 2046.</li></ul><h4>Growth fronts</h4><p>Park Ridge, Logan Reserve and Greenbank, plus Yarrabilba and Greater Flagstone. The last two are Priority Development Areas run by Economic Development Queensland, so an early Council project would focus on Council-planned areas.</p><p class="src">Sources: Logan City Council, ABS, Queensland Government Statistician's Office. Map is schematic.</p></template>
+<template id="d2"><h4>Rivers and creeks</h4><p>The Logan and Albert rivers and about 90 creeks. Significant floods: 1887, 1947, 1974, 2013, 2017, 2022 and March 2025 (ex-Tropical Cyclone Alfred, with 289 mm of rain in 24 hours at Wolffdene).</p><h4>2022</h4><p>The most significant Logan River flood since 1974. Council reported more than 280 homes inundated. The Bureau of Meteorology counted 197 properties damaged. The two figures measure different things.</p><h4>Council's tools today</h4><ul><li><b>Logan Disaster Dashboard:</b> warnings, road hazards, outages, river heights and flood cameras.</li><li><b>Logan Early Warning:</b> SMS and email alerts.</li><li><b>Logan Flood Portal:</b> property flood reports from the Logan and Albert Rivers Flood Study 2023.</li></ul><h4>How we would show flood extents</h4><p>We would use Council's current 1% AEP framing and state which flood study version every map uses.</p><p class="src">Sources: Logan City Council, Bureau of Meteorology.</p></template>
+<template id="d3"><h4>Plans this would support</h4><ul><li>Community Infrastructure Plan 2024–2041 and Parks Infrastructure Plan 2024–2041</li><li>Logan Plan, the new planning scheme</li><li>Corporate Plan 2026–2031: drainage and overland flow, asset management, growth planning</li><li>Climate Change Resilience Strategy 2021–2031</li><li>Local Disaster Management Plan and Recovery Plan</li></ul><h4>Why it is hard today</h4><p>The evidence sits in separate systems and documents, often as PDFs. Pulling it together for one decision takes staff days. ecoheart aims to bring that down to a guided conversation with sources, so staff can spend their time on judgement.</p></template>
+<template id="d4"><h4>What ecoheart does</h4><ul><li><b>Combine:</b> brings flood, census, terrain, asset and plan data into one view.</li><li><b>Ask:</b> staff ask questions in plain English and get answers with citations.</li><li><b>Test:</b> compare options, for example two sites for a new community centre.</li><li><b>Explain:</b> every result shows its data sources and assumptions.</li></ul><h4>What it does not do</h4><ul><li>It does not produce a competing flood map or change Council's flood data.</li><li>It does not replace the Disaster Dashboard, alerts or Flood Portal.</li><li>It does not make decisions. Staff do.</li></ul></template>
+<template id="d5"><h4>Why one catchment</h4><p>Picking one area keeps the first stage small, testable and quick. The lower Logan River around Eagleby and Beenleigh has a recent flood history, growth pressure and good public data. Council might pick a different area, and that is fine.</p><h4>What a good result looks like</h4><ul><li>Staff can answer the agreed question in minutes, with sources.</li><li>The answer matches what Council's own experts would expect.</li><li>Staff say they would use it again.</li></ul><p class="src">The map and numbers on this slide are illustrative. They are not real results.</p></template>
+<template id="ds1"><h4>Logan Flood Portal, PD Hub & Open Data</h4><p>Property flood reports (depth, velocity, level, hazard) from the Logan and Albert Rivers Flood Study 2023. The Open Data portal offers planning-scheme maps and development applications under a CC BY licence. PD Hub documents are print or PDF only, so raw data comes from Open Data.</p><p class="src">logan.qld.gov.au · flood.logan.qld.gov.au</p></template>
+<template id="ds2"><h4>ABS 2021 Census</h4><p>QuickStats for the Logan local government area, plus small-area boundaries (SA1 and SA2) for population, age and household profiles. 2021 is the latest Census.</p><p class="src">abs.gov.au</p></template>
+<template id="ds3"><h4>FloodCheck Queensland & Queensland Globe</h4><p>Floodplain extents, historic flood lines and the Queensland Floodplain Assessment Overlay. This is regional modelled mapping, not live floodwater. The Queensland Open Data Portal also holds the 2022 damage assessment dataset.</p><p class="src">qld.gov.au · data.qld.gov.au</p></template>
+<template id="ds4"><h4>Bureau of Meteorology</h4><p>Logan and Albert river flood information, Queensland warnings, and river height and rainfall history. We would use BoM's official data feeds and their terms.</p><p class="src">bom.gov.au</p></template>
+<template id="ds5"><h4>Geoscience Australia ELVIS</h4><p>LiDAR-based digital elevation models. Useful for terrain shading and showing where overland water collects.</p><p class="src">elevation.fsdf.org.au</p></template>
+<template id="ds6"><h4>G-NAF</h4><p>The Geocoded National Address File from Geoscape, published on data.gov.au. It is Australia's official address source. It uses the GDA2020 datum, which differs from the global WGS84 datum by about 1.8 m, so we configure for it.</p><p class="src">data.gov.au</p></template>
+<template id="d7"><h4>Show now</h4><p>Working demos built for other regions, including Olympia, Washington, and Florida examples. They show the approach. They are not Logan results.</p><h4>Configure for Logan</h4><p>Setting up existing building blocks with Australian data, Logan documents, local place names and an Australian hosting region. This is setup work, not new development.</p><h4>Build together</h4><p>Anything that touches Council-held data or systems, live feeds, or wider coverage. This needs agreements, security review and funding, and we would scope it with Council.</p></template>
+<template id="d8"><h4>Month one keeps it simple</h4><ul><li>Public data only, no personal information</li><li>No connection to Council systems</li><li>No live operational or emergency use</li><li>Written scope and success measures before work starts</li></ul><h4>One to three months adds</h4><ul><li>A walkthrough of Council data and a data-quality and licence review</li><li>Australian hosting set up and a security review</li><li>Logan and Albert rivers plus 2–3 creek systems</li><li>River gauge history for scenario testing</li><li>Prioritising community facilities from the CIP 2024–2041</li><li>User testing with 5–10 Council staff</li><li>A procurement-ready options paper</li></ul></template>
+<template id="d9"><h4>Where data lives</h4><p>Logan data would be hosted in an Australian cloud region. We would state clearly where any AI processing happens and who can access data.</p><h4>Privacy</h4><p>The early stages need no personal information. Before any Council data is used, we would agree how we meet Queensland's Information Privacy Act 2009, including its rules on data leaving Australia and on contracted service providers, and the data breach notification scheme that applies to councils from 1 July 2026.</p><h4>Security</h4><p>We would provide a security pack for Council IT, covering access controls and MFA, encryption, logging, incident response, Essential Eight alignment, and deleting data when the project ends.</p><h4>Local support</h4><p>An Australian partner would provide on-the-ground and network support during AEST hours.</p></template>
+
+<script>
+(function(){
+  const scenes=[...document.querySelectorAll('.scene')];
+  const chapters=document.querySelector('.chapters');
+  const count=document.getElementById('count'), bar=document.getElementById('bar');
+  const drawer=document.getElementById('drawer'), scrim=document.getElementById('scrim');
+  const dbody=document.getElementById('dbody'), dtitle=document.getElementById('dtitle');
+  let i=0;
+  scenes.forEach((s,k)=>{const b=document.createElement('button');b.textContent=k+1;b.title=s.dataset.title;b.addEventListener('click',()=>go(k));chapters.appendChild(b);});
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function countUp(s){
+    s.querySelectorAll('[data-count]').forEach(el=>{
+      const end=+el.dataset.count, pre=el.dataset.prefix||'';
+      if(reduce){el.textContent=pre+end.toLocaleString('en-AU');return;}
+      const t0=performance.now(), dur=1400;
+      (function f(t){const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3);el.textContent=pre+Math.round(end*(.82+.18*e)).toLocaleString('en-AU');if(p<1)requestAnimationFrame(f);})(t0);
+    });
+  }
+  function go(k){
+    i=Math.max(0,Math.min(scenes.length-1,k));
+    scenes.forEach((s,n)=>{s.classList.toggle('on',n===i);s.setAttribute('aria-hidden',n!==i);});
+    [...chapters.children].forEach((b,n)=>b.setAttribute('aria-current',n===i));
+    count.textContent=(i+1)+' / '+scenes.length;
+    bar.style.width=((i+1)/scenes.length*100)+'%';
+    countUp(scenes[i]);
+    if(location.hash!=='#'+scenes[i].id) history.replaceState(null,'','#'+scenes[i].id);
+    closeD();
+  }
+  function openD(id){const t=document.getElementById(id);if(!t)return;dbody.innerHTML='';dbody.appendChild(t.content.cloneNode(true));const h=dbody.querySelector('h4');dtitle.textContent=scenes[i].dataset.title;drawer.classList.add('open');scrim.classList.add('open');drawer.setAttribute('aria-hidden','false');document.getElementById('dclose').focus();}
+  function closeD(){drawer.classList.remove('open');scrim.classList.remove('open');drawer.setAttribute('aria-hidden','true');}
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-detail]');if(b)openD(b.dataset.detail);});
+  document.getElementById('dclose').onclick=closeD; scrim.onclick=closeD;
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape')return closeD();
+    if(drawer.classList.contains('open'))return;
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(i+1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    else if(e.key==='d'||e.key==='D'){const b=scenes[i].querySelector('[data-detail]');if(b)openD(b.dataset.detail);}
+  });
+  let sx=null;document.getElementById('stage').addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+  document.getElementById('stage').addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>60)go(i+(dx<0?1:-1));sx=null;});
+  addEventListener('hashchange',()=>{const k=scenes.findIndex(s=>'#'+s.id===location.hash);if(k>=0&&k!==i)go(k);});
+  const start=scenes.findIndex(s=>'#'+s.id===location.hash);
+  go(start>=0?start:0);
+})();
+</script>
+</body>
+</html>

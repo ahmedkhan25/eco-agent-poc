@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // Static explainer pages in public/ are served at their folder path.
+  async rewrites() {
+    return [{ source: '/logan', destination: '/logan/index.html' }];
+  },
   // Lint is run as its own step (`npm run lint`); don't let style-only ESLint
   // errors (e.g. react/no-unescaped-entities) fail the production build/deploy.
   eslint: {
