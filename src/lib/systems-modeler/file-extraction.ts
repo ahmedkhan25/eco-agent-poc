@@ -3,17 +3,33 @@
  * for injection into the systems modeler generation pipeline.
  */
 
-import * as pdfjsLib from "pdfjs-dist";
+// pdf.js is large (about 400 KB), so load it only when someone uploads a PDF.
+// Importing it at the top put it on the Systems Modeler's critical path: if
+// that one chunk failed to download, the whole page crashed.
+type PdfJs = typeof import("pdfjs-dist");
+let pdfjsPromise: Promise<PdfJs> | null = null;
 
-// Use CDN worker to avoid Next.js bundling issues
-if (typeof window !== "undefined") {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+function loadPdfJs(): Promise<PdfJs> {
+  if (!pdfjsPromise) {
+    pdfjsPromise = import("pdfjs-dist")
+      .then((pdfjsLib) => {
+        // Use CDN worker to avoid Next.js bundling issues
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+        return pdfjsLib;
+      })
+      .catch((err) => {
+        pdfjsPromise = null; // allow a retry on the next upload
+        throw err;
+      });
+  }
+  return pdfjsPromise;
 }
 
 /**
  * Extract all text content from a PDF file.
  */
 export async function extractTextFromPDF(file: File): Promise<string> {
+  const pdfjsLib = await loadPdfJs();
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const pages: string[] = [];
